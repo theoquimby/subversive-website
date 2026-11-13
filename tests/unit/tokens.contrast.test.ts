@@ -76,11 +76,35 @@ pairs.push(
   { name: "sticker: paper on spruce", skin: "paper", fg: r("paper"), bg: r("spruce"), role: "label" },
   { name: "ledger: paper on spruce", skin: "paper", fg: r("paper"), bg: r("spruce"), role: "body" },
   { name: "date block Music: ink on pils", skin: "overtime", fg: r("ink"), bg: r("pils"), role: "label" },
-  { name: "date block Trivia: ink on sky (numerals)", skin: "overtime", fg: r("ink"), bg: r("sky"), role: "display" },
-  { name: "date block Festival: bone on currant", skin: "overtime", fg: r("bone"), bg: r("currant"), role: "label" },
+  {
+    name: "date block Trivia: ink on sky (numerals)",
+    skin: "overtime",
+    fg: r("ink"),
+    bg: r("sky"),
+    role: "display",
+  },
+  {
+    name: "date block Festival: bone on currant",
+    skin: "overtime",
+    fg: r("bone"),
+    bg: r("currant"),
+    role: "label",
+  },
   { name: "date block Game: bone on court", skin: "overtime", fg: r("bone"), bg: r("court"), role: "label" },
-  { name: "date block Ember: card on ember (numerals)", skin: "overtime", fg: r("card"), bg: r("ember"), role: "display" },
-  { name: "Overtime glow on night (display)", skin: "overtime", fg: r("emberGlow"), bg: r("night"), role: "display" },
+  {
+    name: "date block Ember: card on ember (numerals)",
+    skin: "overtime",
+    fg: r("card"),
+    bg: r("ember"),
+    role: "display",
+  },
+  {
+    name: "Overtime glow on night (display)",
+    skin: "overtime",
+    fg: r("emberGlow"),
+    bg: r("night"),
+    role: "display",
+  },
 );
 
 describe("token contrast, measured as rendered", () => {

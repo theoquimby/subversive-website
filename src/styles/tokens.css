@@ -6,23 +6,23 @@
 
 :root {
   /* Raw palette (spec §2.1; adjusted values listed in tokens.ts → adjustments) */
-  --paper: #F5ECDC;
-  --paper-deep: #EBDFC8;
-  --card: #FFFDF8;
+  --paper: #f5ecdc;
+  --paper-deep: #ebdfc8;
+  --card: #fffdf8;
   --ink: #151412;
-  --pils: #FFCE3A;
-  --ember: #E3600C;
-  --ember-deep: #AE4004;
-  --ember-glow: #FF996A;
-  --sky: #2F9BE0;
-  --sky-deep: #17639B;
-  --spruce: #1E3A2F;
-  --currant: #6B2D5C;
-  --night: #0F0E0C;
+  --pils: #ffce3a;
+  --ember: #e3600c;
+  --ember-deep: #ae4004;
+  --ember-glow: #ff996a;
+  --sky: #2f9be0;
+  --sky-deep: #17639b;
+  --spruce: #1e3a2f;
+  --currant: #6b2d5c;
+  --night: #0f0e0c;
   --night-raised: #191712;
-  --bone: #EFE7D8;
-  --court: #2361D6;
-  --go: #2DB55D;
+  --bone: #efe7d8;
+  --court: #2361d6;
+  --go: #2db55d;
 
   /* Type scale (spec §2.3): fluid from 320 px to 1280 px, sizes in rem so text zoom scales */
   --t-mega: clamp(4rem, 1.8333rem + 10.8333vw, 10.5rem);

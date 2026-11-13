@@ -51,6 +51,7 @@ function apcaY(hex: string): number {
   const { r, g, b } = parseHex(hex);
   const ch = (v: number) => (v / 255) ** 2.4;
   const y = 0.2126729 * ch(r) + 0.7151522 * ch(g) + 0.072175 * ch(b);
+  // biome-ignore lint/suspicious/noApproximativeNumericConstant: 1.414 is APCA's published blkClmp exponent, not √2.
   return y < 0.022 ? y + (0.022 - y) ** 1.414 : y;
 }
 

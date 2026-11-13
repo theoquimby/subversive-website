@@ -22,7 +22,8 @@ function block(selectorPattern: RegExp): string {
 
 function declarations(body: string): Map<string, string> {
   const out = new Map<string, string>();
-  for (const m of body.matchAll(/(--[\w-]+)\s*:\s*([^;]+);/g)) out.set(m[1] as string, (m[2] as string).trim());
+  for (const m of body.matchAll(/(--[\w-]+)\s*:\s*([^;]+);/g))
+    out.set(m[1] as string, (m[2] as string).trim());
   return out;
 }
 
@@ -38,7 +39,7 @@ const overtimeDecls = declarations(block(/^\[data-skin="overtime"\]\s*\{/m));
 describe("tokens.css matches tokens.ts", () => {
   it("has every raw colour with the same hex", () => {
     for (const [key, hex] of Object.entries(raw)) {
-      expect(rootDecls.get(cssVar(key)), cssVar(key)).toBe(hex);
+      expect(rootDecls.get(cssVar(key))?.toUpperCase(), cssVar(key)).toBe(hex);
     }
   });
 
