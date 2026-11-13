@@ -101,10 +101,8 @@ export function KitPrimitives() {
         </ul>
         <div className="kit-glass-hero">
           <GlassGlyph color={beers[0]?.color ?? ""} size="hero" rise />
-          <GlassGlyph color={beers.find((b) => b.hazy)?.color ?? ""} hazy size="hero" fill={0.62} />
           <p className="kit-note">
-            Hero size with the barley on the bowl; the second is half drunk and hazy. The first pours in on
-            load.
+            Hero size: their stemmed glass with the barley printed on the bowl. It pours in on load.
           </p>
         </div>
       </KitSection>
@@ -113,13 +111,13 @@ export function KitPrimitives() {
         <div className="kit-stickers">
           {wings ? (
             <Sticker shape="burst" color="pils" rotate="a" label={`${wings.name}, ${wings.price} dollars`}>
-              ${wings.price}
+              {`$${wings.price}`}
             </Sticker>
           ) : null}
           <Sticker shape="round" color="sky" rotate="b" label="Dogs welcome">
             Dogs
           </Sticker>
-          <Sticker shape="slash" color="ember" rotate="c" label="Tonight">
+          <Sticker shape="slash" color="ember" rotate="a" label="Tonight">
             Tonight
           </Sticker>
         </div>
@@ -154,7 +152,6 @@ export function KitPrimitives() {
           <Seal spin className="kit-seal__mark" />
           <div className="kit-seal__bands">
             <Chevrons />
-            <Chevrons tone="accent" />
           </div>
         </div>
       </KitSection>
@@ -185,8 +182,8 @@ export function KitPrimitives() {
 
       <KitSection id="kit-photos" title="Photos">
         <div className="kit-photos">
-          <PhotoFrame id="burger-and-beer" ratio="4/3" sizes="(min-width: 64rem) 40vw, 90vw" />
-          <PhotoFrame id="firepit-beers" ratio="1/1" sizes="(min-width: 64rem) 25vw, 45vw" />
+          <PhotoFrame id="burger-and-beer" ratio="3/2" sizes="(min-width: 64rem) 40vw, 90vw" />
+          <PhotoFrame id="firepit-beers" ratio="4/5" sizes="(min-width: 64rem) 25vw, 45vw" />
           <PhotoFrame id="exterior-dusk" ratio="4/5" sizes="(min-width: 64rem) 25vw, 45vw" />
         </div>
       </KitSection>

@@ -46,7 +46,9 @@ export function MotionSheet({ spec }: { spec: SheetSpec }) {
           {spec.job} · {spec.durationMs} ms · {spec.easing.token}
         </span>
       </figcaption>
-      <ol className="motion-sheet__strip">
+      {/* scrolls sideways on phones, so it takes keyboard focus (axe: scrollable-region-focusable) */}
+      {/* biome-ignore lint/a11y/noNoninteractiveTabindex: a scrollable region must be reachable by keyboard */}
+      <ol className="motion-sheet__strip" tabIndex={0} aria-label={`${spec.name}, seven frames`}>
         {frames.map((f, i) => {
           const next = frames[i + 1];
           return (

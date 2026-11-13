@@ -294,11 +294,13 @@
   font-size: max(1.5rem, var(--sticker-size, 1.5rem));
 }
 .sticker__ink,
-.sticker__ghost {
+.sticker__text::before {
   grid-area: 1 / 1;
 }
-/* Misregistration: the same words, 1 px down-right, ink at 18% (behind the ink layer) */
-.sticker__ghost {
+/* Misregistration: the same words, 1 px down-right, ink at 18% (behind the ink layer).
+   Drawn from data-text so the words appear once in the document. */
+.sticker__text::before {
+  content: attr(data-text);
   z-index: -1;
   translate: 1px 1px;
   color: color-mix(in srgb, var(--ink) 18%, transparent);
@@ -325,7 +327,7 @@
   filter: url(#sv-print);
 }
 .sticker[data-shape="tag"] {
-  padding: 0.35em 0.7em 0.45em;
+  padding: 0.45em 0.8em 0.55em;
 }
 .sticker__shape--tag {
   border: var(--stroke) solid var(--ink);
@@ -471,8 +473,8 @@
   --stub-ink: var(--bone);
 }
 .ticket[data-kind="game"] {
-  --stub-fill: var(--court);
-  --stub-ink: var(--bone);
+  --stub-fill: var(--ember);
+  --stub-ink: var(--card);
 }
 
 .ticket__stub,
@@ -509,38 +511,25 @@
   background: var(--surface);
 }
 
-/* Notches: a page-coloured circle with the ink ring, centred on the seam; each piece shows
-   its own quarter, so together they read as one half-circle cut. */
-.ticket__stub::before,
-.ticket__stub::after,
-.ticket__body::before,
-.ticket__body::after {
-  content: "";
-  position: absolute;
-  width: calc(var(--notch) * 2);
-  height: calc(var(--notch) * 2);
-  border: var(--edge);
-  border-radius: 50%;
-  background: var(--bg);
+/* Notches are punched holes: each piece is masked at its two seam corners, so the page shows
+   through and the cut reads as paper, not a rivet (M1 review). A stub that tilts or tears
+   carries its half of each hole with it. */
+.ticket__stub {
+  mask:
+    radial-gradient(circle var(--notch) at 100% 0, transparent calc(100% - 0.5px), black 100%),
+    radial-gradient(circle var(--notch) at 100% 100%, transparent calc(100% - 0.5px), black 100%);
+  mask-composite: intersect;
 }
-.ticket__stub::before {
-  top: calc(var(--notch) * -1 - var(--stroke));
-  right: calc(var(--notch) * -1 - var(--stroke));
+.ticket__body {
+  mask:
+    radial-gradient(circle var(--notch) at 0 0, transparent calc(100% - 0.5px), black 100%),
+    radial-gradient(circle var(--notch) at 0 100%, transparent calc(100% - 0.5px), black 100%);
+  mask-composite: intersect;
 }
-.ticket__stub::after {
-  bottom: calc(var(--notch) * -1 - var(--stroke));
-  right: calc(var(--notch) * -1 - var(--stroke));
-}
-.ticket__body::before {
-  top: calc(var(--notch) * -1 - var(--stroke));
-  left: calc(var(--notch) * -1);
-}
-.ticket__body::after {
-  bottom: calc(var(--notch) * -1 - var(--stroke));
-  left: calc(var(--notch) * -1);
-}
-.ticket__notch {
-  display: none;
+/* On night the 14% edge left tickets as generic dark cards; tickets keep a visible outline */
+[data-skin="overtime"] .ticket__stub,
+[data-skin="overtime"] .ticket__body {
+  border-color: color-mix(in srgb, var(--bone) 40%, transparent);
 }
 
 /* Starting to tear: hover (pointer) or press (touch) */
@@ -873,4 +862,8 @@ body::after {
   height: 0.9em;
   margin-left: 0.2em;
   vertical-align: -0.05em;
+}
+/* icons inside buttons keep a true 2 px stroke at 18 px (2 × 24 / 18) */
+.btn__icon {
+  stroke-width: 2.67;
 }

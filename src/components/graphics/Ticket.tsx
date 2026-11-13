@@ -35,8 +35,6 @@ export function Ticket({
     >
       <span className="ticket__stub">{stub}</span>
       <span className="ticket__body">{children}</span>
-      <span className="ticket__notch ticket__notch--top" aria-hidden="true" />
-      <span className="ticket__notch ticket__notch--bottom" aria-hidden="true" />
     </Tag>
   );
 }

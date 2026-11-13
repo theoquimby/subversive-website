@@ -53,7 +53,7 @@ function HeritageWordmark({ className, name }: { className?: string; name: strin
       <path d="M38 14C34 7 28 4 21 4 12 4 6 9 6 17c0 18 33 10 33 29 0 9-7 14-17 14-8 0-14-4-18-11" />
       <path d="M72 4v36c0 12 7 20 18 20s18-8 18-20V4" />
       <path d="M142 4v56h20c10 0 17-6 17-15s-7-14-17-14h-20m0-27h18c9 0 15 5 15 13.5S169 31 160 31" />
-      <path d="M238 4 212 60 200 33" stroke="var(--accent)" strokeLinejoin="miter" />
+      <path d="M238 4 212 60 200 33" strokeLinejoin="miter" />
       <path d="M302 4h-34v56h34M268 31h28" />
       <path d="M336 60V4h20c10 0 17 6 17 15s-7 15-17 15h-20m20 0 18 26" />
       <path d="M442 14c-4-7-10-10-17-10-9 0-15 5-15 13 0 18 33 10 33 29 0 9-7 14-17 14-8 0-14-4-18-11" />

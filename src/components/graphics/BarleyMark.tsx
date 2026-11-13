@@ -37,7 +37,7 @@ export function BarleyMark({ variant = "stroke", draw = false, title, className 
       viewBox={BARLEY_VIEWBOX}
       className={["barley", draw ? "barley--draw" : "", className ?? ""].filter(Boolean).join(" ")}
       fill={solid ? "currentColor" : "none"}
-      stroke={solid ? "none" : "currentColor"}
+      stroke="currentColor" // the solid variant keeps the stroke so both share one bounding box
       strokeWidth={3}
       strokeLinejoin="miter"
       shapeRendering="geometricPrecision"

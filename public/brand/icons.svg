@@ -4,15 +4,15 @@
   <symbol id="icon-calendar-plus" viewBox="0 0 24 24"><path d="M4 5h16v15H4zm0 4h16M8 3v4m8-4v4m-4 5v6m-3-3h6"/></symbol>
   <symbol id="icon-clock" viewBox="0 0 24 24"><path d="M12 3a9 9 0 1 1 0 18 9 9 0 0 1 0-18"/><path d="M12 7v5l3 3"/></symbol>
   <symbol id="icon-close" viewBox="0 0 24 24"><path d="m5 5 14 14m0-14L5 19"/></symbol>
-  <symbol id="icon-dog" viewBox="0 0 24 24"><path d="M6 10 5 3l5 4h4l5-4-1 7v5l-4 5h-4l-4-5zm4.5 6h3m-4-5v1m5-1v1"/></symbol>
+  <symbol id="icon-dog" viewBox="0 0 24 24"><path d="M7 5h10v9l-3 5h-4l-3-5zm0 1L4 9v6l3-2m10-7 3 3v6l-3-2m-7-3v1m4-1v1m-3 4h2"/></symbol>
   <symbol id="icon-external" viewBox="0 0 24 24"><path d="M9 5h10v10m0-10L5 19"/></symbol>
   <symbol id="icon-fork" viewBox="0 0 24 24"><path d="M8 3v6m4-6v6m4-6v6M8 9a4 4 0 0 0 8 0m-4 4v8"/></symbol>
-  <symbol id="icon-glass" viewBox="0 0 24 24"><path d="M6 3h12l-2 18H8zm.5 4h11"/></symbol>
-  <symbol id="icon-parking" viewBox="0 0 24 24"><path d="M4 3h16v18H4z"/><path d="M9 17V7h4a3 3 0 0 1 0 6H9"/></symbol>
-  <symbol id="icon-phone" viewBox="0 0 24 24"><path d="M5 3h4l2 5-3 2c1.2 2.6 3.4 4.8 6 6l2-3 5 2v4c0 1-1 2-2 2-8.5 0-16-7.5-16-16 0-1 1-2 2-2"/></symbol>
+  <symbol id="icon-glass" viewBox="0 0 24 24"><path d="M7 3h10l-1 11c0 2-2 3-4 3s-4-1-4-3zm5 14v3m-4 1h8M7.5 7h9"/></symbol>
+  <symbol id="icon-parking" viewBox="0 0 24 24"><path d="M4 4h16v16H4z"/><path d="M9 16V8h3.5a2.5 2.5 0 0 1 0 5H9"/></symbol>
+  <symbol id="icon-phone" viewBox="0 0 24 24"><path d="M6 4h3l2 4.5-2.5 2a10 10 0 0 0 5 5l2-2.5 4.5 2v3c0 1-1 2-2 2-7.5 0-14-6.5-14-14 0-1 1-2 2-2"/></symbol>
   <symbol id="icon-pin" viewBox="0 0 24 24"><path d="m12 21-5.6-7.6a7 7 0 1 1 11.2 0z"/><path d="M12 7.5a2.5 2.5 0 1 1 0 5 2.5 2.5 0 0 1 0-5"/></symbol>
   <symbol id="icon-speaker-off" viewBox="0 0 24 24"><path d="M3 9h4l5-4v14l-5-4H3zm12 0 6 6m0-6-6 6"/></symbol>
   <symbol id="icon-speaker-on" viewBox="0 0 24 24"><path d="M3 9h4l5-4v14l-5-4H3zm12 .5a3.5 3.5 0 0 1 0 5M17.5 7a7 7 0 0 1 0 10"/></symbol>
-  <symbol id="icon-stein" viewBox="0 0 24 24"><path d="M5 4h10v17H5zm10 4h4v9h-4M8 8v9m4-9v9"/></symbol>
-  <symbol id="icon-tent" viewBox="0 0 24 24"><path d="M3 20h18M12 4 4 20m8-16 8 16m-8-8-3 8m3-8 3 8"/></symbol>
+  <symbol id="icon-stein" viewBox="0 0 24 24"><path d="M5 4h10v16H5zm10 4h4v8h-4M5 8h10"/></symbol>
+  <symbol id="icon-tent" viewBox="0 0 24 24"><path d="M3 20h18M12 4 4 20m8-16 8 16m-8-7v7"/></symbol>
 </svg>

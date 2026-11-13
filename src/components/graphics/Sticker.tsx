@@ -1,7 +1,6 @@
 // Stickers (spec §3.5): the menu's starburst and round stamp, as die-cut stickers that
 // carry the things that change. Server-rendered; pop-in and peel are CSS, dragging is the
 // DraggableSticker wrapper. Never more than three in one viewport.
-import type { ReactNode } from "react";
 import { PRINT_FILTER_ID } from "./PrintFilter";
 import { BURST_POINTS } from "./sticker-geometry";
 
@@ -16,7 +15,8 @@ export interface StickerProps {
   rotate?: StickerAngle;
   /** Text equivalent for the sticker's fact; the visual text is hidden from AT. */
   label: string;
-  children: ReactNode;
+  /** The printed words (a string, so the misregistration layer can repeat them in CSS). */
+  children: string;
   /** Pop in when first seen (spec §3.5). Off for stickers that must be still. */
   pop?: boolean;
   className?: string;
@@ -69,10 +69,10 @@ export function Sticker({
     >
       <span className="sticker__body">
         <Shape shape={shape} />
-        <span className="sticker__text" aria-hidden="true">
+        {/* misregistration: the same words offset 1 px in ink at 18%, drawn by CSS from
+            data-text so the words exist once in the document */}
+        <span className="sticker__text" aria-hidden="true" data-text={children}>
           <span className="sticker__ink">{children}</span>
-          {/* misregistration: the same words offset 1 px in ink at 18% */}
-          <span className="sticker__ghost">{children}</span>
         </span>
       </span>
       <span className="sticker__flap" aria-hidden="true" />

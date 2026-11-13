@@ -808,3 +808,38 @@
     grid-column: auto;
   }
 }
+
+/* ---- M1 review fixes ---- */
+.kit-icons .kit-label {
+  white-space: nowrap;
+}
+.kit-photos {
+  align-items: start;
+}
+@media (min-width: 64rem) {
+  .kit-photos {
+    grid-template-columns: 1.875fr 1fr 1fr; /* 3:2 and two 4:5 frames share one height */
+  }
+}
+.motion-sheet {
+  grid-template-columns: minmax(0, 1fr);
+}
+@media (min-width: 64rem) {
+  .motion-sheet {
+    grid-template-columns: minmax(0, 1fr) 13rem;
+    column-gap: var(--s-7);
+    align-items: start;
+  }
+  .motion-sheet__head {
+    grid-column: 1 / -1;
+  }
+}
+.motion-sheet .kit-curve {
+  max-width: 13rem;
+}
+.motion-sheet__stage {
+  height: 7.5rem;
+}
+.kit-marks {
+  align-items: start;
+}

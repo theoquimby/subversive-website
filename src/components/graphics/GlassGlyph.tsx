@@ -8,7 +8,8 @@ import { BARLEY_VIEWBOX, KERNELS } from "./BarleyMark";
 // On a 24 × 38 grid: a tall bowl (rim 6–18 at y 2) narrowing to a rounded base at y 29.5,
 // a short stem and a flat foot. The spec says "pint"; the photographs show this stemmed
 // glass with the barley on the bowl, so the glyph draws what they actually pour into.
-const OUTLINE = "M6 2l1.6 23.4Q8 29.5 12 29.5t4.4-4.1L18 2M12 29.5V36M7 36h10";
+// The stem carries a small knop (as on their glassware) and the foot is drawn twice for weight.
+const OUTLINE = "M6 2l1.6 23.4Q8 29.5 12 29.5t4.4-4.1L18 2M12 29.5V36M10.7 32.6h2.6M7 36h10M8 37h8";
 const INSIDE = "M7.1 2.5 8.6 25.3Q9 28.4 12 28.4t3.4-3.1L16.9 2.5z";
 const BOTTOM = 28.5;
 const TOP = 6; // a full pour's liquid line; the head sits above it
@@ -63,7 +64,8 @@ export function GlassGlyph({
         </g>
       </g>
       {size === "hero" ? (
-        <svg x="9.9" y="10.5" width="4.2" height="11.9" viewBox={BARLEY_VIEWBOX} className="glass__mark">
+        // the print spans about 60% of the bowl, as on the real glass (M1 review)
+        <svg x="9.15" y="7.5" width="5.7" height="16.2" viewBox={BARLEY_VIEWBOX} className="glass__mark">
           {KERNELS.map((d) => (
             <path key={d} d={d} />
           ))}
