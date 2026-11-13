@@ -94,3 +94,27 @@ export const eventLabels = {
   calendar: { apple: "Apple Calendar", outlook: "Outlook", google: "Google Calendar" },
   ticker: "Coming up",
 } as const;
+
+// Home (spec §6.1). Every line is the spec's own.
+export const homeLabels = {
+  headline: ["Beer.", "Burgers.", "Catskill."] as const,
+  subline: (street: string) => `Farmhouse brewery, taproom & kitchen at ${street}.`,
+  onTap: "On tap",
+  fullMenu: "Full drink & food menu",
+  kitchen: "From the kitchen",
+  seeFood: "See the food menu",
+  comingUp: "Coming up",
+  whereFrom: "Where it comes from",
+  ourBeer: "Our beer",
+  visit: "Visit",
+  facts: [
+    "First come, first served",
+    "Heated tent",
+    "8 spots + street parking",
+    "Leashed dogs outside and in the tent",
+  ],
+  weekdayTag: { wed: "Wing Wednesday", thu: "Rodeo Thursdays", other: "Dogs welcome in the tent" },
+  mapTitle:
+    "Where our ingredients come from: Catskill, with Hudson Falls, Cairo, Altamont and Hammondsport, and Livingston, where it began in 2018",
+  since: "2018",
+} as const;

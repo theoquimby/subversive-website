@@ -3,10 +3,12 @@
 // M1: icon sprite, grain tile. M6 adds the NY map, M7 the gate bootstrap.
 import { buildGrain } from "./build-grain.ts";
 import { buildIcons } from "./build-icons.ts";
+import { buildNyMap } from "./build-ny-map.ts";
 
 const generators: { name: string; run: () => Promise<void> }[] = [
   { name: "icons", run: buildIcons },
   { name: "grain", run: buildGrain },
+  { name: "ny-map", run: buildNyMap },
 ];
 
 for (const g of generators) {

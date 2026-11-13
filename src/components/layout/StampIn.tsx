@@ -7,6 +7,7 @@ import { useEffect } from "react";
 //                load is left alone (the words never wait, spec §3A).
 //   [data-pop]   stickers — pop in when first visible, including at load (they are
 //                objects, not words; spec §3.5). CSS adds the 250 ms delay.
+//   [data-draw]  the Home map: its lines draw toward Catskill when first visible
 //   [data-pour]  menu rows — the glass fills when the row is first visible, at load too
 //                (spec §4.4). Rows in the hidden list wait until they are shown.
 // Reduced motion: everything is marked shown at once and nothing moves.
@@ -16,6 +17,7 @@ export function StampIn() {
     if (reduced) {
       for (const el of document.querySelectorAll<HTMLElement>("[data-pop]")) el.dataset.pop = "in";
       for (const el of document.querySelectorAll<HTMLElement>("[data-pour]")) el.dataset.pour = "in";
+      for (const el of document.querySelectorAll<Element>("[data-draw]")) el.setAttribute("data-draw", "in");
       return;
     }
     const firstPass = new Set<Element>();
@@ -30,6 +32,8 @@ export function StampIn() {
             el.dataset.pop = "in";
           } else if (el.hasAttribute("data-pour")) {
             el.dataset.pour = "in";
+          } else if (el.hasAttribute("data-draw")) {
+            el.setAttribute("data-draw", "in");
           } else if (!isFirst) {
             el.dataset.stamp = "in";
           }
@@ -39,7 +43,8 @@ export function StampIn() {
       },
       { rootMargin: "0px 0px -12% 0px" },
     );
-    for (const el of document.querySelectorAll("[data-stamp], [data-pop], [data-pour]")) io.observe(el);
+    for (const el of document.querySelectorAll("[data-stamp], [data-pop], [data-pour], [data-draw]"))
+      io.observe(el);
     return () => io.disconnect();
   }, []);
   return null;

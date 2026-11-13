@@ -1,0 +1,447 @@
+/* Home (spec §6.1, §5.3, §5.6). */
+
+/* ---------- Hero ---------- */
+.hero {
+  /* the stickers hang off the photo's corners; they never make the page scroll sideways */
+  overflow-x: clip;
+  background: var(--bg);
+  color: var(--fg);
+  transition:
+    background-color 600ms var(--ease-in-out),
+    color 600ms var(--ease-in-out);
+}
+.hero__inner {
+  display: grid;
+  gap: var(--s-8);
+  max-width: var(--content-max);
+  margin-inline: auto;
+  padding: var(--s-7) var(--gutter) var(--s-9);
+}
+@media (min-width: 64rem) {
+  .hero__inner {
+    grid-template-columns: minmax(0, 7fr) minmax(0, 5fr);
+    align-items: end;
+    column-gap: var(--s-10);
+    padding-top: var(--s-9);
+  }
+}
+.hero__text {
+  container-type: inline-size;
+  display: grid;
+  justify-items: start;
+  gap: var(--s-5);
+}
+.hero__title {
+  margin: 0 0 0 var(--optical-left);
+  font-family: var(--ff-display);
+  /* --t-mega, but "Burgers." always fits its column (it is ~4.7 em wide) */
+  font-size: min(var(--t-mega), 20.5cqi);
+  font-weight: 400;
+  line-height: var(--lh-mega);
+  letter-spacing: var(--track-mega);
+}
+.hero__title span {
+  display: block;
+}
+.hero__accent {
+  color: var(--accent);
+}
+.hero__sub {
+  max-width: var(--measure-subline);
+  margin: 0;
+  font-size: var(--t-subline);
+  line-height: var(--lh-body);
+  text-wrap: pretty;
+}
+.hero__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--s-3);
+}
+
+.hero__art {
+  position: relative;
+}
+.hero__frame {
+  position: relative;
+  max-width: 30rem;
+  margin-inline: auto;
+}
+@media (min-width: 64rem) {
+  .hero__frame {
+    max-width: none;
+  }
+}
+.hero__frame--night,
+.hero[data-overtime] .hero__frame--day {
+  display: none;
+}
+.hero[data-overtime] .hero__frame--night {
+  display: block;
+}
+.hero__game {
+  position: absolute;
+  inset: auto var(--s-4) var(--s-4);
+  display: grid;
+  gap: var(--s-2);
+}
+
+/* The pour (spec §5.3): once per session the photo fills like a glass, bottom to top, with
+   a band of foam riding the edge; then the foam settles into the frame's top edge. */
+.hero__foam {
+  position: absolute;
+  inset: 0;
+  border-radius: var(--r-box);
+  pointer-events: none;
+  opacity: 0;
+}
+@media (prefers-reduced-motion: no-preference) {
+  html:not([data-poured]) .hero__frame--day .photo img {
+    animation: pour 1000ms var(--ease-out) both;
+  }
+  html:not([data-poured]) .hero__foam {
+    background: linear-gradient(to bottom, var(--card) 0 12px, transparent 12px);
+    clip-path: inset(0 round var(--r-box));
+    animation: foam 1000ms var(--ease-out) both;
+  }
+}
+/* reduced data opts out too (a query Chromium does not know yet would otherwise sink the
+   whole rule above, so it stands alone) */
+@media (prefers-reduced-data: reduce) {
+  html:not([data-poured]) .hero__frame--day .photo img,
+  html:not([data-poured]) .hero__foam {
+    animation: none;
+  }
+}
+@keyframes pour {
+  from {
+    clip-path: inset(100% 0 0 0);
+  }
+  to {
+    clip-path: inset(0 0 0 0);
+  }
+}
+@keyframes foam {
+  0% {
+    opacity: 1;
+    translate: 0 100%;
+  }
+  80% {
+    opacity: 1;
+    translate: 0 0;
+  }
+  100% {
+    opacity: 0;
+    translate: 0 0;
+  }
+}
+
+/* stickers: at most two, on the photo's corners */
+.hero-stickers {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+.hero-stickers > * {
+  pointer-events: auto;
+}
+.hero-stickers__event {
+  position: absolute;
+  top: -1.25rem;
+  right: -0.75rem;
+  width: 6.5rem;
+}
+.hero-stickers__tag {
+  position: absolute;
+  left: -0.75rem;
+  bottom: var(--s-6);
+  /* wide enough that the longest tag ("Dogs welcome in the tent") sets in two lines */
+  width: min(15rem, 70%);
+}
+
+/* ---------- Sections ---------- */
+.home {
+  padding-top: 0;
+  padding-bottom: 0;
+}
+.home-section {
+  display: grid;
+  justify-items: start;
+  gap: var(--s-6);
+  margin-top: var(--section);
+}
+.home-section > .pill {
+  padding: 6px 18px 8px;
+  font-size: clamp(1.375rem, 1.2083rem + 0.8333vw, 1.875rem);
+}
+.home-section > :not(.pill, a, .btn) {
+  justify-self: stretch;
+}
+.home-tap {
+  display: grid;
+  gap: 0 var(--s-9);
+}
+.home-tap .mgroup:first-child {
+  margin-top: 0;
+}
+@media (min-width: 64rem) {
+  .home-tap {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    align-items: start;
+  }
+}
+
+/* kitchen: a snapping strip on a phone (the next photo peeks), three across on desktop */
+.kitchen-strip {
+  display: grid;
+  grid-auto-flow: column;
+  grid-auto-columns: 78%;
+  gap: var(--s-4);
+  margin: 0 calc(-1 * var(--gutter));
+  padding: 0 var(--gutter);
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+  scroll-padding-inline: var(--gutter);
+  scrollbar-width: none;
+  list-style: none;
+}
+.kitchen-strip::-webkit-scrollbar {
+  display: none;
+}
+.kitchen-strip > li {
+  scroll-snap-align: start;
+}
+@media (min-width: 64rem) {
+  .kitchen-strip {
+    grid-auto-flow: row;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    margin: 0;
+    padding: 0;
+    overflow: visible;
+  }
+}
+.kitchen-strip__caption {
+  display: flex;
+  justify-content: space-between;
+  margin: var(--s-3) 0 0;
+  font-family: var(--ff-display);
+  font-size: var(--t-h3);
+}
+.home .intro-box {
+  margin-top: 0;
+}
+.home-coming {
+  justify-self: stretch;
+}
+
+/* ---------- Where it comes from (spruce, the label's register) ---------- */
+.where-from {
+  --bg: var(--spruce);
+  --surface: var(--spruce);
+  --rule: color-mix(in srgb, var(--bone) 24%, transparent);
+  margin-top: var(--section);
+  background: var(--spruce);
+  color: var(--bone);
+}
+.where-from__band {
+  display: block;
+}
+.where-from__inner {
+  display: grid;
+  gap: var(--s-9);
+  padding-top: var(--s-10);
+  padding-bottom: var(--section);
+}
+@media (min-width: 64rem) {
+  .where-from__inner {
+    grid-template-columns: minmax(0, 5fr) minmax(0, 7fr);
+    align-items: center;
+    column-gap: var(--s-10);
+  }
+}
+.where-from__text {
+  display: grid;
+  justify-items: start;
+  gap: var(--s-6);
+}
+.where-from__text > .pill {
+  padding: 6px 18px 8px;
+  font-size: clamp(1.375rem, 1.2083rem + 0.8333vw, 1.875rem);
+}
+.where-from__line {
+  max-width: var(--measure-subline);
+  margin: 0;
+  font-size: var(--t-subline);
+  text-wrap: pretty;
+}
+.where-from .text-link {
+  color: var(--bone);
+}
+
+.sourcing {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  width: 100%;
+  margin: 0;
+  border: var(--stroke) solid color-mix(in srgb, var(--bone) 60%, transparent);
+}
+.sourcing__cell {
+  padding: var(--s-4);
+  border-right: var(--stroke-dash) solid var(--rule);
+  border-bottom: var(--stroke-dash) solid var(--rule);
+}
+.sourcing__cell:nth-child(2n) {
+  border-right: 0;
+}
+.sourcing__cell:nth-last-child(-n + 2) {
+  border-bottom: 0;
+}
+.sourcing__what {
+  font-family: var(--ff-utility);
+  font-weight: 700;
+  font-size: var(--t-label);
+  letter-spacing: var(--track-label);
+  text-transform: uppercase;
+  color: var(--pils);
+}
+.sourcing__who {
+  margin: var(--s-2) 0 0;
+  font-weight: 600;
+}
+.sourcing__where {
+  margin: 0;
+  color: var(--fg-muted);
+  font-size: var(--t-small);
+}
+
+/* the map: one monoline in the label's gold */
+.ny-map {
+  display: block;
+  width: 100%;
+  height: auto;
+  overflow: visible;
+}
+.ny-map__state {
+  fill: none;
+  stroke: var(--pils);
+  stroke-width: 2;
+  stroke-linejoin: round;
+  vector-effect: non-scaling-stroke;
+}
+.ny-map__line {
+  fill: none;
+  stroke: var(--pils);
+  stroke-width: 1.5;
+  stroke-dasharray: 1;
+  vector-effect: non-scaling-stroke;
+  opacity: 0.7;
+}
+@media (scripting: enabled) and (prefers-reduced-motion: no-preference) {
+  .ny-map:not([data-draw="in"]) .ny-map__line {
+    stroke-dashoffset: 1;
+  }
+  .ny-map[data-draw="in"] .ny-map__line {
+    animation: map-draw 900ms var(--ease-in-out) both;
+    animation-delay: calc(200ms + var(--i, 0) * 120ms);
+  }
+}
+@keyframes map-draw {
+  from {
+    stroke-dashoffset: 1;
+  }
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+.ny-map__dot {
+  fill: var(--spruce);
+  stroke: var(--pils);
+  stroke-width: 3;
+}
+.ny-map__place[data-kind="origin"] .ny-map__dot {
+  stroke-dasharray: 4 3;
+}
+.ny-map__mark path {
+  fill: var(--pils);
+  stroke: var(--pils);
+  stroke-width: 3;
+}
+.ny-map__label {
+  fill: var(--bone);
+  font-family: var(--ff-utility);
+  font-weight: 700;
+  font-size: 24px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+.ny-map__place[data-kind="taproom"] .ny-map__label {
+  fill: var(--pils);
+  font-size: 30px;
+}
+.ny-map__year {
+  fill: var(--fg-muted);
+}
+
+/* ---------- Visit band, gift cards ---------- */
+.home-visit__grid {
+  display: grid;
+  gap: var(--s-9);
+}
+@media (min-width: 64rem) {
+  .home-visit__grid {
+    grid-template-columns: minmax(0, 7fr) minmax(0, 5fr);
+    column-gap: var(--s-10);
+  }
+}
+.home-visit .hours {
+  margin-top: 0;
+}
+.fact-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--s-2);
+  margin: var(--s-7) 0 0;
+  padding: 0;
+  list-style: none;
+}
+.fact-chips li {
+  padding: 6px 12px 5px;
+  border-radius: var(--r-pill);
+  background: var(--paper-deep);
+  font-family: var(--ff-utility);
+  font-weight: 700;
+  font-size: var(--t-label);
+  letter-spacing: var(--track-label);
+  text-transform: uppercase;
+}
+.home-visit > .photo {
+  justify-self: stretch;
+}
+.gift-band {
+  margin-bottom: var(--section);
+  padding-top: var(--s-7);
+  border-top: var(--stroke) solid var(--rule-strong);
+}
+.gift-band__title {
+  margin: 0;
+  font-family: var(--ff-display);
+  font-size: var(--t-h3);
+  font-weight: 400;
+}
+.gift-band p {
+  max-width: var(--measure-prose);
+  margin: 0;
+}
+/* on a phone the map is ~350 px wide: its labels (in map units) step up to stay legible */
+@media (max-width: 47.99rem) {
+  .ny-map__label {
+    font-size: 40px;
+    letter-spacing: 0.06em;
+  }
+  .ny-map__place[data-kind="taproom"] .ny-map__label {
+    font-size: 46px;
+  }
+  .ny-map__place:not([data-kind="taproom"]):not([data-kind="origin"]) .ny-map__label {
+    display: none;
+  }
+}

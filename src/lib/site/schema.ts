@@ -52,6 +52,7 @@ export const siteSchema = z.object({
     dogs: z.string(),
     giftCards: z.string(),
   }),
+  sourcingLine: z.string(),
   sourcing: z.array(z.object({ what: z.string(), who: z.string(), where: z.string() })),
   about: z.object({ founders: z.array(z.string()), paragraphs: z.array(z.string()) }),
   brewery: z.object({ paragraphs: z.array(z.string()) }),
