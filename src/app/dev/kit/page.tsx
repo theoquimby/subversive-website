@@ -1,8 +1,13 @@
 import menu from "@content/menu.json";
 import { CurvePlot } from "@/components/dev/CurvePlot";
 import { SkinSwitch } from "@/components/dev/SkinSwitch";
+import { BARLEY_VIEWBOX, BarleyMark, KERNELS } from "@/components/graphics/BarleyMark";
 import { Checker } from "@/components/graphics/Checker";
+import { Wordmark } from "@/components/graphics/Wordmark";
+import { Pill } from "@/components/layout/Pill";
+import { StampIn } from "@/components/layout/StampIn";
 import { adjustments, cssVar, raw, semanticNames } from "@/styles/tokens";
+import legacyBarley from "../../../../docs/source/legacy/barley-mark-legacy.webp";
 
 // /dev/kit: every token, in either skin, set with real menu content (plan M0 item 14).
 // M1 adds the graphic primitives; each later milestone adds its components and motion sheets.
@@ -79,9 +84,7 @@ const DURATIONS = [
 function Section({ id, title, children }: { id: string; title: string; children: React.ReactNode }) {
   return (
     <section className="kit-section" aria-labelledby={id}>
-      <h2 id={id} className="kit-pill">
-        {title}
-      </h2>
+      <Pill id={id}>{title}</Pill>
       {children}
     </section>
   );
@@ -93,8 +96,48 @@ export default function KitPage() {
       <Checker />
       <main id="main" className="kit-main">
         <header className="kit-head">
-          <h1 className="kit-label">Dev kit · M0 foundation · Tokens</h1>
+          <h1 className="kit-label">Dev kit · M1 graphic kit</h1>
         </header>
+
+        <Section id="kit-marks" title="Marks">
+          <div className="kit-marks">
+            <div className="kit-marks__loud">
+              <Wordmark className="kit-marks__wordmark" />
+              <p className="kit-note">Loud wordmark · Caprasimo with the accent slash at 61°</p>
+            </div>
+            <figure className="kit-marks__barley">
+              <div className="kit-marks__pair">
+                <BarleyMark className="kit-marks__mark" title="Barley mark" />
+                <BarleyMark className="kit-marks__mark" variant="solid" />
+              </div>
+              <figcaption className="kit-label">Barley mark · stroke, solid</figcaption>
+            </figure>
+            <figure className="kit-marks__overlay">
+              {/* Legacy raster placed under the redraw: its mark spans x 15.6–39.4, y 7.25–97.5 px
+                  of a 55 × 105 file; scaled 1.853 units/px so its width equals the kernels' 8–52. */}
+              <svg viewBox={BARLEY_VIEWBOX} className="barley kit-marks__mark" aria-hidden="true">
+                <image
+                  href={legacyBarley.src}
+                  x={-20.95}
+                  y={-11.43}
+                  width={101.9}
+                  height={194.5}
+                  opacity={0.5}
+                />
+                <g fill="none" stroke="var(--accent)" strokeWidth={1.5}>
+                  {KERNELS.map((d) => (
+                    <path key={d} d={d} />
+                  ))}
+                </g>
+              </svg>
+              <figcaption className="kit-label">Overlay on the legacy mark</figcaption>
+            </figure>
+            <figure className="kit-marks__heritage">
+              <Wordmark variant="heritage" className="kit-marks__heritage-mark" />
+              <figcaption className="kit-label">Heritage wordmark · small use only</figcaption>
+            </figure>
+          </div>
+        </Section>
 
         <Section id="kit-colour" title="Colour">
           <ul className="kit-swatches">
@@ -210,6 +253,7 @@ export default function KitPage() {
         </Section>
       </main>
       <Checker />
+      <StampIn />
     </SkinSwitch>
   );
 }

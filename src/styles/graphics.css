@@ -46,3 +46,106 @@
     background-image: conic-gradient(Canvas 25%, CanvasText 0 50%, Canvas 0 75%, CanvasText 0);
   }
 }
+
+/* ---------- Barley mark (spec §3.1) ---------- */
+.barley {
+  display: block;
+  height: 1em;
+  width: auto;
+  aspect-ratio: 60 / 170;
+  overflow: visible;
+}
+/* Draw-in: kernels trace bottom to top, 60 ms apart; 300 ms each, 600 ms in all */
+@media (prefers-reduced-motion: no-preference) {
+  .barley--draw path {
+    stroke-dasharray: 1;
+    stroke-dashoffset: 1;
+    animation: barley-draw 300ms var(--ease-out) forwards;
+    animation-delay: calc(var(--i) * 60ms);
+  }
+  .barley--draw[fill="currentColor"] path {
+    stroke-dasharray: none;
+    opacity: 0;
+    animation-name: barley-fill;
+  }
+}
+@keyframes barley-draw {
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+@keyframes barley-fill {
+  to {
+    opacity: 1;
+  }
+}
+
+/* ---------- Wordmark (spec §3.1) ---------- */
+.wordmark {
+  display: inline-flex;
+  align-items: baseline;
+  font-family: var(--ff-display);
+  font-weight: 400;
+  line-height: 1;
+  white-space: nowrap;
+  letter-spacing: -0.01em;
+}
+/* The slash stands on the baseline and reaches the ascender. Side bearings are pulled in
+   so it sits as tight as the letters around it (estimated; check at 22 px and mega). */
+.wordmark__slash {
+  height: 0.74em;
+  width: auto;
+  aspect-ratio: 76.43 / 100;
+  margin-inline: -0.06em -0.015em;
+  fill: var(--accent);
+  overflow: visible;
+}
+.wordmark-heritage {
+  display: block;
+  height: 1em;
+  width: auto;
+  aspect-ratio: 664 / 64;
+  vector-effect: non-scaling-stroke;
+}
+
+/* ---------- Section pill (spec §3.4) ---------- */
+.pill {
+  display: inline-block;
+  max-width: 100%;
+  margin: 0;
+  padding: 8px 26px 11px;
+  border-radius: var(--r-pill);
+  background: var(--fg);
+  color: var(--bg);
+  font-family: var(--ff-display);
+  font-size: var(--t-h2);
+  line-height: var(--lh-h2);
+  font-weight: 400;
+  text-wrap: balance;
+}
+/* Text rides 1 px high for descender space (spec §3A optical rule) */
+.pill__text {
+  display: inline-block;
+  translate: 0 -1px;
+}
+@media (prefers-reduced-motion: no-preference) {
+  .pill[data-stamp="in"] {
+    animation: pill-stamp var(--d-2) var(--ease-stamp) both;
+    transform-origin: 0 100%;
+  }
+}
+@keyframes pill-stamp {
+  from {
+    scale: 1.12;
+    rotate: -2deg;
+  }
+  to {
+    scale: 1;
+    rotate: 0deg;
+  }
+}
+@media (forced-colors: active) {
+  .pill {
+    border: var(--stroke) solid CanvasText;
+  }
+}

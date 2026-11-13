@@ -1,8 +1,8 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 60 118" fill="currentColor" role="img" aria-label="Subversive barley mark, solid">
-  <path d="M30 14 8 2v22l22 12z"/>
-  <path d="M30 46 8 34v22l22 12z"/>
-  <path d="M30 78 8 66v22l22 12z"/>
-  <path d="M30 30l22-12v22L30 52z"/>
-  <path d="M30 62l22-12v22L30 84z"/>
-  <path d="M30 94l22-12v22l-22 12z"/>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 60 170" fill="currentColor" role="img" aria-label="Subversive barley mark, solid">
+  <path d="M30 14.5 8 2v25.5l22 12.5z"/>
+  <path d="M30 40l22-12.5v25.5L30 65.5z"/>
+  <path d="M30 65.5 8 53v25.5l22 12.5z"/>
+  <path d="M30 91l22-12.5v25.5L30 116.5z"/>
+  <path d="M30 116.5 8 104v25.5l22 12.5z"/>
+  <path d="M30 142l22-12.5v25.5L30 167.5z"/>
 </svg>
