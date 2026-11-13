@@ -37,7 +37,7 @@ function expected(v: SemanticValue): string {
 
 const rootDecls = declarations(block(/^:root\s*\{/m));
 const paperDecls = declarations(block(/:root,\s*\[data-skin="paper"\]\s*\{/));
-const overtimeDecls = declarations(block(/^\[data-skin="overtime"\]\s*\{/m));
+const overtimeDecls = declarations(block(/^\[data-skin="overtime"\][^{]*\{/m));
 
 describe("tokens.css matches tokens.ts", () => {
   it("has every raw colour with the same hex", () => {

@@ -3,7 +3,7 @@ import { expect, test } from "@playwright/test";
 // Plan M2 shell flows, on phone and desktop projects.
 const PAGES = [
   { href: "/menu", label: "Menu", h1: "Menu" },
-  { href: "/events", label: "Events", h1: "Events" },
+  { href: "/events", label: "Events", h1: "What's on" },
   { href: "/visit", label: "Visit", h1: "Find us" },
   { href: "/beer", label: "Our beer", h1: "Our beer" },
 ];

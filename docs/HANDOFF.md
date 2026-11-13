@@ -59,6 +59,26 @@
 
    What we reject: bento grids, glassmorphism, neon or gradient heroes, soft shadows, parallax and
    3D scroll gimmicks, kinetic type everywhere.
+6. **"Improve on their menu; nothing heavy-handed; refined fun"** (Theo, M3). Their printed menu is the
+   source, but a master designer would set it with more taste. In practice: smaller section pills that
+   stay on one line, flat tints instead of outlined chips, quieter dashed rules, an ember kernel (not a
+   black slab) for "current", two columns of rows on wide screens.
+7. **Motion must be high-end** (Theo, M4–M5). Measured, not assumed: frame-sample every motion piece.
+   Lessons so far:
+   - Animate clip-path shapes directly, never a registered custom property inside clip-path.
+   - One motion per change: a link tap from the open menu lets the page change carry the sheet away.
+   - Page changes: React captures only each page's content (not the shell) as a layer, so a clip
+     there let old words show through. Pages now sit in an opaque frame and change with a fast
+     lift-and-fade out (160 ms) and a gentle settle in (320 ms); the header cross-fades with them.
+   - No permanent view-transition names on list items: each becomes a layer that fades over the change.
+8. **Max's beer label** (New York Nectar, shared by Theo in chat on 2026-11-13; ask Theo for the file to
+   put in `docs/source/`). Thin gold monoline on spruce green: the New York State outline holding the
+   beer name in a light geometric monoline cap face, the monoline "SUBVERSIVE / BREWING" wordmark with
+   rules either side, a mountain-line mark with "CRAFTED IN CATSKILL NY", the barley mark, a ruled box
+   for the beer's sentence, small caps footer lines. This is the refined register to lean on for
+   `/beer`, the Home "Where it comes from" map (draw the state in that monoline gold-on-spruce), can
+   imagery and OG cards. The label face is a candidate answer to O5 (display/label typeface): ask Max
+   for its name before swapping anything.
 
 ---
 

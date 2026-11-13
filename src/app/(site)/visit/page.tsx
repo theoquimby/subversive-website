@@ -21,7 +21,7 @@ export const metadata: Metadata = {
   description: "Hours, directions and parking for Subversive, 96 West Bridge Street, Catskill NY.",
 };
 
-export default function VisitPage() {
+export default async function VisitPage() {
   const site = getSite();
   const today = nyParts(now()).date;
   return (
@@ -35,7 +35,7 @@ export default function VisitPage() {
         <div className="visit-grid">
           <section id="hours" className="visit-hours" aria-labelledby="hours-title">
             <Pill id="hours-title">{visitLabels.hours}</Pill>
-            <HoursCard hours={site.hours} events={hoursEvents()} today={today} />
+            <HoursCard hours={site.hours} events={await hoursEvents()} today={today} />
           </section>
           <AddressBlock site={site} />
         </div>

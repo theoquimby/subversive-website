@@ -184,7 +184,10 @@
   color-scheme: light;
 }
 
-[data-skin="overtime"] {
+/* A page that is night throughout (/events, its pages, /bands) marks itself
+   data-page-skin="overtime", and the whole document follows: header, rail, page. */
+[data-skin="overtime"],
+:root:has([data-page-skin="overtime"]) {
   --bg: var(--night);
   --surface: var(--night-raised);
   --fg: var(--bone);

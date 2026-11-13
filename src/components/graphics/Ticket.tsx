@@ -25,6 +25,8 @@ export function Ticket({
   className?: string;
 }) {
   const Tag = href ? "a" : "div";
+  // inside a link the pieces must be phrasing content; standing alone they can hold a heading
+  const Piece = href ? "span" : "div";
   return (
     <Tag
       href={href}
@@ -33,8 +35,8 @@ export function Ticket({
       data-torn={torn ? "" : undefined}
       style={torn ? ({ "--torn-edge": TORN_EDGE } as React.CSSProperties) : undefined}
     >
-      <span className="ticket__stub">{stub}</span>
-      <span className="ticket__body">{children}</span>
+      <Piece className="ticket__stub">{stub}</Piece>
+      <Piece className="ticket__body">{children}</Piece>
     </Tag>
   );
 }

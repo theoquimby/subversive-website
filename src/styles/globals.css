@@ -4,6 +4,7 @@
 @import "./shell.css";
 @import "./menu.css";
 @import "./visit.css";
+@import "./events.css";
 @import "./print.css";
 
 /*
@@ -244,36 +245,47 @@
   }
 }
 
-/* ---------- Page wipe (spec §5.5) ----------
- * The new page is already in place beneath; the old page is clipped away along the 61°
- * slash. --run is the slash's horizontal travel over the full viewport height
- * (100svh / tan 61° = 55.43svh). Forward: the edge sweeps left → right, the old page
- * retreats to the upper right. Back: mirrored.
+/* ---------- Page transition (spec §5.5, revised; see PageWipe.tsx) ----------
+ * The page's content is an opaque frame, so its snapshot is a clean picture. The old page
+ * lifts and fades fast; the new one settles in a beat later. The mobile menu's sheet
+ * (class "wipe") is still carried off along the 61° slash on a link tap. --run is the
+ * slash's horizontal travel over the full viewport height (100svh / tan 61°).
  */
-::view-transition-image-pair(.wipe),
-::view-transition-image-pair(.wipe-back) {
-  isolation: isolate;
+.page-frame {
+  background: var(--bg);
 }
-::view-transition-new(.wipe),
-::view-transition-new(.wipe-back) {
+::view-transition-group(.page-in),
+::view-transition-group(.page-out) {
   animation: none;
 }
-::view-transition-old(.wipe),
-::view-transition-old(.wipe-back) {
+::view-transition-old(.page-out) {
+  animation: page-out 160ms var(--ease-in-out) both;
+}
+::view-transition-new(.page-in) {
+  animation: page-in 320ms var(--ease-out) 100ms both;
+}
+@keyframes page-out {
+  to {
+    opacity: 0;
+    translate: 0 -8px;
+  }
+}
+@keyframes page-in {
+  from {
+    opacity: 0;
+    translate: 0 14px;
+  }
+}
+::view-transition-old(.wipe) {
   --run: 55.43svh;
   z-index: 1;
-  animation-duration: var(--d-3);
-  animation-timing-function: var(--ease-in-out);
-  animation-fill-mode: both;
+  animation: wipe-forward var(--d-3) var(--ease-in-out) both;
+}
+::view-transition-new(.wipe) {
+  animation: none;
 }
 /* The polygon itself animates (a registered custom property inside clip-path forced a
    style recalc every frame). Both ends have the same four corners. */
-::view-transition-old(.wipe) {
-  animation-name: wipe-forward;
-}
-::view-transition-old(.wipe-back) {
-  animation-name: wipe-back;
-}
 @keyframes wipe-forward {
   from {
     clip-path: polygon(0 0, 100% 0, 100% 100%, calc(-1 * var(--run)) 100%);
@@ -282,17 +294,27 @@
     clip-path: polygon(calc(100% + var(--run)) 0, 100% 0, 100% 100%, 100% 100%);
   }
 }
-@keyframes wipe-back {
-  from {
-    clip-path: polygon(0 0, calc(100% + var(--run)) 0, 100% 100%, 0 100%);
-  }
-  to {
-    clip-path: polygon(0 0, 0 0, calc(-1 * var(--run)) 100%, 0 100%);
-  }
-}
 /* The header holds still through every wipe */
 ::view-transition-group(site-header) {
   animation: none;
+}
+/* …but its contents cross-fade with the page (the current-page kernel moves; on /events
+   the whole header turns to night), over the same span as the page arriving */
+::view-transition-old(site-header) {
+  animation: header-out 320ms var(--ease-in-out) both;
+}
+::view-transition-new(site-header) {
+  animation: header-in 320ms var(--ease-in-out) both;
+}
+@keyframes header-out {
+  to {
+    opacity: 0;
+  }
+}
+@keyframes header-in {
+  from {
+    opacity: 0;
+  }
 }
 @media (prefers-reduced-motion: reduce) {
   ::view-transition-group(*),

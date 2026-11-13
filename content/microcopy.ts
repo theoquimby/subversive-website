@@ -70,3 +70,27 @@ export const visitLabels = {
   contact: "Contact",
   bookYourBand: "Book your band",
 } as const;
+
+// Events (spec §6.3, §5.7, §4.6–4.7). Interface labels and copy named in the spec.
+export const eventLabels = {
+  title: "What's on",
+  filters: "Filter events",
+  categories: {
+    all: "All",
+    games: "Games",
+    music: "Music",
+    "trivia-movies": "Trivia & movies",
+    festivals: "Festivals",
+    other: "Other",
+  },
+  empty: "Nothing on the calendar yet.",
+  over: "This one's over",
+  upcoming: "Upcoming events",
+  goodToKnow: "Good to know",
+  tip: (t: string) => `${t} tip`,
+  closedOn: (day: string, title: string) => `Closed ${day} · ${title}`,
+  previous: "Previous",
+  next: "Next",
+  calendar: { apple: "Apple Calendar", outlook: "Outlook", google: "Google Calendar" },
+  ticker: "Coming up",
+} as const;

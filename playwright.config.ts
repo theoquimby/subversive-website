@@ -47,6 +47,6 @@ export default defineConfig({
     url: `http://localhost:${port}`,
     reuseExistingServer: !ci,
     timeout: 120_000,
-    env: { SV_E2E: "1" },
+    env: { SV_E2E: "1", OPS_EVENTS_URL: "" },
   },
 });
