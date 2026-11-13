@@ -42,10 +42,6 @@ jobs:
 
       - name: Lighthouse budgets
         run: pnpm lhci
-        # The M0/M1 home page paints no content Lighthouse counts (the rail is a CSS
-        # background, the h1 is visually hidden), so it reports NO_FCP. Remove this line
-        # in M2, when the header puts the wordmark on every page.
-        continue-on-error: true
 
       - uses: actions/upload-artifact@v4
         if: failure()

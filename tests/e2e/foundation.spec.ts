@@ -54,7 +54,8 @@ test("the skip link appears on first Tab and targets main", async ({ page, isMob
 });
 
 test("home passes axe", async ({ page }) => {
-  await page.goto("/");
+  await page.goto("/", { waitUntil: "networkidle" });
+  await page.evaluate(() => document.fonts.ready);
   const results = await new AxeBuilder({ page }).analyze();
   expect(results.violations.map((v) => `${v.id}: ${v.help}`)).toEqual([]);
 });

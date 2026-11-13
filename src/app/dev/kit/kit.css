@@ -843,3 +843,24 @@
 .kit-marks {
   align-items: start;
 }
+/* M2 sheets: a phone screen in miniature (390 × 844 at 1:12) */
+.motion-sheet__screen {
+  position: relative;
+  width: 32.5px;
+  height: 70.3px;
+  border: 1px solid var(--rule-strong);
+  border-radius: 4px;
+  background: var(--paper-deep);
+  overflow: hidden;
+}
+.motion-sheet__old,
+.motion-sheet__sheet {
+  position: absolute;
+  inset: 0;
+}
+.motion-sheet__old {
+  background: var(--fg);
+}
+.motion-sheet__sheet {
+  background: var(--pils);
+}

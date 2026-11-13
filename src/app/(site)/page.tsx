@@ -1,12 +1,16 @@
-import site from "@content/site.json";
+import { PageWipe } from "@/components/layout/PageWipe";
+import { getSite } from "@/lib/site/site";
 
-// M0: a blank Paper page under the checker rail. The home page is built in M6.
+// Home is built in M6. Until then the shell stands on its own; the page has its h1.
 export const revalidate = 300;
 
 export default function Home() {
+  const site = getSite();
   return (
-    <main id="main" className="min-h-[100svh]">
-      <h1 className="sr-only">{site.name}</h1>
-    </main>
+    <PageWipe>
+      <div className="page page--home-pending">
+        <h1 className="sr-only">{site.name}</h1>
+      </div>
+    </PageWipe>
   );
 }

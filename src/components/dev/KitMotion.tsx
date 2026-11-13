@@ -97,6 +97,52 @@ const sheets: SheetSpec[] = [
   },
 ];
 
+// M2: the page wipe and the mobile menu share one geometry — an edge at 61° crossing the
+// viewport. Drawn at 390 × 844: the edge travels 844 / tan 61° + 390 = 858 px in all.
+const RUN = 844 / Math.tan((61 * Math.PI) / 180);
+const wipeX = (p: number) => lerp(-RUN, 390, p);
+sheets.push(
+  {
+    name: "Page wipe (forward)",
+    job: "The old page is cut away up and to the right; the new one is already beneath",
+    durationMs: 420,
+    easing: { bezier: CURVES.inOut.values, token: "--ease-in-out" },
+    value: (p) => wipeX(p),
+    unit: "px",
+    draw: (p) => (
+      <span className="motion-sheet__screen">
+        <span
+          className="motion-sheet__old"
+          style={{
+            clipPath: `polygon(${((wipeX(p) + RUN) / 390) * 100}% 0, 100% 0, 100% 100%, ${(wipeX(p) / 390) * 100}% 100%)`,
+          }}
+        />
+      </span>
+    ),
+  },
+  {
+    name: "Mobile menu",
+    job: "The sheet wipes in from the top right along the slash",
+    durationMs: 420,
+    easing: { bezier: CURVES.inOut.values, token: "--ease-in-out" },
+    value: (p) => lerp(390, -RUN, p),
+    unit: "px",
+    draw: (p) => {
+      const x = lerp(390, -RUN, p);
+      return (
+        <span className="motion-sheet__screen">
+          <span
+            className="motion-sheet__sheet"
+            style={{
+              clipPath: `polygon(${((x + RUN) / 390) * 100}% 0, 100% 0, 100% 100%, ${(x / 390) * 100}% 100%)`,
+            }}
+          />
+        </span>
+      );
+    },
+  },
+);
+
 export function KitMotion() {
   return (
     <div className="kit-sheets">

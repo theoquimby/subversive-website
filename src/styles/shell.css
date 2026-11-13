@@ -1,0 +1,493 @@
+/* Site shell (spec §4.1, §4.12, §5.7): header, mobile menu, footer, page frame, 404. */
+
+/* ---------- Page frame ---------- */
+.site-main {
+  display: block;
+  min-height: 60svh;
+}
+.page {
+  max-width: var(--content-max);
+  margin-inline: auto;
+  padding: var(--s-10) var(--gutter) var(--section);
+}
+.page__title {
+  margin-left: var(--optical-left);
+  font-family: var(--ff-display);
+  font-size: var(--t-h1);
+  line-height: var(--lh-h1);
+}
+.page--home-pending {
+  min-height: 40svh;
+}
+
+/* ---------- Header (spec §4.1) ---------- */
+.site-header {
+  position: sticky;
+  top: 0;
+  z-index: 50;
+  padding-top: env(safe-area-inset-top);
+  background: transparent;
+  view-transition-name: site-header;
+  transition:
+    translate var(--d-2) var(--ease-out),
+    background-color var(--d-2) var(--ease-out),
+    box-shadow var(--d-2) var(--ease-out);
+}
+.site-header[data-solid] {
+  background: var(--bg);
+  box-shadow: 0 var(--stroke) 0 var(--rule-strong);
+}
+.site-header[data-hidden] {
+  translate: 0 calc(-100% - var(--stroke));
+}
+.site-header__inner {
+  display: flex;
+  align-items: center;
+  gap: var(--s-6);
+  max-width: var(--content-max);
+  height: 60px;
+  margin-inline: auto;
+  padding-inline: max(var(--gutter), env(safe-area-inset-left)) max(var(--gutter), env(safe-area-inset-right));
+}
+@media (min-width: 64rem) {
+  .site-header__inner {
+    height: 76px;
+  }
+}
+
+.brand {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--s-2);
+  margin-right: auto;
+  color: var(--fg);
+  text-decoration: none;
+}
+.brand__mark {
+  font-size: 30px;
+  stroke-width: 4;
+}
+.brand__word {
+  font-size: 22px;
+}
+@media (min-width: 64rem) {
+  .brand__mark {
+    font-size: 36px;
+  }
+  .brand__word {
+    font-size: 26px;
+  }
+}
+
+/* Desktop nav: tracked caps, the active page marked by one solid kernel */
+.site-nav {
+  display: none;
+}
+@media (min-width: 64rem) {
+  .site-nav {
+    display: block;
+  }
+}
+.site-nav__list {
+  display: flex;
+  gap: var(--s-7);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.site-nav__link {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 44px;
+  color: var(--fg);
+  font-family: var(--ff-utility);
+  font-weight: 700;
+  font-size: var(--t-nav);
+  letter-spacing: var(--track-label);
+  text-transform: uppercase;
+  text-decoration: none;
+}
+.site-nav__kernel {
+  width: 7px;
+  height: 11px;
+  fill: var(--accent);
+  opacity: 0;
+  translate: 0 -1px;
+  transition: opacity var(--d-2) var(--ease-out);
+}
+.site-nav__link[aria-current="page"] .site-nav__kernel {
+  opacity: 1;
+}
+@media (hover: hover) {
+  .site-nav__link:hover {
+    color: var(--accent-text);
+  }
+}
+
+.site-header__actions {
+  display: flex;
+  align-items: center;
+  gap: var(--s-2);
+}
+/* Persistent Order: flat (no stamp shadow) — the stamp belongs to each page's one action */
+.site-header__order {
+  min-height: 44px;
+  padding: 0 var(--s-5);
+  font-size: var(--t-nav);
+  box-shadow: none;
+}
+@media (hover: hover) {
+  .site-header__order:hover {
+    translate: none;
+    box-shadow: none;
+    background: color-mix(in srgb, var(--pils) 82%, var(--ink));
+  }
+}
+.site-header__order:active {
+  translate: 0 1px;
+  box-shadow: none;
+}
+
+/* Menu button: two lines that cross into a tall × at the slash angle */
+.menu-button {
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  margin-right: -10px;
+  padding: 0;
+  border: 0;
+  border-radius: var(--r-pill);
+  background: transparent;
+  color: var(--fg);
+  cursor: pointer;
+}
+@media (min-width: 64rem) {
+  .site-header .menu-button {
+    display: none;
+  }
+}
+.menu-glyph {
+  width: 26px;
+  height: 26px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2;
+  stroke-linecap: square;
+  overflow: visible;
+}
+.menu-glyph path {
+  transform-box: view-box;
+  transform-origin: 12px 12px;
+  transition:
+    translate var(--d-2) var(--ease-out),
+    rotate var(--d-2) var(--ease-out);
+}
+.menu-glyph[data-open] .menu-glyph__a {
+  translate: 0 3px;
+  rotate: -61deg;
+}
+.menu-glyph[data-open] .menu-glyph__b {
+  translate: 0 -3px;
+  rotate: 61deg;
+}
+
+/* ---------- Mobile menu (spec §4.1) ---------- */
+@property --sheet-x {
+  syntax: "<length-percentage>";
+  inherits: false;
+  initial-value: -55.43svh;
+}
+.menu-sheet {
+  --run: 55.43svh;
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  display: grid;
+  grid-template-rows: 1fr auto;
+  height: 100dvh;
+  padding: calc(env(safe-area-inset-top) + 76px) max(var(--gutter), env(safe-area-inset-right))
+    calc(env(safe-area-inset-bottom) + var(--s-7)) max(var(--gutter), env(safe-area-inset-left));
+  overflow-y: auto;
+  background: var(--bg);
+  color: var(--fg);
+  clip-path: polygon(calc(var(--sheet-x) + var(--run)) 0, 100% 0, 100% 100%, var(--sheet-x) 100%);
+}
+.menu-sheet:focus {
+  outline: none;
+}
+@media (prefers-reduced-motion: no-preference) {
+  .menu-sheet[data-state="open"] {
+    animation: sheet-in var(--d-3) var(--ease-in-out) both;
+  }
+  .menu-sheet[data-state="closed"] {
+    animation: sheet-out 300ms var(--ease-in-out) both;
+  }
+  .menu-sheet[data-state="open"] .menu-sheet__nav li {
+    animation: sheet-link var(--d-2) var(--ease-out) both;
+    animation-delay: calc(240ms + var(--i) * var(--stagger));
+  }
+}
+@keyframes sheet-in {
+  from {
+    --sheet-x: 100%;
+  }
+}
+@keyframes sheet-out {
+  to {
+    --sheet-x: 100%;
+  }
+}
+@keyframes sheet-link {
+  from {
+    opacity: 0;
+    translate: 0 12px;
+  }
+}
+.menu-sheet__close {
+  position: absolute;
+  top: calc(env(safe-area-inset-top) + 8px);
+  right: max(var(--gutter), env(safe-area-inset-right));
+}
+.menu-sheet__nav {
+  align-self: start;
+  padding-top: max(0px, 18svh - 76px);
+}
+.menu-sheet__nav ol {
+  display: grid;
+  gap: var(--s-2);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.menu-sheet__link {
+  display: flex;
+  align-items: baseline;
+  gap: var(--s-4);
+  color: var(--fg);
+  font-family: var(--ff-display);
+  font-size: var(--t-h1);
+  line-height: 1.02;
+  text-decoration: none;
+}
+.menu-sheet__num {
+  min-width: 2ch;
+  font-family: var(--ff-utility);
+  font-weight: 700;
+  font-size: var(--t-label);
+  letter-spacing: var(--track-label);
+  color: var(--fg-muted);
+  translate: 0 -0.3em;
+}
+.menu-sheet__facts {
+  display: grid;
+  gap: 0;
+  padding-top: var(--s-6);
+  border-top: var(--stroke) solid var(--rule-strong);
+}
+.menu-sheet__fact,
+.menu-sheet__social a {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  color: var(--fg);
+  font-size: var(--t-body);
+  text-decoration: none;
+}
+.menu-sheet__social {
+  display: flex;
+  gap: var(--s-6);
+  margin: 0;
+}
+.menu-sheet__social a {
+  font-family: var(--ff-utility);
+  font-weight: 700;
+  font-size: var(--t-label);
+  letter-spacing: var(--track-label);
+  text-transform: uppercase;
+}
+
+/* ---------- Footer (spec §4.12) ---------- */
+.site-footer {
+  margin-top: var(--section);
+  padding-bottom: env(safe-area-inset-bottom);
+}
+.site-footer__inner {
+  max-width: var(--content-max);
+  margin-inline: auto;
+  padding: var(--s-10) var(--gutter) var(--s-8);
+  container-type: inline-size;
+}
+/* The wordmark spans gutter to gutter (Sub/ersive ≈ 5.3 em) */
+.site-footer__word {
+  display: block;
+  color: var(--fg);
+  font-size: 18.6cqi; /* spec §4.12: always gutter to gutter, so no mega cap */
+  letter-spacing: var(--track-mega);
+  text-decoration: none;
+  margin-left: var(--optical-left);
+}
+.site-footer__cols {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--s-8) var(--s-6);
+  margin-top: var(--s-9);
+}
+.site-footer__cols section {
+  display: grid;
+  align-content: start;
+  gap: var(--s-1);
+}
+.site-footer__cols a {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  color: var(--fg);
+  font-size: var(--t-body);
+  line-height: 1.35;
+  text-decoration: none;
+}
+@media (hover: hover) {
+  .site-footer__cols a:hover {
+    color: var(--accent);
+  }
+}
+.site-footer__head {
+  margin-bottom: var(--s-2);
+  font-family: var(--ff-utility);
+  font-weight: 700;
+  font-size: var(--t-label);
+  letter-spacing: var(--track-label);
+  text-transform: uppercase;
+  color: var(--fg-muted);
+}
+.site-footer__seal {
+  font-size: 7.5rem;
+  align-self: end;
+  justify-self: end;
+}
+@media (min-width: 48rem) {
+  .site-footer__cols {
+    grid-template-columns: repeat(3, minmax(0, 1fr)) auto;
+  }
+  .site-footer__seal {
+    font-size: 9rem;
+  }
+}
+.site-footer__base {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--s-4) var(--s-6);
+  margin-top: var(--s-9);
+  padding-top: var(--s-5);
+  border-top: 1px solid var(--rule);
+}
+.site-footer__small {
+  color: var(--fg-muted);
+  font-size: var(--t-small);
+}
+.pause-motion {
+  min-height: 44px;
+  padding: 0 var(--s-4);
+  border: 1px solid var(--rule-strong);
+  border-radius: var(--r-pill);
+  background: transparent;
+  color: var(--fg);
+  font-family: var(--ff-utility);
+  font-weight: 700;
+  font-size: var(--t-label);
+  letter-spacing: var(--track-label);
+  text-transform: uppercase;
+  cursor: pointer;
+}
+.pause-motion[aria-pressed="true"] {
+  background: var(--fg);
+  color: var(--bg);
+}
+
+/* ---------- 404 (spec §5.7) ---------- */
+.not-found {
+  display: grid;
+  gap: var(--s-8);
+  align-items: end;
+  min-height: 70svh;
+}
+@media (min-width: 64rem) {
+  .not-found {
+    grid-template-columns: 1fr auto;
+  }
+}
+.not-found__title {
+  margin-left: var(--optical-left);
+  font-family: var(--ff-display);
+  font-size: var(--t-mega);
+  line-height: var(--lh-mega);
+  letter-spacing: var(--track-mega);
+}
+.not-found__sub {
+  margin-top: var(--s-5);
+  max-width: var(--measure-subline);
+  font-size: var(--t-subline);
+}
+.not-found__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--s-3);
+  margin-top: var(--s-8);
+}
+.not-found .glass {
+  justify-self: end;
+}
+/* The glass drains from 78% to empty, accelerating like something poured out */
+@media (prefers-reduced-motion: no-preference) {
+  .glass--drain .glass__pour {
+    animation: glass-drain 1600ms var(--ease-fall) 500ms both;
+  }
+}
+@keyframes glass-drain {
+  to {
+    translate: 0 var(--level);
+  }
+}
+
+/* ---------- Error ---------- */
+.error-page {
+  display: grid;
+  gap: var(--s-6);
+  justify-items: start;
+  min-height: 50svh;
+  align-content: center;
+}
+.error-page__title {
+  font-family: var(--ff-display);
+  font-size: var(--t-h1);
+  line-height: var(--lh-h1);
+}
+/* the close state reads as a cut × only with a heavier, butt-capped stroke */
+.menu-sheet__close .menu-glyph {
+  stroke-width: 2.5;
+  stroke-linecap: butt;
+}
+.menu-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 99;
+}
+/* At 320 px the brand, Order and the menu button must share 280 px */
+@media (max-width: 22.5rem) {
+  .site-header__inner {
+    gap: var(--s-3);
+  }
+  .brand__word {
+    font-size: 19px;
+  }
+  .site-header__order {
+    padding: 0 var(--s-4);
+  }
+  .site-header__order .btn__icon {
+    display: none;
+  }
+}

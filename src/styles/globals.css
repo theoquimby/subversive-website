@@ -1,6 +1,7 @@
 @import "tailwindcss";
 @import "./tokens.css";
 @import "./graphics.css";
+@import "./shell.css";
 
 /*
  * Tailwind sees only our tokens: its stock colours, fonts, sizes, radii, shadows and
@@ -237,5 +238,68 @@
   }
   .skip-link {
     border-color: CanvasText;
+  }
+}
+
+/* ---------- Page wipe (spec §5.5) ----------
+ * The new page is already in place beneath; the old page is clipped away along the 61°
+ * slash. --run is the slash's horizontal travel over the full viewport height
+ * (100svh / tan 61° = 55.43svh). Forward: the edge sweeps left → right, the old page
+ * retreats to the upper right. Back: mirrored.
+ */
+@property --wipe-x {
+  syntax: "<length-percentage>";
+  inherits: false;
+  initial-value: 0%;
+}
+::view-transition-image-pair(.wipe),
+::view-transition-image-pair(.wipe-back) {
+  isolation: isolate;
+}
+::view-transition-new(.wipe),
+::view-transition-new(.wipe-back) {
+  animation: none;
+}
+::view-transition-old(.wipe),
+::view-transition-old(.wipe-back) {
+  --run: 55.43svh;
+  z-index: 1;
+  animation-duration: var(--d-3);
+  animation-timing-function: var(--ease-in-out);
+  animation-fill-mode: both;
+}
+::view-transition-old(.wipe) {
+  animation-name: wipe-forward;
+  clip-path: polygon(calc(var(--wipe-x) + var(--run)) 0, 100% 0, 100% 100%, var(--wipe-x) 100%);
+}
+::view-transition-old(.wipe-back) {
+  animation-name: wipe-back;
+  clip-path: polygon(0 0, calc(var(--wipe-x) + var(--run)) 0, var(--wipe-x) 100%, 0 100%);
+}
+@keyframes wipe-forward {
+  from {
+    --wipe-x: calc(-1 * var(--run));
+  }
+  to {
+    --wipe-x: 100%;
+  }
+}
+@keyframes wipe-back {
+  from {
+    --wipe-x: 100%;
+  }
+  to {
+    --wipe-x: calc(-1 * var(--run));
+  }
+}
+/* The header holds still through every wipe */
+::view-transition-group(site-header) {
+  animation: none;
+}
+@media (prefers-reduced-motion: reduce) {
+  ::view-transition-group(*),
+  ::view-transition-old(*),
+  ::view-transition-new(*) {
+    animation: none !important;
   }
 }
