@@ -60,6 +60,10 @@ Subversive already has a strong, slightly rowdy print identity that the old webs
 
 The website is that menu taken off the table and made to move. It is printed matter that behaves: stickers that peel and can be flicked, a checker rail that rolls when you scroll, glasses that fill, ticket stubs that tear. Under the play, the layout is strict, typographic and quiet, with a lot of paper showing. Fun lives in the objects; class lives in the grid, the spacing and the restraint.
 
+**The look in one sentence:** Caprasimo and Barlow Condensed in black ink on warm cream menu stock, with a rolling checkerboard rail, fat black pill headers and die-cut pils-yellow stickers; one 2 px ink stroke draws every box, ticket and glass, and the slash from the wordmark cuts between sections.
+
+**The first screen passes the three-question test** before any styling is judged: who is this for (anyone hungry or thirsty near Catskill), what do I get (beer, burgers, a taproom that is open or not right now), what do I do next (see the menu). One primary action per screen; the second button is visibly secondary.
+
 Two skins, one system:
 
 - **Paper** (default, daytime): warm cream stock, black ink, three spot colors. Menu, visit, about.
@@ -116,8 +120,9 @@ Semantic tokens (Paper → Overtime): `--bg` (paper → night), `--surface` (car
 Rules:
 
 - A screen uses ink + paper + **at most two** spot colors. Pils and ember are the default pair; sky appears where the content is about kids, dogs or specials.
+- **Each color has a job, and only that job.** Pils: the primary action and "today/tonight". Ember: display accents and event dates. Sky: kids, dogs, specials. Spruce: sourcing. Go-green: the open dot. If a color shows up doing something else, it is a bug. An accent spread everywhere points at nothing.
 - Spot colors are flat. No gradients, except the two photo scrims defined in §3.7.
-- Write a unit test (`tokens.contrast.test.ts`) that computes WCAG contrast for every foreground/background pair the semantic layer allows and fails under 4.5:1 for text tokens and 3:1 for large-display and UI-boundary tokens. The hex values above were chosen by eye and arithmetic; the test is the authority, and any value that fails is adjusted darker, not exempted.
+- Write a unit test (`tokens.contrast.test.ts`) that computes WCAG contrast for every foreground/background pair the semantic layer allows and fails under 4.5:1 for text tokens and 3:1 for large-display and UI-boundary tokens. Also compute APCA and require Lc 75 for body text, Lc 60 for larger content text and Lc 45 for display type. Measure the pairs as rendered (including opacity-reduced text), not the intended values. The hex values above were chosen by eye and arithmetic; the test is the authority, and any value that fails is adjusted darker, not exempted.
 
 ### 2.2 Beer color
 
@@ -196,7 +201,9 @@ Assume four of five visitors are on a phone, often outdoors, one-handed, on cell
 | Spring "sticker" | stiffness 420, damping 22, mass 0.9 | Drag release, pop-in |
 | Spring "heavy" | stiffness 180, damping 26 | Goblin body, sheets |
 
-Stagger children by 40 ms, never more than 8 items (the rest appear together).
+Stagger children by 45 ms using one CSS custom property (`transition-delay: calc(var(--i) * 45ms)`), never more than 8 items (the rest appear together).
+
+Easing is always a `cubic-bezier()` with a stated reason; the keywords `ease`, `ease-in`, `ease-out` are banned from the codebase (lint for them). Two physical curves for anything under gravity (the goblin dropping away, the draining pint on the 404, kernel confetti): fall `cubic-bezier(.33, 0, .67, .33)`, rise `cubic-bezier(.33, .67, .67, 1)` (constant acceleration). Overshoot is about 10% past the target. Squash and stretch happen only at contact, with `transform-origin` on the contact edge, and keep volume roughly constant (the goblin's landing: +8% wide, −8% tall for about 130 ms).
 
 ---
 
@@ -316,7 +323,7 @@ One fixed, pointer-events-none overlay on `body::after`: a 220 × 220 px tiled n
 
 ### 3.9 Icons
 
-No icon library. Draw a set of about 14 icons in the same 2 px miter stroke as the barley mark, on a 24 px grid: pin, clock, phone, dog, tent, parking "P", fork, glass (pint), stein, arrow, external arrow, calendar plus, speaker on/off, close. Geometric, slightly chunky, no rounded caps. One `<Icon name>` component reading from an SVG sprite.
+No icon library. Draw a set of about 14 icons in the same 2 px miter stroke as the barley mark, on a 24 px grid: pin, clock, phone, dog, tent, parking "P", fork, glass (pint), stein, arrow, external arrow, calendar plus, speaker on/off, close. Geometric, slightly chunky, no rounded caps. 3 px safe margin (18 px live area), coordinates on whole or half pixels only, one `<Icon name>` component reading from an SVG sprite with `<use>`. `/dev/kit` shows the set at 3× with the grid, live area and a 20 px keyline circle overlaid, and at true size. Before M1 is done, audit the set in writing (which icon looks optically heavier or lighter than the rest, and why) and fix every icon the audit names.
 
 ---
 
@@ -334,11 +341,16 @@ These are the working rules of a senior designer, written down so they are appli
 - **Space is unequal on purpose.** Related things sit close (4–12 px); unrelated things sit far (56 px and up). Space above a heading is at least twice the space below it. Uniform 24 px gaps everywhere reads as a template.
 - **The first viewport is a poster.** At 390 × 844 the home hero must work as a still image: status pill, three-word headline, one line, two buttons, and the top third of the photo with a sticker breaking its edge, so the eye is pulled down. Compose it, screenshot it, and judge it as a poster before adding motion.
 - **Break the frame once.** In each major section one element crosses a boundary: a sticker overlapping a photo's corner, a headline's descender touching a rule, a photo bleeding off one side. Once, not everywhere.
+- **No two neighbours alike.** Consecutive sections never share an arrangement unless they are a series. Name each section's arrangement in one word (stack, split, rail, ledger, strip) and check the sequence.
+- **No dead ground.** An empty band deeper than half a screen is a defect, as is a section that fills one side and leaves the other bare. Restraint is not emptiness: when a decoration is removed, the content, a photo or the type takes the room, never another ornament.
+- **Every label earns its place.** A small label or number next to a heading must tell the reader something the heading does not.
 - **Squint test.** Blur a screenshot 8 px. The loud thing, the primary action and the section structure must still be obvious. If it turns to even grey, the hierarchy is too flat.
 
 ### Typography
 
 - Set display type tight and large; set labels small, uppercase and tracked. The contrast between the fat soft serif and the narrow caps is the typographic identity, so they should always appear together: a Caprasimo headline with a Barlow Condensed eyebrow above or a label beside it.
+- An orphaned word, or a break inside a beer name, a price or a time, is a defect at any width. Check both 390 and 1280.
+- Large display type is aligned optically, not mathematically: the round of the S or C sits about 0.04em left of the column edge so it lines up with small text above it.
 - Lines of display type are broken by hand for sense and shape (`Beer. / Burgers. / Catskill.`), never left to wrap. Provide explicit breaks per breakpoint where the wrap would be ugly.
 - Body copy is never wider than 62 characters and never justified. Left rag is cleaned with `text-wrap: pretty`.
 - Numbers are designed: tabular in columns, old-style nowhere, a thin space around the slash in `5 / 8`, the slash drawn at the wordmark angle where it appears at display size.
@@ -356,17 +368,22 @@ These are the working rules of a senior designer, written down so they are appli
 
 ### Motion
 
+- **The words never wait.** Headline, body and the primary action are readable at first paint on every page. Load animation is for objects (the photo pour, stickers, the rail), never for the text a visitor came to read. The still frame a load sequence ends on is the designed composition; it is never a frame the sequence merely passes through, and a screenshot at any random moment should be legible.
+- **One job each.** Every animation reveals something, directs attention to the next step, or confirms an action. If it does none of these, cut it. A static design is valid.
+- **Entrances never block feedback.** A running entry animation must not suppress hover, press or focus states on the same element.
 - **Respond within 100 ms.** Every press shows its pressed state immediately; navigation and data come after. Nothing ever waits for an animation to finish before it can be used, and every animation can be interrupted (springs, not fixed timelines, for anything the finger drives).
 - **Duration follows distance.** 120 ms for a press, 220 ms for a control, 420 ms for a panel, 800 ms or more only for a set piece that happens once. Exits take about 70% of the entrance time.
 - **Easing has a reason.** Things entering decelerate (`--ease-out`). Things leaving accelerate. Physical objects (stickers, the goblin, stamps) overshoot; typographic and layout elements never bounce.
 - **One focal motion at a time.** On load, choreograph a sequence with a clear lead: pill, then headline, then photo, then stickers. Stagger 40–60 ms; the whole entrance finishes inside 900 ms. Two things never start moving in the same frame unless they are one object.
-- **Reveal, don't fade.** Headlines enter line by line from behind a mask (each line in an `overflow: hidden` wrapper, translating up from 110%); photos are uncovered by a clip-path; rules draw from left to right. Plain opacity fades are for cross-fading content in place only. When opacity is used, pair it with a move of 12 px or less.
+- **Reveal, don't fade.** Below the first screen, section headlines enter line by line from behind a mask (each line in an `overflow: hidden` wrapper padded so descenders and overshoot are not clipped, translating up from 110%); photos are uncovered by a clip-path; rules draw from left to right. Plain opacity fades are for cross-fading content in place only. When opacity is used, pair it with a move of 12 px or less.
 - **Motion comes from somewhere.** Menus grow from the button that opened them (`transform-origin` at the trigger), the gate's wipe starts at the pressed pill, a ticket expands from its list position into the event hero. Nothing appears from nowhere.
 - **Scroll-linked motion is decorative only** and scrubs with the scroll position (rail, parallax, pour line). Content never depends on it, and nothing is pinned or hijacked.
 - **Texture of time.** Idle motion is slow and sparse: the open dot's pulse, the seal's rotation, the ticker. At rest, the page is still. A page where everything loops is noise.
 
 ### Photography and objects
 
+- **Depth in three layers:** something real at the back (a photograph, a color field), content in the middle, the one action in front. The hard offset shadow belongs to pressable things only, so the primary action is always the nearest object on the screen.
+- A photo that carries a section is never shown at thumbnail scale and never above its native resolution (the current files are 1500 px wide: do not stretch them past that on large screens; frame them instead).
 - A photo is cropped for one subject and one focal point, with consistent headroom. Food is shot-size dominant: it fills at least 60% of its frame after cropping.
 - Photos sit in designed frames at designed ratios; they never appear at their native aspect by accident. Hovering a photo scales the image 1.03 inside its fixed frame over 420 ms; the frame does not move.
 - Graphic objects behave like their real counterparts: stickers have a cut edge and peel, tickets have perforations and tear, the glass fills from the bottom with a meniscus, stamps land with weight and leave slightly uneven ink (the displacement filter in §3.5). The illusion is in two or three such details per object, not in realism.
@@ -375,14 +392,17 @@ These are the working rules of a senior designer, written down so they are appli
 
 After every milestone, before calling it done:
 
-1. Capture screenshots of each changed route at 390 and 1280 px, both skins, plus a short screen recording of any new motion.
-2. Critique them against this section and §9.3 as a hostile senior designer would, writing down at least five specific faults (misaligned edges, competing emphasis, cramped or equal spacing, weak crops, motion that draws attention to itself).
-3. Fix them. Then do a **subtraction pass**: remove one element, one color or one animation from each screen and keep the removal if the screen is no worse.
-4. Compare the screen against `docs/source/food-menu-2026-10.png`. If the site no longer looks related to that menu, it has drifted toward generic; pull it back.
+1. Capture screenshots of each changed route at 390 and 1280 px, both skins: the first screen alone and the full page. Look at the captures before the code. For each: what does a first glance land on, could a stranger say what the page is, how many left edges does the text use, what is each section's arrangement in one word, where is there empty space with nothing answering it.
+2. Motion cannot be judged from a still, and the builder cannot watch it play. For every set piece in §5, produce a **motion sheet** in `/dev/kit`: a strip of 7 evenly timed ghost frames with the pixel gap between frames labelled, and each cubic-bezier plotted on a time-by-progress axis with its four values printed. Positions are computed, not eyeballed. A 45 ms and a 90 ms stagger look identical in a screenshot; the sheet is how timing gets reviewed.
+3. Toggle the construction overlay (`?grid` on any route in dev: columns, baseline rhythm, the three alignment edges) and check that every text block starts on an edge.
+4. Critique them against this section and §9.3 as a hostile senior designer would. The review works best when the one who looks is not the one who made it: use a separate reviewer session or agent that sees only the screenshots and this spec, writing down at least five specific faults (misaligned edges, competing emphasis, cramped or equal spacing, weak crops, motion that draws attention to itself).
+5. Fix them. Then do a **subtraction pass**: remove one element, one color or one animation from each screen and keep the removal if the screen is no worse.
+6. Finish with an audit in the commit or PR notes, in three lists kept apart: what was computed (grid, sizes, timings), what was estimated (word widths, optical nudges), and what could not be verified without a person watching it on a phone. Theo reviews the third list.
+7. Compare the screen against `docs/source/food-menu-2026-10.png`. If the site no longer looks related to that menu, it has drifted toward generic; pull it back.
 
 ### Tells of a generated site (reject on sight)
 
-Everything centered · identical cards in a three-up grid · icon-heading-blurb feature rows · soft grey drop shadows · the same medium radius on every element · equal spacing between all sections · purple or blue gradients · a default sans for everything · emoji as icons · fade-up on every element as it scrolls in · hero text over a darkened stock photo · sentences that would fit any business · sections that exist because sites usually have them.
+Everything centered · bento grids · glassmorphism · neon accents · decorative lines and dividers that explain nothing · alternating section backgrounds by habit · the accent color on headlines, icons, borders and buttons at once · identical cards in a three-up grid · icon-heading-blurb feature rows · soft grey drop shadows · the same medium radius on every element · equal spacing between all sections · purple or blue gradients · a default sans for everything · emoji as icons · fade-up on every element as it scrolls in · hero text over a darkened stock photo · sentences that would fit any business · sections that exist because sites usually have them.
 
 ---
 
@@ -581,6 +601,7 @@ The page people will open most, usually standing outside or at a table. Optimise
 - **Segmented control:** `Drinks | Food`, sticky directly under the header, synced to `?show=` and remembered per device. Switching is instant (both lists are in the HTML; inactive one is `hidden`) with a 220 ms cross-slide.
 - **Section chips** below it, horizontally scrollable and sticky with the control: Drinks → Beer · Specials · Cocktails · Wine & cider · No-alcohol. Food → Burgers · Chicken · Small bites · Salads · Sides & sauces · This week · Specials. The chip for the section in view is selected (IntersectionObserver); tapping scrolls to it with `scroll-margin-top` accounting for the sticky stack.
 - **Filter chips** (multi-select, in a row that collapses behind a "Filter" pill on phone): Drinks → `Light`, `Hoppy`, `Malty`, `Farmhouse`, `Sour`, `Under 5%`. Food → `Vegetarian`, `Vegan`, `Kid-friendly`. Filtering dims non-matching rows to 30% rather than removing them, so the list never jumps; a count announces via `aria-live` ("4 beers match").
+- **"Pick one for me"** (stretch, M8): a small pill next to the filters. Two taps, no form: `Lighter` or `Bolder`, then `Crisp`, `Hoppy`, `Tart` or `Malty`. It scrolls to and highlights the one or two matching beers with a pils flash and the line "Try the {name}." It answers the question every first-time visitor asks at the bar. It only ever recommends from the live list and uses the same data as the filters; no invented tasting notes.
 - **Beer section:** groups in the menu's own order (Light, Hoppy, Malty, Farmhouse, Sour), each a Utility group header with a rule, rows per §4.4. Legend `9 oz / 16 oz` in the section header.
 - **Today's features:** items with `availability.days` matching today (NY time) are pulled into a pils-outlined box at the top of Food titled with their label ("Wing Wednesday", "Rodeo Thursdays"). On other days they sit in "This week" with their day chip.
 - **Burger sections** open with the section intro box (§4.5), then three rows; on tablet and up the three burgers lay out as the three boxed columns from the printed menu (pill name, outlined description box, price in a small pill beneath).
