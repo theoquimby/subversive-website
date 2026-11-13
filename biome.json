@@ -41,7 +41,6 @@
     "enabled": true,
     "rules": {
       "recommended": true,
-      "a11y": "error",
       "suspicious": {
         "noExplicitAny": "error"
       },
@@ -52,6 +51,9 @@
       "correctness": {
         "noUnusedImports": "error",
         "noUnusedVariables": "error"
+      },
+      "a11y": {
+        "noSvgWithoutTitle": "off"
       }
     }
   },

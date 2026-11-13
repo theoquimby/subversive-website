@@ -1,10 +1,18 @@
 import { describe, expect, it } from "vitest";
-import { CURVES, cubicBezier, curveCss, SPRINGS, sample, springToLinear } from "@/lib/motion/curves";
+import {
+  type Bezier,
+  CURVES,
+  cubicBezier,
+  curveCss,
+  SPRINGS,
+  sample,
+  springToLinear,
+} from "@/lib/motion/curves";
 
 describe("cubicBezier", () => {
   it("is 0 at t = 0 and 1 at t = 1 for every named curve", () => {
     for (const c of Object.values(CURVES)) {
-      const f = cubicBezier(...c.values);
+      const f = cubicBezier(...(c.values as Bezier));
       expect(f(0)).toBeCloseTo(0, 6);
       expect(f(1)).toBeCloseTo(1, 6);
     }

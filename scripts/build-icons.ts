@@ -5,7 +5,7 @@ import { readdirSync, readFileSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 import { fileURLToPath } from "node:url";
 import { optimize } from "svgo";
-import svgoConfig from "../svgo.config.js";
+import svgoConfig from "../svgo.config.ts";
 
 const root = fileURLToPath(new URL("..", import.meta.url));
 const dir = join(root, "src/components/graphics/icons");

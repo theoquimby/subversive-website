@@ -33,7 +33,6 @@ interface Props {
 export function BarleyMark({ variant = "stroke", draw = false, title, className }: Props) {
   const solid = variant === "solid";
   return (
-    // biome-ignore lint/a11y/noSvgWithoutTitle: titled (role="img") when meaningful, aria-hidden otherwise.
     <svg
       viewBox={BARLEY_VIEWBOX}
       className={["barley", draw ? "barley--draw" : "", className ?? ""].filter(Boolean).join(" ")}

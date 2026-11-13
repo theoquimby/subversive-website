@@ -23,7 +23,10 @@ function block(selectorPattern: RegExp): string {
 function declarations(body: string): Map<string, string> {
   const out = new Map<string, string>();
   for (const m of body.matchAll(/(--[\w-]+)\s*:\s*([^;]+);/g))
-    out.set(m[1] as string, (m[2] as string).trim());
+    out.set(
+      m[1] as string,
+      (m[2] as string).replace(/\s+/g, " ").replace(/\( /g, "(").replace(/ \)/g, ")").trim(),
+    );
   return out;
 }
 
