@@ -6,7 +6,8 @@
       "October / Oktoberfest specials are seasonal and probably ended; confirm before launch.",
       "Draft list changes often; confirm the current taps."
     ],
-    "pourSizes": { "half": "9 oz", "full": "16 oz" }
+    "pourSizes": { "half": "9 oz", "full": "16 oz" },
+    "updated": "2026-10-23"
   },
   "drinks": [
     {
@@ -56,6 +57,8 @@
       "id": "drink-specials",
       "title": "Drink specials",
       "seasonal": true,
+      "availableFrom": "2026-10-01",
+      "availableUntil": "2026-10-31",
       "groups": [
         {
           "title": "October specials",
@@ -202,16 +205,18 @@
       "id": "weekly-features",
       "title": "Weekly features",
       "items": [
-        { "name": "Wing Wednesday Special", "description": "(10) 24-hour house-brined jumbo wings tossed in the sauce of your choice, served with carrots & celery and a side of blue cheese or ranch.", "price": 16, "availability": { "days": ["wed"], "label": "Wednesdays only" } },
-        { "name": "Rodeo Burger", "description": "Two smashed 3 oz patties of local ground beef topped with cheddar, house barbecue sauce and an onion ring on a See & Be milk bun. Served with fries or a side salad.", "price": 17, "availability": { "days": ["thu"], "label": "Rodeo Thursdays" } },
-        { "name": "Lil’ Rodeo with fries", "description": "One smashed patty of local ground beef topped with cheddar, house barbecue sauce and an onion ring on a Martin’s potato roll.", "price": 10, "availability": { "days": ["thu"], "label": "Rodeo Thursdays" } },
-        { "name": "Rodeo Rings", "description": "(8) onion rings à la carte with house buttermilk ranch.", "price": 10, "availability": { "days": ["thu"], "label": "Rodeo Thursdays" } }
+        { "name": "Wing Wednesday Special", "description": "(10) 24-hour house-brined jumbo wings tossed in the sauce of your choice, served with carrots & celery and a side of blue cheese or ranch.", "price": 16, "availability": { "days": ["wed"], "label": "Wednesdays only", "title": "Wing Wednesday" } },
+        { "name": "Rodeo Burger", "description": "Two smashed 3 oz patties of local ground beef topped with cheddar, house barbecue sauce and an onion ring on a See & Be milk bun. Served with fries or a side salad.", "price": 17, "availability": { "days": ["thu"], "label": "Rodeo Thursdays", "title": "Rodeo Thursdays" } },
+        { "name": "Lil’ Rodeo with fries", "description": "One smashed patty of local ground beef topped with cheddar, house barbecue sauce and an onion ring on a Martin’s potato roll.", "price": 10, "availability": { "days": ["thu"], "label": "Rodeo Thursdays", "title": "Rodeo Thursdays" } },
+        { "name": "Rodeo Rings", "description": "(8) onion rings à la carte with house buttermilk ranch.", "price": 10, "availability": { "days": ["thu"], "label": "Rodeo Thursdays", "title": "Rodeo Thursdays" } }
       ]
     },
     {
       "id": "seasonal-specials",
       "title": "Oktoberfest specials",
       "seasonal": true,
+      "availableFrom": "2026-10-01",
+      "availableUntil": "2026-10-31",
       "note": "Available the entire month of October.",
       "items": [
         { "name": "The Bavarian Burger", "description": "October burger of the month. Two smashed 3 oz patties of local grass-fed beef, Bavarian mustard, pickles, muenster cheese, caraway kraut. Served with a side of German potato salad, fries or a house side salad.", "modifiers": "Sub Impossible plant-based meat +2.", "price": 20 },
