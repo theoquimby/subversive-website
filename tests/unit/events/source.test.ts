@@ -52,6 +52,13 @@ describe("getEvents (spec §8.6)", () => {
     expect(r.events.map((e) => e.id)).toEqual(["a", "b"]);
   });
 
+  it("a working feed with nothing upcoming → the seed, for now (Theo, 2026-11-13)", async () => {
+    const empty = { timezone: "America/New_York", events: [] };
+    const r = await run(async () => respond(JSON.stringify(empty), { status: 200 }));
+    expect(r.origin).toBe("seed");
+    expect(r.events.length).toBeGreaterThan(0);
+  });
+
   it.each([
     ["a login redirect", async () => new Response(null, { status: 307, headers: { location: "/login" } })],
     ["200 HTML", async () => respond("<html></html>", { status: 200, type: "text/html" })],

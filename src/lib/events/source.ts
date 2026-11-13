@@ -24,15 +24,22 @@ const cachedOps = unstable_cache(() => opsEventsSource.fetch(), ["ops-events"], 
   tags: ["events"],
 });
 
+// TEMPORARY (Theo, 2026-11-13): the Ops feed is public but empty until Max enters events
+// there, so a working feed with nothing upcoming also falls back to the seed. Set this to
+// false (and drop its test) once Ops holds the calendar; then an empty feed is the truth.
+const EMPTY_FEED_USES_SEED = true;
+
 export async function getEvents(): Promise<EventsResult> {
+  const today = nyParts(now()).date;
   try {
     const feed = await cachedOps();
-    return { events: feed.events.map(enrich).sort(byDateThenTime), origin: "ops" };
+    const events = feed.events.map(enrich).sort(byDateThenTime);
+    if (!(EMPTY_FEED_USES_SEED && upcoming(events, today).length === 0)) return { events, origin: "ops" };
   } catch {
-    const feed = await seedEventsSource.fetch();
-    const today = nyParts(now()).date;
-    return { events: upcoming(feed.events.map(enrich), today).sort(byDateThenTime), origin: "seed" };
+    // any failure: the seed below
   }
+  const feed = await seedEventsSource.fetch();
+  return { events: upcoming(feed.events.map(enrich), today).sort(byDateThenTime), origin: "seed" };
 }
 
 export function upcoming(events: readonly SiteEvent[], today: IsoDate): SiteEvent[] {
