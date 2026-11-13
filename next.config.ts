@@ -7,6 +7,8 @@ const isDev = process.env.NODE_ENV === "development";
 // RSC payload scripts (self.__next_f.push) are blocked: their hashes change per page and
 // per build, so they cannot be listed. Shipped: 'self' 'unsafe-inline', with SRI integrity
 // still on every script file. No third-party origin is allowed anywhere.
+// No upgrade-insecure-requests: HSTS already forces https, and WebKit applies the
+// directive to http://localhost, which broke every asset in the CI WebKit runs.
 const scriptSrc = isDev ? "'self' 'unsafe-inline' 'unsafe-eval'" : "'self' 'unsafe-inline'";
 
 const csp = [
@@ -21,7 +23,6 @@ const csp = [
   "form-action 'self'",
   "frame-ancestors 'none'",
   "manifest-src 'self'",
-  "upgrade-insecure-requests",
 ].join("; ");
 
 const securityHeaders = [
