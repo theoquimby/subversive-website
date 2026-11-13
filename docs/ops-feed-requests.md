@@ -1,34 +1,101 @@
-# Events feed: requests for the Ops session
+# Ops as Max's one hub: what the website reads, and what Ops needs to add
 
-For Theo to take to the Subversive Ops session. The website only reads
-`GET /api/public/events?days=120`; nothing in Ops was touched.
+For Theo to take to the Subversive Ops session (repo `theoquimby/subversive-ops`). The
+website only ever reads public, read-only endpoints; nothing in Ops is changed from the
+website's repo (CLAUDE.md).
 
-## State on 2026-11-13
+**Goal (Theo, 2026-11-13):** Max runs the business from one place, Ops. Anything a guest
+sees that Max might change (events, closures, hours, the menu and the tap list, a notice)
+is entered once in Ops and appears on the website by itself.
 
-The endpoint is public now (it used to answer with a login redirect, O1). It returns
-`200 application/json` with `{"timezone":"America/New_York","events":[]}`.
+Every feed below follows the pattern the events feed already uses: the website reads the
+live feed first and falls back to its own file (`content/*.json`) if the feed is down, so
+the website never breaks while Ops catches up.
 
-An empty list is a valid answer, so the site shows "Nothing on the calendar yet." and no
-late nights in the hours. The seed (`content/events.seed.json`, crawled from the old site)
-is only used when the feed fails. **Question for Theo and Max:** are the November and
-December Knicks nights and trivia meant to be entered in Ops, or should the site keep the
-seed until they are? The site's rule today follows the spec: a working feed is the truth.
+## 1. Events and closures: live
 
-Note: Next keeps the last good feed in its data cache (`unstable_cache`, tag `events`)
-across rebuilds, so a later outage still shows the last good list, not the seed. Ops can
-refresh the site at once with `POST /api/revalidate` and the header
-`x-revalidate-secret: <REVALIDATE_SECRET>` (set that variable on Vercel first).
+`GET /api/public/events?days=120` (Ops: `src/app/api/public/events/route.ts`). The shape
+matches the website exactly. Events entered in Ops appear on the website within 5 minutes:
+on `/events`, on each event page, in the ticker, and as late hours or closures in the
+open-now pill and the hours card (a `CLOSURE` closes the day; an event ending after
+closing time keeps the bar open late).
 
-## Fields the site would use (all optional; the site works without them)
+State on 2026-11-13: the feed is public and returns an empty list. Until Max enters events,
+the website shows the seed (`content/events.seed.json`). When Ops holds the calendar, set
+`EMPTY_FEED_USES_SEED` to `false` in `src/lib/events/source.ts`.
 
-| Field | Type | Used for |
-| --- | --- | --- |
-| `slug` | string | Stable event URLs that survive title edits (plan Q14) |
-| `imageUrl`, `imageAlt` | URL, string | A photo on the event page |
-| `ticketUrl` / `rsvpUrl` | URL | A button on the event page |
-| `priceLabel` | string | "Free", "$10" on the ticket |
-| `kitchenCloseOverride`, `barCloseOverride` | `HH:mm` | Exact hours on special nights |
-| `kind` values `TRIVIA`, `MOVIE` | string | Filters without guessing from titles |
-| `featured` | boolean | Pinning an event on Home |
-| `updatedAt` | ISO instant | Cache freshness |
-| `pastDays` query parameter | number | Past events and the bands list (plan Q15) |
+Optional fields the website already understands if Ops adds them: `slug` (stable URLs),
+`imageUrl` + `imageAlt`, `ticketUrl` / `rsvpUrl`, `priceLabel`, `kitchenCloseOverride` /
+`barCloseOverride` (`HH:mm`), finer `kind` values (`TRIVIA`, `MOVIE`), `featured`,
+`updatedAt`, and a `pastDays` query parameter for past events.
+
+Notes for Ops:
+- A `HOLIDAY` event is sent with `closed: false`; the website shows it as a notice but
+  keeps the day open. If holidays mean closed, send `closed: true` for them too.
+- `PRIVATE` events are excluded already. Good.
+
+## 2. Instant updates (small, high value)
+
+When Max saves an event, a menu item or hours in Ops, Ops calls:
+
+```
+POST https://<website>/api/revalidate
+x-revalidate-secret: <REVALIDATE_SECRET>
+```
+
+The website then reads the feeds again at once instead of within 5 minutes. The route
+exists on the website; set `REVALIDATE_SECRET` on both Vercel projects.
+
+## 3. Hours and site notices: needs an Ops endpoint
+
+Weekly hours live only in the website's `content/site.json` today, so a change means a
+commit. Requested:
+
+`GET /api/public/site`
+
+```json
+{
+  "timezone": "America/New_York",
+  "hours": {
+    "mon": { "open": "16:30", "close": "20:00", "kitchenClose": "20:00" },
+    "tue": null,
+    "wed": { "open": "16:30", "close": "20:00", "kitchenClose": "20:00" },
+    "thu": { "open": "16:30", "close": "20:00", "kitchenClose": "20:00" },
+    "fri": { "open": "16:30", "close": "20:30", "kitchenClose": "20:15" },
+    "sat": { "open": "12:00", "close": "20:30", "kitchenClose": "20:15" },
+    "sun": { "open": "12:00", "close": "18:30", "kitchenClose": "18:15" }
+  },
+  "notice": null
+}
+```
+
+- `hours`: one entry per weekday, `null` for a closed day, times `HH:mm` New York.
+- `notice`: optional guest-facing line (`{ "text": "...", "until": "2026-12-01" }`), never
+  the internal `Announcement` model.
+
+## 4. Menu and tap list: needs an Ops endpoint
+
+Ops already holds menu recipes (name, category, `menuPrice`, `active`) mapped to Square,
+and allergens. The website's menu needs a little more per item. Requested:
+
+`GET /api/public/menu`, in the website's menu shape (`src/lib/menu/schema.ts`, the same as
+`content/menu.json`): `drinks[]` sections with `groups[]`, `food[]` sections with `items[]`,
+`notices[]`, and `_meta.updated`.
+
+- Per item: `name`, `description`, `price` (or `prices: { half, full }` for draft beer),
+  optional `tags` (`vegetarian`, `vegan`, `kid-friendly`, `dog-friendly`), `badge`, and the
+  seasonal window (`availableFrom` / `availableUntil`).
+- Draft beer also needs `style`, `abv`, and `color` (`#RRGGBB`, for the glass on the menu).
+  Ops has none of these today; they could be fields on the menu recipe, or a small "tap
+  list" screen in Ops where Max marks what's pouring.
+- Only `active` items; nothing about cost, recipes or suppliers.
+
+The website already has the seam for this: `MenuSource` in `src/lib/menu/source.ts`
+(`MENU_SOURCE=file` today). An `opsMenuSource` slots in beside it with the file as fallback.
+
+## Order of work
+
+1. Max enters upcoming events in Ops (no code). Then flip `EMPTY_FEED_USES_SEED`.
+2. Ops: the revalidate ping on save (a few lines).
+3. Ops: `/api/public/site` (hours). Website: read it, `site.json` as fallback.
+4. Ops: the tap list and `/api/public/menu`. Website: `opsMenuSource`, `menu.json` as fallback.
