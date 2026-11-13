@@ -1,0 +1,18 @@
+{
+  "_meta": {
+    "purpose": "Fallback + test fixture in the exact shape of the Ops feed (GET /api/public/events). Used while that endpoint is still behind login, and whenever the feed is unreachable.",
+    "source": "drinksubversive.com/events-1, crawled 2026-11-13."
+  },
+  "timezone": "America/New_York",
+  "events": [
+    { "id": "seed-2026-11-13-knicks-pacers", "date": "2026-11-13", "title": "Subversive Overtime: Knicks at Pacers", "kind": "GAME", "closed": false, "startTime": "19:00", "endTime": "21:30", "description": "We’re staying open late for Knicks basketball! NBA Cup group stage, tipoff at 7 PM. Our kitchen will be taking orders until 8:15 PM, and the bar will stay open through the final buzzer." },
+    { "id": "seed-2026-11-15-knicks-raptors", "date": "2026-11-15", "title": "Subversive Overtime: Knicks at Raptors", "kind": "GAME", "closed": false, "startTime": "18:00", "endTime": "20:30", "description": "The Knicks take on the Toronto Raptors, with tipoff at 6 PM." },
+    { "id": "seed-2026-11-21-knicks-blazers", "date": "2026-11-21", "title": "Subversive Overtime: Knicks vs. Blazers", "kind": "GAME", "closed": false, "startTime": "19:30", "endTime": "22:00", "description": "We’re staying open late for Knicks basketball! The Knicks take on the Portland Trail Blazers with tipoff at 7:30 PM." },
+    { "id": "seed-2026-11-25-knicks-cavaliers", "date": "2026-11-25", "title": "Subversive Overtime: Knicks vs. Cavaliers", "kind": "GAME", "closed": false, "startTime": "19:30", "endTime": "22:00", "description": "Thanksgiving Eve. We’re staying open late as the Knicks take on the Cleveland Cavaliers in the NBA Cup group stage, with tipoff at 7:30 PM." },
+    { "id": "seed-2026-11-27-knicks-heat", "date": "2026-11-27", "title": "Subversive Overtime: Knicks vs. Heat", "kind": "GAME", "closed": false, "startTime": "19:00", "endTime": "21:30", "description": "Black Friday. We’re staying open late as the Knicks take on the Miami Heat in NBA Cup group stage play, with tipoff at 7 PM." },
+    { "id": "seed-2026-11-29-knicks-hawks", "date": "2026-11-29", "title": "Subversive Overtime: Knicks vs. Hawks", "kind": "GAME", "closed": false, "startTime": "18:00", "endTime": "20:30", "description": "We’re staying open late as the Knicks take on the Atlanta Hawks, with tipoff at 6 PM." },
+    { "id": "seed-2026-12-10-trivia", "date": "2026-12-10", "title": "Trivia with Smarty Pints", "kind": "OTHER", "closed": false, "startTime": "18:30", "endTime": "20:30", "description": "Biweekly trivia with Lauren from Smarty Pints Trivia. Trivia kicks off at 6:30 and play is open to all. The winning team takes home a 4-pack." },
+    { "id": "seed-2026-12-18-knicks-wizards", "date": "2026-12-18", "title": "Subversive Overtime: Knicks at Wizards", "kind": "GAME", "closed": false, "startTime": "19:00", "endTime": "21:30", "description": "We’re staying open late as the Knicks take on the Washington Wizards, with tipoff at 7 PM." },
+    { "id": "seed-2026-12-27-knicks-nets", "date": "2026-12-27", "title": "Subversive Overtime: Knicks vs. Nets", "kind": "GAME", "closed": false, "startTime": "18:00", "endTime": "20:30", "description": "We’re staying open late as the Knicks take on the Brooklyn Nets, with tipoff at 6 PM." }
+  ]
+}

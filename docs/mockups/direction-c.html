@@ -1,0 +1,81 @@
+<!doctype html><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<link rel="stylesheet" href="node_modules/@fontsource/anton/400.css">
+<link rel="stylesheet" href="node_modules/@fontsource/ibm-plex-mono/400.css"><link rel="stylesheet" href="node_modules/@fontsource/ibm-plex-mono/500.css">
+<link rel="stylesheet" href="node_modules/@fontsource/archivo/400.css"><link rel="stylesheet" href="node_modules/@fontsource/archivo/600.css">
+<style>
+:root{--night:#0F0E0C;--bone:#EFE7D8;--ember:#FF6B1A;--blue:#2C6BE0;--line:#EFE7D824}
+*{box-sizing:border-box;margin:0}
+body{background:var(--night);color:var(--bone);font:400 16px/1.5 Archivo,sans-serif}
+.wrap{max-width:1120px;margin:0 auto;padding:0 20px}
+.mono{font-family:"IBM Plex Mono";text-transform:uppercase;letter-spacing:.06em;font-size:13px}
+.hero{position:relative;min-height:640px;display:flex;flex-direction:column;background:linear-gradient(#0F0E0Cb0,#0F0E0C30 30%,#0F0E0C40 55%,#0F0E0C 100%),url(img/05.jpg) center/cover}
+header{display:flex;align-items:center;justify-content:space-between;padding:16px 0}
+.brand{display:flex;align-items:center;gap:10px;font:400 22px Anton;letter-spacing:.08em;text-transform:uppercase}
+.mark{width:15px;height:30px;background:var(--ember);-webkit-mask:url(img/07.png) center/contain no-repeat;mask:url(img/07.png) center/contain no-repeat}
+nav{display:none;gap:28px}
+.btn{display:inline-block;background:var(--ember);color:var(--night);padding:12px 18px;font:500 13px "IBM Plex Mono";letter-spacing:.08em;text-transform:uppercase;border-radius:2px}
+.btn.o{background:#0F0E0C80;color:var(--bone);border:1px solid var(--bone);backdrop-filter:blur(6px)}
+.herotxt{margin-top:auto;padding-bottom:26px;display:grid;gap:16px;justify-items:start}
+.status{display:flex;gap:10px;align-items:center}.status:before{content:"";width:8px;height:8px;border-radius:50%;background:#5BE37D;box-shadow:0 0 12px #5BE37D}
+h1{font:400 clamp(72px,23vw,210px)/.86 Anton;text-transform:uppercase;letter-spacing:.005em;margin-left:-3px}
+.cta{display:flex;gap:10px;flex-wrap:wrap}
+.ticker{border-block:1px solid var(--line);padding:11px 0;white-space:nowrap;overflow:hidden;color:var(--ember)}
+h2{font:400 46px/1 Anton;text-transform:uppercase;margin:46px 0 14px;display:flex;justify-content:space-between;align-items:baseline}
+h2 span{color:var(--bone);opacity:.55}
+.board{border:1px solid var(--line);border-radius:4px;background:#17150F}
+.cols{display:grid}
+.grp{padding:12px 16px 6px;color:var(--ember)}
+.row{display:grid;grid-template-columns:auto 1fr auto;gap:10px;align-items:baseline;padding:10px 16px;border-top:1px solid var(--line)}
+.row b{font:400 23px/1.1 Anton;text-transform:uppercase;letter-spacing:.03em}
+.row u{border-bottom:1px dotted #EFE7D855;text-decoration:none;transform:translateY(-4px)}
+.row i{font:500 14px "IBM Plex Mono";font-style:normal}
+.row span{grid-column:1/-1;font-size:14px;opacity:.65;margin-top:-4px}
+.events{display:grid;gap:10px}
+.ev{display:grid;grid-template-columns:1fr auto;gap:4px 12px;padding:16px;border-radius:4px;background:linear-gradient(100deg,#1B2E57,#17150F 70%);border:1px solid var(--line)}
+.ev.t{background:linear-gradient(100deg,#4A2410,#17150F 70%)}
+.ev .mono{color:var(--ember);grid-column:1/-1}.ev b{font:400 28px/1 Anton;text-transform:uppercase}.ev span{font-size:14px;opacity:.7;grid-column:1}
+.ev em{grid-row:2/4;grid-column:2;align-self:center;font:400 44px Anton;font-style:normal}
+.strip{display:grid;grid-template-columns:1fr 1fr 1fr;gap:4px;margin-top:46px}.strip img{width:100%;aspect-ratio:1;object-fit:cover;display:block}
+.vg{display:grid;gap:26px;margin-bottom:50px}
+.hours div{display:flex;justify-content:space-between;padding:10px 0;border-bottom:1px solid var(--line)}
+.hours .today{color:var(--ember)}
+@media(min-width:860px){nav{display:flex}.hero{min-height:760px}.cols{grid-template-columns:1fr 1fr}.cols>div+div{border-left:1px solid var(--line)}.events{grid-template-columns:repeat(3,1fr)}.vg{grid-template-columns:1fr 1fr;gap:64px}.strip{grid-template-columns:repeat(3,1fr)}.strip img{aspect-ratio:16/10}}
+</style>
+<section class="hero"><div class="wrap" style="flex:1;display:flex;flex-direction:column;width:100%">
+<header><div class="brand"><i class="mark"></i>Subversive</div><nav class="mono"><span>Menu</span><span>Events</span><span>Visit</span><span>Malthouse</span></nav><a class="btn">Order</a></header>
+<div class="herotxt">
+ <div class="status mono">Open today 4:30–8:30 · Kitchen til 8:15</div>
+ <h1>Subver&shy;sive</h1>
+ <p class="mono" style="font-size:14px">Brewery · Taproom · Kitchen — 96 W Bridge St, Catskill NY</p>
+ <div class="cta"><a class="btn">See the menu</a><a class="btn o">Order pickup</a></div>
+</div></div></section>
+<div class="ticker mono">Tonight · Knicks at Pacers · 7:00 tip · open til the final buzzer &nbsp;✦&nbsp; Sun · Knicks at Raptors · 6:00 &nbsp;✦&nbsp; Dec 10 · Trivia</div>
+<div class="wrap">
+<h2>On tap <span class="mono">9 oz / 16 oz</span></h2>
+<div class="board cols">
+ <div><div class="grp mono">Light</div>
+  <div class="row"><b>Puff Puff Pils</b><u></u><i>5 / 8</i><span>Europils · 4.2%</span></div>
+  <div class="row"><b>¡Chinga La Migra!</b><u></u><i>5 / 8</i><span>Light lager · 4.0% · 15% of sales to CCSM</span></div>
+  <div class="grp mono" style="border-top:1px solid var(--line)">Hoppy</div>
+  <div class="row"><b>New York Nectar</b><u></u><i>5 / 8</i><span>New York IPA · 7.0% · all NY grain &amp; hops</span></div>
+  <div class="row"><b>Off Axis</b><u></u><i>5 / 8</i><span>Southern Hemisphere pale ale · 5.5%</span></div></div>
+ <div><div class="grp mono">Farmhouse &amp; sour</div>
+  <div class="row"><b>Sudachi Saison</b><u></u><i>6 / 9</i><span>Saison with sudachi &amp; Buddha’s hand · 6.5%</span></div>
+  <div class="row"><b>Forbidden Fruit</b><u></u><i>5 / 8</i><span>Black currant sour · 6.0%</span></div>
+  <div class="row"><b>Cheap Dills</b><u></u><i>5 / 8</i><span>Pickle gose · 4.5% · house pickle brine</span></div>
+  <div class="grp mono" style="border-top:1px solid var(--line)">Malty</div>
+  <div class="row"><b>Mountain Märzen</b><u></u><i>5 / 8</i><span>Oktoberfest lager · 5.8%</span></div></div>
+</div>
+<h2>Coming up</h2>
+<div class="events">
+ <div class="ev"><div class="mono">Tonight · Fri Nov 13</div><b>Knicks at Pacers</b><span>Open til the final buzzer</span><em>7:00</em></div>
+ <div class="ev"><div class="mono">Sun Nov 15</div><b>Knicks at Raptors</b><span>Subversive Overtime</span><em>6:00</em></div>
+ <div class="ev t"><div class="mono">Thu Dec 10</div><b>Trivia night</b><span>With Smarty Pints · open to all</span><em>6:30</em></div>
+</div>
+<div class="strip"><img src="img/15.jpg"><img src="img/06.jpg"><img src="img/16.jpg"></div>
+<h2>Visit</h2>
+<div class="vg">
+ <div class="hours mono" style="font-size:14px"><div><span>Mon</span><span>4:30–8</span></div><div style="opacity:.45"><span>Tue</span><span>Closed</span></div><div><span>Wed</span><span>4:30–8</span></div><div><span>Thu</span><span>4:30–8</span></div><div class="today"><span>Fri · today</span><span>4:30–8:30</span></div><div><span>Sat</span><span>12–8:30</span></div><div><span>Sun</span><span>12–6:30</span></div></div>
+ <div style="display:grid;gap:16px;align-content:start"><p style="font:400 34px/1.05 Anton;text-transform:uppercase">96 West Bridge Street<br>Catskill, NY 12414</p><p style="opacity:.75;font-size:15px">First come, first served. Heated tent. Leashed dogs welcome outside and in the tent. 8 spots on site, more on West Bridge &amp; Division St.</p><div class="cta"><a class="btn">Directions</a><a class="btn o">(518) 303-1270</a></div></div>
+</div>
+</div>

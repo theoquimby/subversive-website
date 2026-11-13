@@ -1,0 +1,101 @@
+<!doctype html><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<link rel="stylesheet" href="node_modules/@fontsource/barlow-condensed/600.css"><link rel="stylesheet" href="node_modules/@fontsource/barlow-condensed/700.css">
+<link rel="stylesheet" href="node_modules/@fontsource/barlow/400.css"><link rel="stylesheet" href="node_modules/@fontsource/barlow/500.css"><link rel="stylesheet" href="node_modules/@fontsource/barlow/600.css">
+<link rel="stylesheet" href="node_modules/@fontsource/newsreader/400-italic.css">
+<style>
+:root{--spruce:#1E3A2F;--oat:#F0E8D7;--gold:#DDA63A;--rust:#B8492A;--line:#1E3A2F2e}
+*{box-sizing:border-box;margin:0}
+body{background:var(--oat);color:var(--spruce);font:400 16px/1.5 Barlow,sans-serif}
+.wrap{max-width:1120px;margin:0 auto;padding:0 20px}
+.cond{font-family:"Barlow Condensed";text-transform:uppercase}
+/* chevron band drawn from the barley mark */
+.band{height:30px;background:
+ linear-gradient(135deg,transparent 46%,var(--c,var(--gold)) 46% 54%,transparent 54%) 0 0/30px 30px,
+ linear-gradient(45deg,transparent 46%,var(--c,var(--gold)) 46% 54%,transparent 54%) 15px 0/30px 30px}
+.top{background:var(--spruce);color:var(--oat)}
+header{display:flex;align-items:center;justify-content:space-between;padding:16px 0}
+.brand{display:flex;align-items:center;gap:10px;font:600 24px "Barlow Condensed";letter-spacing:.24em;text-transform:uppercase}
+.mark{width:16px;height:32px;background:var(--gold);-webkit-mask:url(img/07.png) center/contain no-repeat;mask:url(img/07.png) center/contain no-repeat}
+nav{display:none;gap:30px;font:600 17px "Barlow Condensed";letter-spacing:.14em;text-transform:uppercase}
+.btn{display:inline-block;background:var(--gold);color:var(--spruce);padding:11px 20px;font:700 16px "Barlow Condensed";letter-spacing:.12em;text-transform:uppercase;border-radius:3px}
+.btn.o{background:none;border:1.5px solid currentColor;color:inherit}
+.hero{padding:26px 0 0;display:grid;gap:26px}
+.status{font:600 15px "Barlow Condensed";letter-spacing:.16em;text-transform:uppercase;color:var(--gold);display:flex;gap:10px;align-items:center}
+.status:before{content:"";width:9px;height:9px;border-radius:50%;background:#6FCF7F}
+h1{font:700 clamp(64px,19vw,150px)/.84 "Barlow Condensed";text-transform:uppercase;letter-spacing:-.005em}
+h1 span{color:var(--gold)}
+.lede{font:italic 400 21px/1.35 Newsreader;max-width:30ch;opacity:.92}
+.cta{display:flex;gap:12px;flex-wrap:wrap}
+.heroimg{position:relative;margin:0 -20px}
+.heroimg img{display:block;width:100%;aspect-ratio:16/11;object-fit:cover}
+.stamp{position:absolute;right:16px;top:-44px;width:104px;height:104px;border-radius:50%;background:var(--rust);color:var(--oat);display:grid;place-items:center;text-align:center;font:700 15px/1.05 "Barlow Condensed";letter-spacing:.1em;text-transform:uppercase;transform:rotate(-9deg);outline:1.5px solid var(--oat);outline-offset:-7px}
+h2{font:700 44px/.95 "Barlow Condensed";text-transform:uppercase;margin:48px 0 4px;display:flex;align-items:baseline;gap:14px}
+h2 small{font:italic 400 17px Newsreader;text-transform:none;opacity:.7}
+.src{display:grid;grid-template-columns:1fr 1fr;border:1.5px solid var(--spruce);margin-top:18px}
+.src div{padding:14px;border-right:1.5px solid var(--spruce);border-bottom:1.5px solid var(--spruce)}
+.src div:nth-child(2n){border-right:0}.src div:nth-last-child(-n+2){border-bottom:0}
+.src b{display:block;font:700 13px "Barlow Condensed";letter-spacing:.18em;text-transform:uppercase;color:var(--rust)}
+.src span{font:600 21px/1.1 "Barlow Condensed";text-transform:uppercase}.src i{display:block;font:italic 15px Newsreader;opacity:.75}
+.cols{display:grid;gap:0 56px}
+.grp{font:700 14px "Barlow Condensed";letter-spacing:.2em;text-transform:uppercase;color:var(--rust);margin:22px 0 0;padding-bottom:6px;border-bottom:1.5px solid var(--spruce)}
+.row{display:grid;grid-template-columns:1fr auto;gap:0 14px;padding:12px 0;border-bottom:1px solid var(--line)}
+.row b{font:600 24px/1.05 "Barlow Condensed";text-transform:uppercase;letter-spacing:.02em}
+.row span{grid-column:1;font-size:14.5px;opacity:.8}
+.row i{grid-row:1/3;grid-column:2;align-self:center;font:600 19px "Barlow Condensed";font-style:normal;letter-spacing:.04em}
+.events{margin-top:12px;border-top:1.5px solid var(--spruce)}
+.ev{display:grid;grid-template-columns:78px 1fr auto;align-items:center;gap:14px;padding:14px 0;border-bottom:1px solid var(--line)}
+.ev time{font:700 34px/.9 "Barlow Condensed";text-transform:uppercase}.ev time small{display:block;font-size:13px;letter-spacing:.18em;color:var(--rust)}
+.ev b{font:600 22px/1.1 "Barlow Condensed";text-transform:uppercase;display:block}.ev span{font-size:14.5px;opacity:.75}
+.kind{font:700 12px "Barlow Condensed";letter-spacing:.16em;text-transform:uppercase;border:1.5px solid var(--spruce);padding:3px 8px;border-radius:2px}
+.visit{background:var(--spruce);color:var(--oat);margin-top:52px;padding:8px 0 44px}
+.visit h2{color:var(--oat)}.vg{display:grid;gap:26px;margin-top:14px}
+.hours div{display:flex;justify-content:space-between;padding:9px 0;border-bottom:1px solid #F0E8D72e;font:600 20px "Barlow Condensed";letter-spacing:.06em;text-transform:uppercase}
+.hours .today{color:var(--gold)}
+.facts{font-size:15px;opacity:.9;display:grid;gap:6px}
+@media(min-width:860px){nav{display:flex}.hero{grid-template-columns:1fr 1fr;align-items:end;gap:48px;padding-top:40px}.heroimg{margin:0}.heroimg img{aspect-ratio:5/4}.src{grid-template-columns:repeat(4,1fr)}.src div{border-bottom:0!important;border-right:1.5px solid var(--spruce)!important}.src div:last-child{border-right:0!important}.cols{grid-template-columns:1fr 1fr}.vg{grid-template-columns:1fr 1fr;gap:64px}}
+</style>
+<div class="top"><div class="wrap">
+<header><div class="brand"><i class="mark"></i>Subversive</div><nav><span>Menu</span><span>Events</span><span>Visit</span><span>Malthouse</span></nav><a class="btn">Order</a></header>
+<section class="hero">
+ <div style="display:grid;gap:18px;justify-items:start;padding-bottom:30px">
+  <div class="status">Open today 4:30–8:30 · Kitchen til 8:15</div>
+  <h1>Brewery<br>Taproom<br><span>Kitchen</span></h1>
+  <p class="lede">96 West Bridge Street, Catskill, New York. Beer from grain we malt ourselves.</p>
+  <div class="cta"><a class="btn">See the menu</a><a class="btn o">Order pickup</a></div>
+ </div>
+ <div class="heroimg"><img src="img/05.jpg"><div class="stamp">Knicks<br>tonight<br>7:00</div></div>
+</section></div><div class="band" style="--c:#DDA63A"></div></div>
+<div class="wrap">
+<h2>Where it comes from</h2>
+<div class="src">
+ <div><b>Grain</b><span>100% New York</span><i>malted in-house, Catskill</i></div>
+ <div><b>Beef</b><span>Kilcoyne Farms</span><i>Hudson Falls, NY</i></div>
+ <div><b>Buns</b><span>See &amp; Be Bakery</span><i>Cairo, NY</i></div>
+ <div><b>Cider &amp; wine</b><span>Indian Ladder · Dr. Frank</span><i>Altamont · Hammondsport</i></div>
+</div>
+<h2>On tap <small>half 9 oz / full 16 oz</small></h2>
+<div class="cols">
+ <div><div class="grp">Light</div>
+  <div class="row"><b>Puff Puff Pils</b><span>Europils · 4.2%</span><i>5 / 8</i></div>
+  <div class="row"><b>¡Chinga La Migra!</b><span>Light lager · 4.0% · 15% of sales to CCSM</span><i>5 / 8</i></div>
+  <div class="grp">Hoppy</div>
+  <div class="row"><b>New York Nectar</b><span>New York IPA · 7.0% · all NY grain &amp; hops</span><i>5 / 8</i></div>
+  <div class="row"><b>Off Axis</b><span>Southern Hemisphere pale ale · 5.5%</span><i>5 / 8</i></div></div>
+ <div><div class="grp">Farmhouse &amp; sour</div>
+  <div class="row"><b>Sudachi Saison</b><span>Saison with sudachi &amp; Buddha’s hand · 6.5%</span><i>6 / 9</i></div>
+  <div class="row"><b>Forbidden Fruit</b><span>Black currant sour · 6.0%</span><i>5 / 8</i></div>
+  <div class="row"><b>Cheap Dills</b><span>Pickle gose · 4.5% · house pickle brine</span><i>5 / 8</i></div>
+  <div class="grp">Malty</div>
+  <div class="row"><b>Mountain Märzen</b><span>Oktoberfest lager · 5.8%</span><i>5 / 8</i></div></div>
+</div>
+<h2>Coming up</h2>
+<div class="events">
+ <div class="ev"><time><small>Fri · Nov</small>13</time><div><b>Knicks at Pacers</b><span>7:00 tip · open til the final buzzer</span></div><span class="kind">Game</span></div>
+ <div class="ev"><time><small>Sun · Nov</small>15</time><div><b>Knicks at Raptors</b><span>6:00 tip · Subversive Overtime</span></div><span class="kind">Game</span></div>
+ <div class="ev"><time><small>Thu · Dec</small>10</time><div><b>Trivia with Smarty Pints</b><span>6:30 · open to all</span></div><span class="kind">Trivia</span></div>
+</div>
+</div>
+<div class="visit"><div class="band" style="--c:#F0E8D733;margin-bottom:8px"></div><div class="wrap"><h2>Visit</h2><div class="vg">
+ <div class="hours"><div><span>Mon</span><span>4:30–8</span></div><div style="opacity:.5"><span>Tue</span><span>Closed</span></div><div><span>Wed</span><span>4:30–8</span></div><div><span>Thu</span><span>4:30–8</span></div><div class="today"><span>Fri · today</span><span>4:30–8:30</span></div><div><span>Sat</span><span>12–8:30</span></div><div><span>Sun</span><span>12–6:30</span></div></div>
+ <div style="display:grid;gap:16px;align-content:start"><p class="cond" style="font-weight:700;font-size:32px;line-height:1">96 West Bridge Street<br>Catskill, NY 12414</p><div class="facts"><span>Seating is first come, first served.</span><span>Heated tent. Leashed dogs welcome outside and in the tent.</span><span>8 spots on site, more on West Bridge &amp; Division St.</span></div><div class="cta"><a class="btn">Directions</a><a class="btn o">(518) 303-1270</a></div></div>
+</div></div></div>

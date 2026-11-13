@@ -1,0 +1,90 @@
+<!doctype html><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<link rel="stylesheet" href="node_modules/@fontsource/caprasimo/400.css">
+<link rel="stylesheet" href="node_modules/@fontsource/dm-sans/400.css"><link rel="stylesheet" href="node_modules/@fontsource/dm-sans/500.css"><link rel="stylesheet" href="node_modules/@fontsource/dm-sans/700.css">
+<style>
+:root{--paper:#F5ECDC;--ink:#151412;--yellow:#FFCE3A;--blue:#2F9BE0;--orange:#EE6A1F;--line:#15141222}
+*{box-sizing:border-box;margin:0}
+body{background:var(--paper);color:var(--ink);font:500 16px/1.45 "DM Sans",sans-serif}
+.checker{height:22px;background:conic-gradient(var(--ink) 25%,var(--paper) 0 50%,var(--ink) 0 75%,var(--paper) 0) 0 0/22px 22px}
+.wrap{max-width:1120px;margin:0 auto;padding:0 20px}
+header{display:flex;align-items:center;justify-content:space-between;padding:16px 0}
+.brand{display:flex;align-items:center;gap:10px;font:400 22px Caprasimo;letter-spacing:.01em}
+.mark{width:18px;height:34px;background:var(--ink);-webkit-mask:url(img/07.png) center/contain no-repeat;mask:url(img/07.png) center/contain no-repeat}
+.btn{display:inline-flex;align-items:center;gap:8px;background:var(--ink);color:var(--paper);border-radius:999px;padding:11px 20px;font-weight:700;font-size:15px;text-decoration:none}
+.btn.y{background:var(--yellow);color:var(--ink);border:2px solid var(--ink);box-shadow:3px 3px 0 var(--ink)}
+nav{display:none;gap:28px;font-weight:700}
+.hero{display:grid;gap:22px;padding:14px 0 34px}
+h1{font:400 clamp(54px,15vw,132px)/.88 Caprasimo;letter-spacing:-.02em}
+h1 em{font-style:normal;color:var(--orange)}
+.sub{font-size:18px;max-width:30ch}
+.status{display:inline-flex;align-items:center;gap:10px;border:2px solid var(--ink);border-radius:999px;padding:8px 16px 8px 12px;font-weight:700;background:#fff}
+.dot{width:11px;height:11px;border-radius:50%;background:#2DB55D;box-shadow:0 0 0 4px #2DB55D33}
+.cta{display:flex;gap:12px;flex-wrap:wrap}
+.photo{position:relative;border:2px solid var(--ink);border-radius:26px;overflow:visible}
+.photo img{display:block;width:100%;aspect-ratio:4/3.2;object-fit:cover;border-radius:24px}
+.burst{position:absolute;right:-8px;top:-26px;width:124px;height:124px;display:grid;place-items:center;text-align:center;font:400 17px/1 Caprasimo;transform:rotate(11deg);background:var(--yellow);
+ clip-path:polygon(50% 0,59% 12%,72% 4%,76% 18%,91% 16%,88% 31%,100% 38%,91% 50%,100% 62%,88% 69%,91% 84%,76% 82%,72% 96%,59% 88%,50% 100%,41% 88%,28% 96%,24% 82%,9% 84%,12% 69%,0 62%,9% 50%,0 38%,12% 31%,9% 16%,24% 18%,28% 4%,41% 12%)}
+.tag{position:absolute;left:14px;bottom:-16px;background:var(--blue);color:#fff;border:2px solid var(--ink);border-radius:10px;padding:7px 12px;font-weight:700;transform:rotate(-3deg);font-size:14px}
+.pill{display:inline-block;background:var(--ink);color:var(--paper);font:400 24px Caprasimo;padding:8px 24px 10px;border-radius:999px;margin:44px 0 6px}
+.cols{display:grid;gap:0 48px}
+.grp{font-weight:700;font-size:12px;letter-spacing:.14em;text-transform:uppercase;margin:22px 0 2px;color:var(--orange)}
+.row{display:grid;grid-template-columns:1fr auto;gap:2px 14px;padding:13px 0;border-bottom:1.5px dashed var(--line)}
+.row b{font:400 21px/1.1 Caprasimo}
+.row span{grid-column:1;font-size:14.5px;opacity:.75}
+.row i{grid-row:1/3;grid-column:2;align-self:center;font-style:normal;font-weight:700;font-variant-numeric:tabular-nums;font-size:15px}
+.more{display:inline-block;margin-top:16px;font-weight:700;border-bottom:2px solid var(--ink);color:inherit;text-decoration:none}
+.events{display:grid;gap:12px;margin-top:14px}
+.ev{display:grid;grid-template-columns:74px 1fr;border:2px solid var(--ink);border-radius:16px;overflow:hidden;background:#fff}
+.ev time{background:var(--orange);color:#fff;display:grid;place-items:center;text-align:center;font:400 28px/1 Caprasimo;border-right:2px dashed var(--ink);padding:10px 0}
+.ev time small{display:block;font:700 11px "DM Sans";letter-spacing:.12em}
+.ev.b time{background:var(--blue)}.ev.k time{background:var(--ink)}
+.ev div{padding:12px 14px}.ev b{display:block;font-size:17px;line-height:1.2}.ev span{font-size:14px;opacity:.7}
+.visit{display:grid;gap:26px;margin:14px 0 50px}
+.hours{border:2px solid var(--ink);border-radius:18px;background:#fff;padding:6px 18px}
+.hours div{display:flex;justify-content:space-between;padding:10px 0;border-bottom:1.5px dashed var(--line);font-variant-numeric:tabular-nums}
+.hours div:last-child{border:0}.hours .today{font-weight:700}.hours small{opacity:.6;margin-left:8px}
+.facts{display:flex;flex-wrap:wrap;gap:8px}.facts span{border:2px solid var(--ink);border-radius:999px;padding:6px 14px;font-size:14px;font-weight:700}
+.facts span:nth-child(2){background:var(--yellow)}.facts span:nth-child(4){background:var(--blue);color:#fff}
+@media(min-width:860px){nav{display:flex}.hero{grid-template-columns:1.05fr .95fr;align-items:center;gap:56px;padding:30px 0 50px}.cols{grid-template-columns:1fr 1fr}.events{grid-template-columns:repeat(3,1fr)}.visit{grid-template-columns:1fr 1fr}.burst{width:150px;height:150px;font-size:20px}}
+</style>
+<div class="checker"></div>
+<div class="wrap">
+<header><div class="brand"><i class="mark"></i>Subversive</div><nav><span>Menu</span><span>Events</span><span>Visit</span><span>Our beer</span></nav><a class="btn">Order pickup</a></header>
+<section class="hero">
+ <div style="display:grid;gap:20px;justify-items:start">
+  <span class="status"><i class="dot"></i>Open today 4:30–8:30 <span style="opacity:.55;font-weight:500">· kitchen til 8:15</span></span>
+  <h1>Beer.<br>Burgers.<br><em>Catskill.</em></h1>
+  <p class="sub">Farmhouse brewery, taproom &amp; kitchen at 96 West Bridge Street.</p>
+  <div class="cta"><a class="btn y">See the menu</a><a class="btn">Order pickup</a></div>
+ </div>
+ <div class="photo"><img src="img/15.jpg"><div class="burst">Knicks<br>tonight<br>7:00</div><span class="tag">Dogs welcome in the tent</span></div>
+</section>
+<span class="pill">On tap</span>
+<div class="cols">
+ <div><div class="grp">Light</div>
+  <div class="row"><b>Puff Puff Pils</b><span>Europils · 4.2%</span><i>5 / 8</i></div>
+  <div class="row"><b>¡Chinga La Migra!</b><span>Light lager · 4.0% · 15% of sales to CCSM</span><i>5 / 8</i></div>
+  <div class="grp">Hoppy</div>
+  <div class="row"><b>New York Nectar</b><span>New York IPA · 7.0% · all NY grain &amp; hops</span><i>5 / 8</i></div>
+  <div class="row"><b>Off Axis</b><span>Southern Hemisphere pale ale · 5.5%</span><i>5 / 8</i></div></div>
+ <div><div class="grp">Farmhouse &amp; sour</div>
+  <div class="row"><b>Sudachi Saison</b><span>Saison with sudachi &amp; Buddha’s hand · 6.5%</span><i>6 / 9</i></div>
+  <div class="row"><b>Forbidden Fruit</b><span>Black currant sour · 6.0%</span><i>5 / 8</i></div>
+  <div class="row"><b>Cheap Dills</b><span>Pickle gose · 4.5% · house pickle brine</span><i>5 / 8</i></div>
+  <div class="grp">Malty</div>
+  <div class="row"><b>Mountain Märzen</b><span>Oktoberfest lager · 5.8%</span><i>5 / 8</i></div></div>
+</div>
+<a class="more">Full drink &amp; food menu →</a>
+<br><span class="pill">Coming up</span>
+<div class="events">
+ <div class="ev"><time><small>FRI</small>13<small>NOV</small></time><div><b>Knicks at Pacers</b><span>7:00 tip · open til the final buzzer</span></div></div>
+ <div class="ev k"><time><small>SUN</small>15<small>NOV</small></time><div><b>Knicks at Raptors</b><span>6:00 tip · Subversive Overtime</span></div></div>
+ <div class="ev b"><time><small>THU</small>10<small>DEC</small></time><div><b>Trivia with Smarty Pints</b><span>6:30 · open to all</span></div></div>
+</div>
+<span class="pill">Visit</span>
+<div class="visit">
+ <div class="hours"><div><span>Monday</span><span>4:30–8</span></div><div><span>Tuesday</span><span style="opacity:.5">Closed</span></div><div><span>Wednesday</span><span>4:30–8</span></div><div><span>Thursday</span><span>4:30–8</span></div><div class="today"><span>Friday<small>today</small></span><span>4:30–8:30</span></div><div><span>Saturday</span><span>12–8:30</span></div><div><span>Sunday</span><span>12–6:30</span></div></div>
+ <div style="display:grid;gap:16px;align-content:start"><p style="font:400 26px/1.15 Caprasimo">96 West Bridge Street<br>Catskill, NY 12414</p><div class="facts"><span>First come, first served</span><span>Heated tent</span><span>8 spots + street parking</span><span>Leashed dogs outside</span></div><div class="cta"><a class="btn">Directions</a><a class="btn y">(518) 303-1270</a></div></div>
+</div>
+</div>
+<div class="checker"></div>

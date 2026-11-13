@@ -1,0 +1,73 @@
+{
+  "_meta": {
+    "source": "drinksubversive.com, crawled 2026-11-13. Copy is verbatim from the current site unless marked.",
+    "verify": [
+      "Hours: the home page lists separate kitchen close times; its footer says 'Kitchen & taproom now close at the same time'. Confirm with Max.",
+      "Name: rebrand drops 'Malting'. Public name here is 'Subversive'; confirm the long form ('Subversive Brewing'?) with Max.",
+      "Newsletter provider is unknown; the old Squarespace block was broken."
+    ]
+  },
+  "name": "Subversive",
+  "legalOrLongName": "Subversive Brewing",
+  "descriptor": "Farmhouse brewery, taproom & kitchen",
+  "timezone": "America/New_York",
+  "address": { "street": "96 West Bridge Street", "city": "Catskill", "state": "NY", "zip": "12414", "geo": null },
+  "phone": { "display": "(518) 303-1270", "tel": "+15183031270", "note": "Only answered during taproom hours." },
+  "email": "mhenry@drinksubversive.com",
+  "links": {
+    "order": "https://subversiveonline.square.site/",
+    "eGiftCard": "https://squareup.com/gift/V4CJZ1FTSRDKS/order",
+    "map": "https://g.page/subversivebeer?share",
+    "instagram": "https://www.instagram.com/subversivebeer/",
+    "facebook": "https://www.facebook.com/subversivemaltnbrew/",
+    "bandBookingForm": "https://docs.google.com/forms/d/e/1FAIpQLSevc5Im4BWK858WH6Mp9MgRPQ5nE7Pypn_zllFjjl62wLNduw/viewform"
+  },
+  "hours": {
+    "mon": { "open": "16:30", "close": "20:00", "kitchenClose": "20:00" },
+    "tue": null,
+    "wed": { "open": "16:30", "close": "20:00", "kitchenClose": "20:00" },
+    "thu": { "open": "16:30", "close": "20:00", "kitchenClose": "20:00" },
+    "fri": { "open": "16:30", "close": "20:30", "kitchenClose": "20:15" },
+    "sat": { "open": "12:00", "close": "20:30", "kitchenClose": "20:15" },
+    "sun": { "open": "12:00", "close": "18:30", "kitchenClose": "18:15" }
+  },
+  "visit": {
+    "seating": "Seating is first come, first served.",
+    "tent": "Heated tent.",
+    "parking": "We have 8 parking spots onsite. There is plenty of parking on West Bridge Street or around the corner on Division Street if the lot is full!",
+    "dogs": "Leashed, well-behaved dogs are permitted outside and in our heated tent, however we reserve the right to ask anyone with a dog to leave if it causes issues with other customers. Please be a responsible dog owner and help us keep our outdoor area dog friendly!",
+    "giftCards": "Physical gift cards are always available to purchase in the taproom."
+  },
+  "sourcing": [
+    { "what": "Grain", "who": "100% New York", "where": "malted in-house, Catskill" },
+    { "what": "Beef", "who": "Kilcoyne Farms", "where": "Hudson Falls, NY" },
+    { "what": "Buns", "who": "See & Be Bakery", "where": "Cairo, NY" },
+    { "what": "Cider", "who": "Indian Ladder", "where": "Altamont, NY" },
+    { "what": "Wine", "who": "Salmon Run · Dr. Konstantin Frank", "where": "Hammondsport, NY" },
+    { "what": "Spirits", "who": "Black Dirt · Albany Distilling · Taconic · Spirits Lab", "where": "New York State" }
+  ],
+  "about": {
+    "founders": ["Zane Coffey", "Max Ocean"],
+    "paragraphs": [
+      "Subversive Malting + Brewing is a true farmhouse brewery crafting beers from 100% locally sourced ingredients at the foot of the Catskill Mountains. Driven by a passion for native ingredients + inspired by the bounty that surrounds us in New York State, we aim to capture a sense of place in each of our beers.",
+      "We opened our doors in December 2018 as a nano-sized operation producing out of a small barn in Livingston, NY. Within a year of opening, we expanded our production operations and moved them into an old mechanic’s garage in the Village of Catskill, NY, with an onsite taproom which opened in early 2020.",
+      "Our beers are simple and expressive and appeal to a wide variety of palates. Come visit!"
+    ]
+  },
+  "malthouse": {
+    "paragraphs": [
+      "Malt has often been called the soul of beer. It is the source of fermentable sugars in all forms of grain-based alcoholic beverages, and has been made in various ways around the world for thousands of years.",
+      "While historically the malting process was often done by brewers or distillers in-house, 20th Century industrialization led to a massive consolidation of the malting industry. Until just over a decade ago, there were only a handful of malthouses in North America—all of them large industrial behemoths promoting a centralized grain economy.",
+      "We deeply believe that a true regional grain economy is not just possible, but vitally necessary in the 21st Century.",
+      "By keeping all our malt production in-house, we’re able to focus on our raw material selection from top to bottom, and we’re able to tweak recipes by tweaking our malts! We brew beers around the malts we have available and we make malts for the beers we want to brew."
+    ]
+  },
+  "brewery": {
+    "paragraphs": [
+      "Most ‘local’ beer still relies heavily on a global or national supply chain. Just five years ago, our business model would’ve been impossible.",
+      "The beers that we choose to brew are inherently driven by the malts we are able to produce ourselves, and the grains, hops, and other raw agricultural inputs we are able to source from our neighbors.",
+      "We draw inspiration from a variety of breweries and styles from around the world, but seek to create beers that exist outside of traditional style guidelines, and are instead driven by our ingredients, and the refinement of technique in our malting and brewing processes over time."
+    ]
+  },
+  "bands": "If you are a musician interested in playing our establishment please fill out this form."
+}

@@ -1,0 +1,22 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 664 64" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="butt" stroke-linejoin="round" role="img" aria-label="Subversive">
+  <!-- S -->
+  <path d="M38 14C34 7 28 4 21 4 12 4 6 9 6 17c0 18 33 10 33 29 0 9-7 14-17 14-8 0-14-4-18-11"/>
+  <!-- U -->
+  <path d="M72 4v36c0 12 7 20 18 20s18-8 18-20V4"/>
+  <!-- B -->
+  <path d="M142 4v56h20c10 0 17-6 17-15s-7-14-17-14h-20m0-27h18c9 0 15 5 15 13.500S169 31 160 31"/>
+  <!-- V: a long slash with a short left arm, like a check mark -->
+  <path d="M238 4 212 60 200 33" stroke="var(--slash, currentColor)" stroke-linejoin="miter"/>
+  <!-- E -->
+  <path d="M302 4h-34v56h34M268 31h28"/>
+  <!-- R -->
+  <path d="M336 60V4h20c10 0 17 6 17 15s-7 15-17 15h-20m20 0 18 26"/>
+  <!-- S -->
+  <path d="M442 14c-4-7-10-10-17-10-9 0-15 5-15 13 0 18 33 10 33 29 0 9-7 14-17 14-8 0-14-4-18-11"/>
+  <!-- I -->
+  <path d="M478 4v56"/>
+  <!-- V -->
+  <path d="M510 4l24 56 24-56"/>
+  <!-- E -->
+  <path d="M626 4h-34v56h34M592 31h28"/>
+</svg>

@@ -1,0 +1,228 @@
+{
+  "_meta": {
+    "source": "Transcribed from docs/source/drink-menu-2026-10.pdf and docs/source/food-menu-2026-10.pdf (both marked 'Updated October 23').",
+    "verify": [
+      "Cabernet Sauvignon glass price is not printed clearly (assumed 10 to match the Chardonnay).",
+      "October / Oktoberfest specials are seasonal and probably ended; confirm before launch.",
+      "Draft list changes often; confirm the current taps."
+    ],
+    "pourSizes": { "half": "9 oz", "full": "16 oz" }
+  },
+  "drinks": [
+    {
+      "id": "house-beer",
+      "title": "House-brewed beer",
+      "note": "Half pour 9 oz / full pour 16 oz",
+      "groups": [
+        {
+          "title": "Light",
+          "items": [
+            { "name": "Puff Puff Pils", "style": "Europils", "abv": 4.2, "description": "European pilsner brewed with 100% local grains.", "prices": { "half": 5, "full": 8 } },
+            { "name": "¡Chinga La Migra!", "style": "Light lager", "abv": 4.0, "description": "Lager brewed with local barley & corn in solidarity with and support for Columbia County Sanctuary Movement. 15% of draft and can sales go directly to CCSM.", "prices": { "half": 5, "full": 8 }, "badge": "15% to CCSM" }
+          ]
+        },
+        {
+          "title": "Hoppy",
+          "items": [
+            { "name": "New York Nectar", "style": "New York IPA", "abv": 7.0, "description": "Our flagship IPA brewed with 100% New York grown grains & hops.", "prices": { "half": 5, "full": 8 }, "badge": "Flagship" },
+            { "name": "Hoppy American Lager", "style": "Hoppy lager", "abv": 5.0, "description": "Hopped with Nelson, Elani & Loral hops.", "prices": { "half": 5, "full": 8 } },
+            { "name": "Off Axis", "style": "Southern Hemisphere pale ale", "abv": 5.5, "description": "Hazy pale ale brewed with local grain and hopped with New Zealand Rakau, Motueka and Nelson.", "prices": { "half": 5, "full": 8 } }
+          ]
+        },
+        {
+          "title": "Malty",
+          "items": [
+            { "name": "Festbier", "style": "German-style lager", "abv": 4.5, "description": "Modern Oktoberfest lager brewed with 100% local grains. Lighter than a Märzen, but maltier than a pilsner.", "prices": { "half": 5, "full": 8 }, "seasonal": true },
+            { "name": "Mountain Märzen", "style": "Oktoberfest lager", "abv": 5.8, "description": "Traditional Oktoberfest lager, exhibiting rich malt character.", "prices": { "half": 5, "full": 8 }, "seasonal": true }
+          ]
+        },
+        {
+          "title": "Farmhouse",
+          "items": [
+            { "name": "Subversive Saison", "style": "Classic farmhouse ale", "abv": 6.5, "description": "", "prices": { "half": 5, "full": 8 } },
+            { "name": "Sudachi Saison", "style": "Saison with citrus", "abv": 6.5, "description": "Subversive Saison with Japanese sudachi juice & Buddha’s hand.", "prices": { "half": 6, "full": 9 } }
+          ]
+        },
+        {
+          "title": "Sour",
+          "items": [
+            { "name": "Forbidden Fruit", "style": "Black currant sour ale", "abv": 6.0, "description": "A tart & quenching sour ale brewed with local black currant juice.", "prices": { "half": 5, "full": 8 } },
+            { "name": "Cheap Dills", "style": "Pickle gose", "abv": 4.5, "description": "Tart & briny. Brewed with house pickle brine & pickling spice.", "prices": { "half": 5, "full": 8 } }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "drink-specials",
+      "title": "Drink specials",
+      "seasonal": true,
+      "groups": [
+        {
+          "title": "October specials",
+          "items": [
+            { "name": "Subversive Spaghett", "description": "15 oz of Puff Puff Pils topped with an ounce of Faccia Brutto Aperitivo & a lemon wedge.", "price": 10 },
+            { "name": "Beer & a ’Berg", "description": "A pint of Festbier or Märzen and a bottle of Underberg.", "price": 10 },
+            { "name": "The Full Hookup", "description": "A giant Bavarian pretzel + any draft beer (or two half pours).", "price": 20 },
+            { "name": "Stein & Fill", "description": "Buy the 2026 stein; refills at pint prices all October.", "price": 20 },
+            { "name": "Hot Apple Cider", "description": "Add a shot of Black Dirt Bourbon +7.", "price": 6 }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "other-beverages",
+      "title": "Other beverages",
+      "note": "Sourced from likeminded producers",
+      "groups": [
+        {
+          "title": "Wine",
+          "note": "6 oz pour by the glass. Bottles available upon request.",
+          "items": [
+            { "name": "Chardonnay (2024)", "producer": "Salmon Run Wines", "origin": "Hammondsport, NY", "price": 10 },
+            { "name": "Cabernet Sauvignon", "producer": "Dr. Konstantin Frank", "origin": "Hammondsport, NY", "price": 10, "verifyPrice": true }
+          ]
+        },
+        {
+          "title": "Hard cider",
+          "note": "9 oz draft pour",
+          "items": [ { "name": "Indian Ladder Dry Hard Cider", "price": 8 } ]
+        },
+        {
+          "title": "Cocktails",
+          "note": "All 14 unless noted",
+          "items": [
+            { "name": "Classic Gin & Tonic", "description": "Spirits Lab East End Gin, Fever Tree tonic, lime.", "price": 14 },
+            { "name": "Negroni", "description": "Spirits Lab East End Gin, Method vermouth, Faccia Brutto Aperitivo.", "price": 14 },
+            { "name": "Moscow Mule", "description": "Albany Distilling vodka, Fever Tree ginger beer, fresh lime.", "price": 14 },
+            { "name": "Manhattan", "description": "Taconic Founders rye whiskey, Method sweet vermouth, Angostura bitters, Luxardo cherry.", "price": 14 },
+            { "name": "Margarita", "description": "Steelbound “NY Blanco” (75% grain / 25% agave), triple sec, fresh lime, agave, salt.", "price": 14 },
+            { "name": "Hot Apple Cider & Bourbon", "description": "Black Dirt bourbon, NY apple cider, cinnamon stick.", "price": 14 },
+            { "name": "Vodka Soda, Vodka & Cranberry or Vodka Lemonade", "price": 12 },
+            { "name": "Black Dirt Bourbon & Mexican Coca-Cola", "price": 12 }
+          ]
+        },
+        {
+          "title": "Non-alcoholic",
+          "items": [
+            { "name": "Spindrift Sparkling Water", "description": "Grapefruit, lime, raspberry lime, yuzu mandarin.", "price": 3 },
+            { "name": "Tractor Organic Sodas", "description": "Root beer, cherry cream, kola, kola light.", "price": 4 },
+            { "name": "Tractor Organic Unsweetened Iced Tea", "price": 5 },
+            { "name": "Tractor Organic Lemonade", "price": 6 },
+            { "name": "Arnold Palmer", "price": 6 },
+            { "name": "Mexican Coca-Cola", "price": 6 },
+            { "name": "Hot Apple Cider", "price": 6 },
+            { "name": "Industrial Arts Non-Alcoholic Beer", "price": 6 }
+          ]
+        }
+      ]
+    }
+  ],
+  "food": [
+    {
+      "id": "smash-burgers",
+      "title": "Subversive smash burgers",
+      "intro": "Two smashed 3 oz patties of local grass-fed beef from Kilcoyne Farms (Hudson Falls, NY) on a See & Be Bakery (Cairo, NY) milk bun. Served with a side of fries or a house side salad.",
+      "modifiers": "Add bacon +3, tomato +.50, or caramelized onions +.50. Sub GF bun +1.50, vegan bun +1, vegan cheese +1.",
+      "items": [
+        { "name": "Classic", "description": "Lettuce, American cheese, house-made pickles, Subversive Sauce.", "price": 18 },
+        { "name": "Mushroom & Swiss", "description": "Arugula, Swiss cheese, sautéed cremini mushrooms, wild mushroom aioli.", "price": 20 },
+        { "name": "Bacon Barbecue", "description": "Lettuce, bacon, cheddar, frizzled onions, house barbecue sauce.", "price": 20 }
+      ]
+    },
+    {
+      "id": "impossible-burgers",
+      "title": "Impossible plant-based burgers",
+      "intro": "Two smashed 3 oz patties of Impossible plant-based meat on a See & Be Bakery (Cairo, NY) milk bun. Served with a side of fries or a house side salad.",
+      "modifiers": "Add bacon +3, tomato +.50, or caramelized onions +.50. Sub GF bun +1.50, vegan bun +1, vegan cheese +1.",
+      "items": [
+        { "name": "Impossible Classic", "description": "Lettuce, American cheese, house-made pickles, Subversive Sauce.", "price": 20, "tags": ["vegetarian"] },
+        { "name": "Impossible Mushroom & Swiss", "description": "Arugula, Swiss cheese, sautéed cremini mushrooms, wild mushroom aioli.", "price": 22, "tags": ["vegetarian"] },
+        { "name": "Impossible Vegan", "description": "Lettuce, plant-based cheddar cheese, house-made pickles, vegan garlic aioli on a vegan potato bun.", "price": 22, "tags": ["vegan"] }
+      ]
+    },
+    {
+      "id": "chicken-sandwiches",
+      "title": "Chicken sandwiches",
+      "intro": "Served with a side of fries or a house side salad.",
+      "items": [
+        { "name": "Panko Fried Chicken", "description": "House-made pickles, coleslaw, Subversive Sauce on a See & Be milk bun.", "price": 18 },
+        { "name": "Buffalo Chicken", "description": "Panko breaded chicken breast, buffalo sauce, lettuce, tomato, onion and blue cheese on a See & Be milk bun.", "price": 18 },
+        { "name": "Grilled Chicken", "description": "Arugula, tomato, red onion, garlic aioli on a See & Be milk bun.", "price": 16 }
+      ]
+    },
+    {
+      "id": "small-bites",
+      "title": "Small bites & shareables",
+      "items": [
+        { "name": "Lil’ Burger", "description": "One smashed 3 oz patty of local ground beef, pickles, Subversive Sauce, American cheese on a Martin’s potato roll.", "modifiers": "Sub Impossible plant-based meat +2. Add a side of fries or house side salad +4.", "price": 9, "tags": ["kid-friendly"] },
+        { "name": "Chicken Wings", "description": "(6) 24-hour house-brined jumbo wings tossed in the sauce of your choice: buffalo, barbecue, sweet Thai chili, lemon pepper or cajun. Served with carrots & celery and a side of house blue cheese or house ranch.", "price": 13 },
+        { "name": "Chicken Tenders", "description": "(4) lightly breaded chicken tenders served with fries and choice of any dipping sauce.", "price": 14, "tags": ["kid-friendly"] },
+        { "name": "Bavarian Pretzel Sticks", "description": "4 pretzel sticks with house beer cheese + spicy brown mustard.", "price": 13, "tags": ["vegetarian"] },
+        { "name": "Frites", "description": "Large cone of fries, choice of any 2 dipping sauces.", "price": 12, "tags": ["vegetarian"] }
+      ]
+    },
+    {
+      "id": "salads",
+      "title": "Salads",
+      "items": [
+        { "name": "House Salad", "description": "Mixed greens, cucumber, red onion, tomato, croutons, balsamic vinaigrette.", "modifiers": "Add grilled chicken +6 or bacon +3.", "price": 12, "tags": ["vegetarian"] },
+        { "name": "Chicken Caesar Salad", "description": "Grilled chicken, romaine, grated parmesan, croutons, liberally tossed in house caesar dressing.*", "modifiers": "Sub crispy fried chicken +1.", "price": 17 },
+        { "name": "Buffalo Chicken Salad", "description": "Panko breaded buffalo chicken breast, romaine lettuce, tomato, red onion, gorgonzola crumbles, ranch dressing.", "price": 17 },
+        { "name": "Greek Salad", "description": "Bell peppers, tomato, red onion, cucumber, olives, feta and pepperoncini over mixed greens with Greek vinaigrette. Served with toasted pita & a stuffed grape leaf.", "modifiers": "Add grilled chicken +6 or bacon +3.", "price": 16, "tags": ["vegetarian"] }
+      ]
+    },
+    {
+      "id": "sides",
+      "title": "Sides",
+      "items": [
+        { "name": "Pickles", "price": 1 },
+        { "name": "Coleslaw", "price": 3 },
+        { "name": "Side Salad", "price": 5 },
+        { "name": "Fries", "price": 6 },
+        { "name": "Chicken or Beef", "description": "For a dog or a human.", "price": 6, "tags": ["dog-friendly"] }
+      ]
+    },
+    {
+      "id": "sauces",
+      "title": "House-made dipping sauces",
+      "note": "Sauces à la carte +1.25. Beer cheese à la carte +2.",
+      "items": [
+        { "name": "Subversive Sauce", "description": "Belgian-inspired house special sauce." },
+        { "name": "Samurai Sauce", "description": "Belgian spicy fry sauce." },
+        { "name": "Barbecue Sauce", "description": "Sweet and smoky, a little heat." },
+        { "name": "Garlic Aioli", "description": "Roasted garlic, lemon." },
+        { "name": "Vegan Garlic Aioli", "description": "Roasted garlic, lemon, 100% plant based.", "tags": ["vegan"] },
+        { "name": "Wild Mushroom Aioli", "description": "Blend of chanterelle, porcini and shiitake mushrooms." },
+        { "name": "Honey Mustard Sauce", "description": "Sweet and spicy." },
+        { "name": "Buffalo Sauce", "description": "Tangy and spicy." },
+        { "name": "Beer Cheese", "description": "New York Nectar IPA, artisan cheese blend." }
+      ]
+    },
+    {
+      "id": "weekly-features",
+      "title": "Weekly features",
+      "items": [
+        { "name": "Wing Wednesday Special", "description": "(10) 24-hour house-brined jumbo wings tossed in the sauce of your choice, served with carrots & celery and a side of blue cheese or ranch.", "price": 16, "availability": { "days": ["wed"], "label": "Wednesdays only" } },
+        { "name": "Rodeo Burger", "description": "Two smashed 3 oz patties of local ground beef topped with cheddar, house barbecue sauce and an onion ring on a See & Be milk bun. Served with fries or a side salad.", "price": 17, "availability": { "days": ["thu"], "label": "Rodeo Thursdays" } },
+        { "name": "Lil’ Rodeo with fries", "description": "One smashed patty of local ground beef topped with cheddar, house barbecue sauce and an onion ring on a Martin’s potato roll.", "price": 10, "availability": { "days": ["thu"], "label": "Rodeo Thursdays" } },
+        { "name": "Rodeo Rings", "description": "(8) onion rings à la carte with house buttermilk ranch.", "price": 10, "availability": { "days": ["thu"], "label": "Rodeo Thursdays" } }
+      ]
+    },
+    {
+      "id": "seasonal-specials",
+      "title": "Oktoberfest specials",
+      "seasonal": true,
+      "note": "Available the entire month of October.",
+      "items": [
+        { "name": "The Bavarian Burger", "description": "October burger of the month. Two smashed 3 oz patties of local grass-fed beef, Bavarian mustard, pickles, muenster cheese, caraway kraut. Served with a side of German potato salad, fries or a house side salad.", "modifiers": "Sub Impossible plant-based meat +2.", "price": 20 },
+        { "name": "Subversive Schnitzel Sandwich", "description": "Hand-breaded pork loin, braised red cabbage, pickles, dijonnaise on a See & Be milk bun. Served with a side of German potato salad, fries or a house side salad.", "price": 20 },
+        { "name": "Giant Bavarian Pretzel", "description": "With house beer cheese & Bavarian mustard.", "price": 14, "tags": ["vegetarian"] },
+        { "name": "The Full Hookup", "description": "A giant Bavarian pretzel + any draft beer (or two half pours).", "price": 20 }
+      ]
+    }
+  ],
+  "notices": [
+    "If you have a food allergy or intolerance, please notify us.",
+    "*Consuming raw or undercooked meats, poultry, seafood, shellfish or eggs may increase your risk of foodborne illness."
+  ]
+}
