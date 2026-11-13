@@ -50,10 +50,23 @@
   line-height: var(--lh-body);
   text-wrap: pretty;
 }
+/* The row's shape depends on the screen's width, never on which font has loaded: as a
+   wrapping row it sat on two lines in the fallback face and snapped to one when Barlow
+   Condensed arrived, pulling the photo up 60 px (CLS 0.074 in Lighthouse). */
 .hero__actions {
-  display: flex;
-  flex-wrap: wrap;
+  display: grid;
+  grid-auto-flow: column;
+  justify-content: start;
   gap: var(--s-3);
+}
+.hero__actions .btn {
+  white-space: nowrap;
+}
+@media (max-width: 22.5rem) {
+  .hero__actions {
+    grid-auto-flow: row;
+    justify-content: stretch;
+  }
 }
 
 .hero__art {
