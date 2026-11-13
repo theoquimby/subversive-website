@@ -21,20 +21,36 @@
 }
 
 /* ---------- Header (spec §4.1) ---------- */
+/* The sticky stack has one rule (critique 11/13, P0). --header-h is the header's height;
+   --header-offset is how far down anything pinned beneath it must sit: the header's
+   height while it shows, 0 once it has slid away. HeaderScroll sets data-header on <html>
+   in the same frame it hides the header, and pinned bars move their `top` over the same
+   220 ms, so nothing ever shows between or above them. */
+:root {
+  --header-h: calc(60px + env(safe-area-inset-top));
+  --header-offset: var(--header-h);
+}
+@media (min-width: 64rem) {
+  :root {
+    --header-h: calc(76px + env(safe-area-inset-top));
+  }
+}
+:root[data-header="hidden"] {
+  --header-offset: 0px;
+}
 .site-header {
   position: sticky;
   top: 0;
   z-index: 50;
   padding-top: env(safe-area-inset-top);
-  background: transparent;
+  /* always opaque: page content never shows through the logo or the Order button */
+  background: var(--bg);
   view-transition-name: site-header;
   transition:
     translate var(--d-2) var(--ease-out),
-    background-color var(--d-2) var(--ease-out),
     box-shadow var(--d-2) var(--ease-out);
 }
 .site-header[data-solid] {
-  background: var(--bg);
   box-shadow: 0 var(--stroke) 0 var(--rule-strong);
 }
 .site-header[data-hidden] {

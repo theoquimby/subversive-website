@@ -5,7 +5,7 @@ const phase = process.env.PHASE ?? "after";
 const dir = "docs/review/M6";
 const TIMES = [
   ["paper", "2026-11-13T12:00:00-05:00"],
-  ["overtime", "2026-11-13T17:00:00-05:00"],
+  ["game-night", "2026-11-13T17:00:00-05:00"],
 ] as const;
 
 for (const w of [390, 1280]) {

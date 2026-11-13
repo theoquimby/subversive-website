@@ -1,7 +1,8 @@
 // Home hero (spec §6.1.2, §5.3, §5.6). Stack on a phone, a 7/5 split on desktop: the
 // open-now pill, "Beer. / Burgers. / Catskill." (the last in ember), the subline, See the
-// menu and Order pickup; the photo in its frame with up to two stickers. On a game night
-// OvertimeSwitch turns the hero to night: the fire pit and the matchup replace them.
+// menu and Order pickup; the photo in its frame with up to two stickers. A game night
+// does not take over the first screen (Theo, 11/13): the open-now pill carries it in one
+// line, "Open late tonight · Knicks at 7:00".
 //
 // The pour (§5.3), once per session: the photo is revealed by a rising edge with a band
 // of foam riding it. Only clip-path and transform move, so the photo is painted in the
@@ -12,29 +13,16 @@ import type { SiteEvent } from "@/lib/events/enrich";
 import { formatDateShort, weekdayLabel } from "@/lib/hours/format";
 import type { Site } from "@/lib/site/schema";
 import { weekdayOf } from "@/lib/time/ny";
-import { Countdown } from "../events/Countdown";
-import { Matchup } from "../events/Matchup";
 import { PhotoFrame } from "../graphics/PhotoFrame";
 import { Button } from "../ui/Button";
 import { OpenNow } from "../visit/OpenNow";
 import { HeroStickers } from "./HeroStickers";
-import { OvertimeSwitch } from "./OvertimeSwitch";
 import { PourMark } from "./PourMark";
 
 export const POUR_KEY = "sv.poured";
 const POURED_SCRIPT = `try{if(sessionStorage.getItem("${POUR_KEY}"))document.documentElement.dataset.poured=""}catch(e){}`;
 
-export function Hero({
-  site,
-  next,
-  game,
-  today,
-}: {
-  site: Site;
-  next: SiteEvent | null;
-  game: SiteEvent | null;
-  today: string;
-}) {
+export function Hero({ site, next, today }: { site: Site; next: SiteEvent | null; today: string }) {
   const [a, b, c] = homeLabels.headline;
   const sticker = next
     ? {
@@ -75,23 +63,8 @@ export function Hero({
             <span className="hero__foam" aria-hidden="true" />
             <HeroStickers next={sticker} />
           </div>
-          {game ? (
-            <div className="hero__frame hero__frame--night">
-              <PhotoFrame
-                id="firepit-beers"
-                ratio="4/5"
-                reveal={false}
-                sizes="(min-width: 1024px) 40vw, 92vw"
-              />
-              <div className="hero__game">
-                <Matchup event={game} size="pinned" />
-                <Countdown event={game} />
-              </div>
-            </div>
-          ) : null}
         </div>
       </div>
-      <OvertimeSwitch games={game?.startsAt ? [{ startsAt: game.startsAt, endsAt: game.endsAt }] : []} />
       <PourMark />
     </section>
   );

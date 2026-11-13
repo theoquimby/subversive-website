@@ -28,7 +28,7 @@ import { getMenu } from "@/lib/menu/source";
 import { buildMenuView, draftBeers, findItem, type ItemView } from "@/lib/menu/view";
 import { getSite } from "@/lib/site/site";
 import { now } from "@/lib/time/now";
-import { addDays, nyParts } from "@/lib/time/ny";
+import { nyParts } from "@/lib/time/ny";
 
 export const revalidate = 300;
 export const metadata: Metadata = {
@@ -56,8 +56,6 @@ export default async function Home() {
   const view = buildMenuView(applySeasonal(await getMenu(), today));
   const { events } = await getEvents();
   const coming = tickets(upcoming(events, today));
-  const tomorrow = addDays(today, 1);
-  const game = coming.find((e) => e.kind === "GAME" && (e.date === today || e.date === tomorrow)) ?? null;
   const onTap = groupByFamily(draftBeers(view).slice(0, 8));
   const burgers = view.food.find((s) => s.id === "smash-burgers");
   const ticker = coming
@@ -66,7 +64,7 @@ export default async function Home() {
 
   return (
     <PageWipe>
-      <Hero site={site} next={coming[0] ?? null} game={game} today={today} />
+      <Hero site={site} next={coming[0] ?? null} today={today} />
       <Ticker items={ticker} label={homeLabels.comingUp} />
 
       <div className="page home">

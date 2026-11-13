@@ -3,7 +3,7 @@
 // calendar, share, directions; previous and next. A renamed event redirects (308) to its
 // canonical slug; a past one that is gone says "This one's over".
 import { eventLabels, microcopy } from "@content/microcopy";
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { notFound, permanentRedirect } from "next/navigation";
 import { AddToCalendar } from "@/components/events/AddToCalendar";
 import { Countdown } from "@/components/events/Countdown";
@@ -26,8 +26,11 @@ import { scheduleFor } from "@/lib/hours/schedule";
 import { getSite } from "@/lib/site/site";
 import { now } from "@/lib/time/now";
 import { diffDays, type IsoDate, nyParts } from "@/lib/time/ny";
+import { raw } from "@/styles/tokens";
 
 export const revalidate = 300;
+// the phone's status bar and toolbar take the night skin on these pages
+export const viewport: Viewport = { themeColor: raw.night };
 
 type Params = { params: Promise<{ slug: string }> };
 

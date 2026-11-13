@@ -2,7 +2,7 @@
 // its scrim, the ticker, filters, today pinned large with its countdown, the month
 // timeline, and the band booking band. Seed until O1 is fixed; no code change after.
 import { eventLabels, visitLabels } from "@content/microcopy";
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { Countdown } from "@/components/events/Countdown";
 import { EventFilters, type FilterKey } from "@/components/events/EventFilters";
 import { EventList } from "@/components/events/EventList";
@@ -18,8 +18,11 @@ import { formatDateShort } from "@/lib/hours/format";
 import { getSite } from "@/lib/site/site";
 import { now } from "@/lib/time/now";
 import { nyParts } from "@/lib/time/ny";
+import { raw } from "@/styles/tokens";
 
 export const revalidate = 300;
+// the phone's status bar and toolbar take the night skin on these pages
+export const viewport: Viewport = { themeColor: raw.night };
 export const metadata: Metadata = {
   title: "Events · Subversive, Catskill NY",
   description:

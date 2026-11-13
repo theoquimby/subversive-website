@@ -129,22 +129,13 @@
   margin-top: var(--s-10);
 }
 .event-month__label {
-  position: sticky;
-  top: calc(60px + env(safe-area-inset-top));
-  z-index: 5;
   margin: 0 0 var(--s-5);
   padding-block: var(--s-3);
-  background: var(--bg);
   font-family: var(--ff-display);
   font-size: var(--t-h3);
   font-weight: 400;
   line-height: var(--lh-h3);
   border-bottom: 1px solid var(--rule);
-}
-@media (min-width: 64rem) {
-  .event-month__label {
-    top: calc(76px + env(safe-area-inset-top));
-  }
 }
 .event-grid {
   display: grid;

@@ -2,7 +2,7 @@
 
 import { useEffect } from "react";
 
-// One observer for the set pieces that enter once:
+// The set pieces that enter once:
 //   [data-stamp] pills — stamp when they scroll into view; anything already on screen at
 //                load is left alone (the words never wait, spec §3A).
 //   [data-pop]   stickers — pop in when first visible, including at load (they are
@@ -11,6 +11,10 @@ import { useEffect } from "react";
 //   [data-pour]  menu rows — the glass fills when the row is first visible, at load too
 //                (spec §4.4). Rows in the hidden list wait until they are shown.
 // Reduced motion: everything is marked shown at once and nothing moves.
+//
+// Two observers. Pills wait until they are 12% up the screen. Objects use the whole
+// viewport: a sticker at scale 0 sitting just above the fold never crossed that 12% line
+// and waited 2.5 s for its failsafe (critique 11/13).
 export function StampIn() {
   useEffect(() => {
     const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
@@ -20,32 +24,40 @@ export function StampIn() {
       for (const el of document.querySelectorAll<Element>("[data-draw]")) el.setAttribute("data-draw", "in");
       return;
     }
+
     const firstPass = new Set<Element>();
-    const io = new IntersectionObserver(
+    const pills = new IntersectionObserver(
       (entries) => {
         for (const e of entries) {
           const el = e.target as HTMLElement;
           const isFirst = !firstPass.has(el);
           firstPass.add(el);
           if (!e.isIntersecting) continue;
-          if (el.hasAttribute("data-pop")) {
-            el.dataset.pop = "in";
-          } else if (el.hasAttribute("data-pour")) {
-            el.dataset.pour = "in";
-          } else if (el.hasAttribute("data-draw")) {
-            el.setAttribute("data-draw", "in");
-          } else if (!isFirst) {
-            el.dataset.stamp = "in";
-          }
-          io.unobserve(el);
           // a pill on screen at load (first callback, intersecting) is simply left as is
+          if (!isFirst) el.dataset.stamp = "in";
+          pills.unobserve(el);
         }
       },
       { rootMargin: "0px 0px -12% 0px" },
     );
-    for (const el of document.querySelectorAll("[data-stamp], [data-pop], [data-pour], [data-draw]"))
-      io.observe(el);
-    return () => io.disconnect();
+
+    const objects = new IntersectionObserver((entries) => {
+      for (const e of entries) {
+        if (!e.isIntersecting) continue;
+        const el = e.target as HTMLElement;
+        if (el.hasAttribute("data-pop")) el.dataset.pop = "in";
+        else if (el.hasAttribute("data-pour")) el.dataset.pour = "in";
+        else el.setAttribute("data-draw", "in");
+        objects.unobserve(el);
+      }
+    });
+
+    for (const el of document.querySelectorAll("[data-stamp]")) pills.observe(el);
+    for (const el of document.querySelectorAll("[data-pop], [data-pour], [data-draw]")) objects.observe(el);
+    return () => {
+      pills.disconnect();
+      objects.disconnect();
+    };
   }, []);
   return null;
 }

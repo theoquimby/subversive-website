@@ -40,16 +40,10 @@ html:has(.page--menu) {
 .menu {
   /* the dashed row rule, quieter than the 2 px group rules it sits between */
   --fg-faint: color-mix(in srgb, var(--fg) 38%, transparent);
-  --header-h: calc(60px + env(safe-area-inset-top));
   --menu-bar-h: 7rem;
   --price-w: 3ch;
   position: relative;
   margin-top: var(--s-6);
-}
-@media (min-width: 64rem) {
-  .menu {
-    --header-h: calc(76px + env(safe-area-inset-top));
-  }
 }
 /* every anchor target clears the header and the bar */
 .menu [id] {
@@ -85,7 +79,7 @@ html:has(.page--menu) {
 /* ---------- The sticky bar ---------- */
 .menu-bar {
   position: sticky;
-  top: var(--header-h);
+  top: var(--header-offset);
   z-index: 40;
   display: grid;
   /* the scrolling chip rows must never widen the bar */
@@ -101,17 +95,9 @@ html:has(.page--menu) {
     100vmax var(--stroke) 0 var(--rule-strong),
     -100vmax var(--stroke) 0 var(--rule-strong);
   clip-path: inset(0 -100vmax calc(-1 * var(--stroke)));
-  transition: translate var(--d-2) var(--ease-out);
+  /* follows the header as it hides and returns: same duration, same curve */
+  transition: top var(--d-2) var(--ease-out);
 }
-/* the header hides on scroll down; a stuck bar rides up with it */
-html:has(.site-header[data-hidden]) .menu-bar[data-stuck] {
-  translate: 0 calc(-1 * var(--header-h));
-}
-/* one rule under the header-and-bar assembly, not two */
-html:has(.menu-bar[data-stuck]) .site-header[data-solid] {
-  box-shadow: none;
-}
-
 .menu-bar__row {
   display: flex;
   flex-wrap: wrap;
@@ -614,7 +600,6 @@ summary.mrow__sum:focus-visible {
   font-family: var(--ff-display);
   font-size: var(--t-h3);
   line-height: var(--lh-h3);
-  text-wrap: balance;
   border-radius: 3px;
   box-decoration-break: clone;
   -webkit-box-decoration-break: clone;

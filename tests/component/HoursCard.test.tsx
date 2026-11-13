@@ -34,7 +34,10 @@ describe("HoursCard (spec §4.9)", () => {
     expect(tue?.querySelector(".hours__time")?.textContent).toBe("Closed");
     expect(c.querySelector('tr[data-weekday="mon"] .hours__kitchen')?.textContent).toBe("");
     expect(c.querySelector('tr[data-weekday="fri"] .hours__kitchen')?.textContent).toBe("kitchen til 8:15");
-    expect(c.querySelector('tr[data-weekday="fri"] .hours__time')?.textContent).toBe("4:30–8:30");
+    // today (Fri Nov 13) is a game night: today's own row shows tonight's real close
+    expect(c.querySelector('tr[data-weekday="fri"] .hours__time')?.textContent).toBe("4:30–9:30");
+    // another day keeps its regular hours
+    expect(c.querySelector('tr[data-weekday="sat"] .hours__time')?.textContent).toBe("12–8:30");
 
     const special = [...c.querySelectorAll("tr[data-date]")].map((r) => r.getAttribute("data-date"));
     expect(special).toEqual(["2026-11-13", "2026-11-15", "2026-11-21", "2026-11-25"]);

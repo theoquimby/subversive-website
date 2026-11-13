@@ -31,17 +31,14 @@ test("See the menu goes to /menu; Order pickup is external", async ({ page }) =>
   await expect(page).toHaveURL(/\/menu$/);
 });
 
-test("on a game night the hero turns Overtime", async ({ page }) => {
+test("a game night does not take over the first screen: the pill carries it in one line", async ({
+  page,
+}) => {
   await page.clock.install({ time: new Date("2026-11-13T17:00:00-05:00") });
   await page.goto("/");
-  await expect(page.locator("[data-hero]")).toHaveAttribute("data-skin", "overtime");
-  await expect(page.locator(".hero__game .countdown")).toHaveText(/Tip in 2h/);
-});
-
-test("on a quiet afternoon the hero stays Paper", async ({ page }) => {
-  await page.clock.install({ time: new Date("2026-11-13T12:00:00-05:00") });
-  await page.goto("/");
   await expect(page.locator("[data-hero]")).toHaveAttribute("data-skin", "paper");
+  await expect(page.locator(".hero .open-now")).toContainText("Open late tonight · Knicks at 7:00");
+  await expect(page.locator(".hero .matchup")).toHaveCount(0);
 });
 
 test("the pour plays once per session", async ({ page }) => {
@@ -53,16 +50,10 @@ test("the pour plays once per session", async ({ page }) => {
   await expect(page.locator("html")).toHaveAttribute("data-poured", "");
 });
 
-for (const [name, time] of [
-  ["Paper", "2026-11-13T12:00:00-05:00"],
-  ["Overtime", "2026-11-13T17:00:00-05:00"],
-] as const) {
-  test(`axe: home, ${name} hero`, async ({ page }) => {
-    await page.clock.install({ time: new Date(time) });
-    await page.emulateMedia({ reducedMotion: "reduce" });
-    await page.goto("/", { waitUntil: "networkidle" });
-    await page.evaluate(() => document.fonts.ready);
-    const r = await new AxeBuilder({ page }).analyze();
-    expect(r.violations.map((v) => `${v.id}: ${v.help} (${v.nodes.length})`)).toEqual([]);
-  });
-}
+test("axe: home", async ({ page }) => {
+  await page.emulateMedia({ reducedMotion: "reduce" });
+  await page.goto("/", { waitUntil: "networkidle" });
+  await page.evaluate(() => document.fonts.ready);
+  const r = await new AxeBuilder({ page }).analyze();
+  expect(r.violations.map((v) => `${v.id}: ${v.help} (${v.nodes.length})`)).toEqual([]);
+});

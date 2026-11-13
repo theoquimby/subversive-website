@@ -6,9 +6,6 @@
   overflow-x: clip;
   background: var(--bg);
   color: var(--fg);
-  transition:
-    background-color 600ms var(--ease-in-out),
-    color 600ms var(--ease-in-out);
 }
 .hero__inner {
   display: grid;
@@ -71,19 +68,6 @@
   .hero__frame {
     max-width: none;
   }
-}
-.hero__frame--night,
-.hero[data-overtime] .hero__frame--day {
-  display: none;
-}
-.hero[data-overtime] .hero__frame--night {
-  display: block;
-}
-.hero__game {
-  position: absolute;
-  inset: auto var(--s-4) var(--s-4);
-  display: grid;
-  gap: var(--s-2);
 }
 
 /* The pour (spec §5.3): once per session the photo fills like a glass, bottom to top, with
