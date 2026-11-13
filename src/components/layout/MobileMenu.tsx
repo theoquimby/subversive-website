@@ -1,7 +1,8 @@
 "use client";
 
+import { usePathname } from "next/navigation";
 import { Dialog, VisuallyHidden } from "radix-ui";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { BarleyMark } from "../graphics/BarleyMark";
 import { slashBand, toPoints } from "../graphics/slash";
 import { Wordmark } from "../graphics/Wordmark";
@@ -49,16 +50,31 @@ function CutCross() {
 }
 
 export function MobileMenu({ nav, address, mapHref, phone, instagram, facebook }: Props) {
-  const [open, setOpen] = useState(false);
+  // The sheet is open for the page it was opened on. Following a link closes it in the
+  // same commit that brings the new page, with no exit animation of its own: the page
+  // wipe takes the sheet away with the old page (one motion, not two). The close mark
+  // and Escape still wipe it out on its own.
+  const pathname = usePathname();
+  const [openOn, setOpenOn] = useState<string | null>(null);
+  const open = openOn === pathname;
+  const leaving = openOn !== null && !open;
+  useEffect(() => {
+    if (leaving) setOpenOn(null);
+  }, [leaving]);
   return (
-    <Dialog.Root open={open} onOpenChange={setOpen}>
+    <Dialog.Root open={open} onOpenChange={(o) => setOpenOn(o ? pathname : null)}>
       <Dialog.Trigger className="menu-button" aria-label="Menu">
         <Glyph open={false} />
       </Dialog.Trigger>
       <Dialog.Portal>
         {/* Radix locks body scroll from the Overlay; without it the page scrolled behind the sheet */}
         <Dialog.Overlay className="menu-overlay" />
-        <Dialog.Content className="menu-sheet" data-skin="paper" aria-describedby={undefined}>
+        <Dialog.Content
+          className="menu-sheet"
+          data-skin="paper"
+          data-leaving={leaving || undefined}
+          aria-describedby={undefined}
+        >
           <VisuallyHidden.Root>
             <Dialog.Title>Menu</Dialog.Title>
           </VisuallyHidden.Root>
@@ -76,7 +92,14 @@ export function MobileMenu({ nav, address, mapHref, phone, instagram, facebook }
             <ol>
               {nav.map((it, i) => (
                 <li key={it.href} style={{ "--i": i } as React.CSSProperties}>
-                  <Link href={it.href} className="menu-sheet__link" onClick={() => setOpen(false)}>
+                  <Link
+                    href={it.href}
+                    className="menu-sheet__link"
+                    aria-current={it.href === pathname ? "page" : undefined}
+                    onClick={() => {
+                      if (it.href === pathname) setOpenOn(null);
+                    }}
+                  >
                     <span className="menu-sheet__num" aria-hidden="true">
                       {String(i + 1).padStart(2, "0")}
                     </span>

@@ -11,6 +11,9 @@ vi.mock("next/link", () => ({
   ),
 }));
 
+let pathname = "/";
+vi.mock("next/navigation", () => ({ usePathname: () => pathname }));
+
 afterEach(cleanup);
 
 const props = {
@@ -57,14 +60,33 @@ describe("MobileMenu", () => {
     await waitFor(() => expect(document.activeElement).toBe(trigger));
   });
 
-  it("closes when a link is followed", () => {
-    render(<MobileMenu {...props} />);
+  it("closes when the followed link's page arrives, with no exit motion of its own", () => {
+    pathname = "/";
+    const { rerender } = render(<MobileMenu {...props} />);
     act(() => screen.getByRole("button", { name: "Menu" }).click());
     act(() => {
       const link = screen.getByRole("link", { name: /Visit/ });
       link.addEventListener("click", (e) => e.preventDefault());
       link.click();
     });
+    // still up until the new page commits: the page wipe carries it away
+    expect(screen.queryByRole("dialog")).not.toBeNull();
+    pathname = "/visit";
+    rerender(<MobileMenu {...props} />);
     expect(screen.queryByRole("dialog")).toBeNull();
+    pathname = "/";
+  });
+
+  it("tapping the page you are on just closes the sheet", () => {
+    pathname = "/menu";
+    render(<MobileMenu {...props} />);
+    act(() => screen.getByRole("button", { name: "Menu" }).click());
+    act(() => {
+      const link = screen.getByRole("link", { name: /Menu/ });
+      link.addEventListener("click", (e) => e.preventDefault());
+      link.click();
+    });
+    expect(screen.queryByRole("dialog")).toBeNull();
+    pathname = "/";
   });
 });
