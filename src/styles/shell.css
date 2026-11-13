@@ -491,3 +491,148 @@
     display: none;
   }
 }
+
+/* ---------- M2 review fixes ---------- */
+/* The shell is a full-height column, so the footer always meets the bottom edge */
+body {
+  display: flex;
+  flex-direction: column;
+}
+.site-main {
+  flex: 1 0 auto;
+}
+.site-footer {
+  flex: none;
+}
+
+/* Header: the barley drawn at a true 2 px; even nav rhythm with a wider step to Order */
+.brand__mark path {
+  vector-effect: non-scaling-stroke;
+  stroke-width: 2px;
+}
+@media (min-width: 64rem) {
+  .site-header__actions {
+    margin-left: var(--s-4);
+  }
+}
+.site-nav__link {
+  position: relative;
+}
+.site-nav__kernel {
+  position: absolute;
+  left: -12px;
+  top: 50%;
+  translate: 0 -55%;
+}
+
+/* Mobile menu: the header row stays; links sit close; facts follow without a void */
+.menu-sheet {
+  grid-template-rows: auto auto 1fr;
+  padding-top: env(safe-area-inset-top);
+}
+.menu-sheet__top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 60px;
+}
+.menu-sheet__top .brand {
+  margin-right: 0;
+}
+.menu-sheet__close {
+  display: none;
+}
+.menu-sheet__nav {
+  padding-top: max(var(--s-8), 14svh - 60px);
+}
+.menu-sheet__nav ol {
+  gap: 0;
+}
+.menu-sheet__link {
+  line-height: 1.08;
+}
+.menu-sheet__facts {
+  align-self: start;
+  margin-top: var(--s-9);
+  border-top: 0;
+  padding-top: 0;
+}
+.cut-cross {
+  width: 22px;
+  height: 22px;
+  fill: currentColor;
+}
+
+/* Footer: one top line for the three columns, tight rows, tap area from padding */
+.site-footer__cols section {
+  gap: 0;
+}
+.site-footer__cols a {
+  display: block;
+  min-height: 0;
+  padding-block: 9px;
+}
+.site-footer__head {
+  margin-bottom: var(--s-1);
+}
+.site-footer__seal {
+  font-size: 6rem;
+  opacity: 0.9;
+}
+@media (min-width: 48rem) {
+  .site-footer__seal {
+    font-size: 7rem;
+  }
+}
+.site-footer__small span {
+  white-space: nowrap;
+}
+.pause-motion {
+  min-height: 44px;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  text-decoration: underline;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 4px;
+}
+.pause-motion[aria-pressed="true"] {
+  background: transparent;
+  color: var(--accent);
+}
+
+/* 404: the glass stands large at the bottom right, its foot on the page's edge */
+.not-found {
+  position: relative;
+  align-items: end;
+  padding-bottom: 0;
+}
+.not-found__copy {
+  padding-bottom: var(--section);
+}
+.not-found__actions {
+  align-items: center;
+  gap: var(--s-6);
+}
+.not-found .glass {
+  height: clamp(14rem, 40svh, 26rem);
+  justify-self: end;
+  margin-bottom: calc(var(--s-1) * -1);
+}
+@media (max-width: 63.99rem) {
+  .not-found .glass {
+    height: 13rem;
+    margin-top: calc(var(--section) * -0.6);
+  }
+}
+/* The links sit in the lower half, in the thumb's reach (spec §2.5, §4.1); facts beneath */
+.menu-sheet {
+  grid-template-rows: auto 1fr auto;
+}
+.menu-sheet__nav {
+  align-self: end;
+  padding-top: var(--s-8);
+}
+.menu-sheet__facts {
+  margin-top: var(--s-8);
+}

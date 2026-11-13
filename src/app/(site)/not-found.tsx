@@ -3,6 +3,7 @@ import type { Metadata } from "next";
 import { GlassGlyph } from "@/components/graphics/GlassGlyph";
 import { PageWipe } from "@/components/layout/PageWipe";
 import { Button } from "@/components/ui/Button";
+import { TextLink } from "@/components/ui/TextLink";
 
 // 404 (spec §5.7): Paper, a mega headline, one line, three buttons, and their glass draining
 // from 78% to empty on load (the fall curve: it empties under gravity). The goblin peeks in
@@ -24,15 +25,11 @@ export default function NotFound() {
           <p className="not-found__sub">That page is gone or never existed.</p>
           <div className="not-found__actions">
             <Button href="/menu">Menu</Button>
-            <Button href="/events" variant="secondary">
-              Events
-            </Button>
-            <Button href="/" variant="quiet">
-              Home
-            </Button>
+            <TextLink href="/events">Events</TextLink>
+            <TextLink href="/">Home</TextLink>
           </div>
         </div>
-        <GlassGlyph color={PILS_COLOR} fill={0.78} size="hero" className="glass--drain" />
+        <GlassGlyph color={PILS_COLOR} fill={0.78} size="hero" mark={false} className="glass--drain" />
       </div>
     </PageWipe>
   );

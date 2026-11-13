@@ -33,7 +33,7 @@ test("the checker rail is the first thing on the page", async ({ page }) => {
   await expect(rail).toBeVisible();
   const box = await rail.boundingBox();
   expect(box?.y).toBe(0);
-  expect(box?.height).toBeGreaterThanOrEqual(44);
+  expect(box?.height).toBeGreaterThanOrEqual(22); // one row at the top since M2 (refinement)
 });
 
 test("no horizontal scroll at 320 px", async ({ page }) => {

@@ -63,9 +63,15 @@ export function Footer() {
           <Seal spin className="site-footer__seal" />
         </div>
         <div className="site-footer__base">
+          {/* each clause holds together; the line breaks only between them */}
           <p className="site-footer__small">
-            © {new Date().getFullYear()} {site.name} · {site.address.street}, {site.address.city}{" "}
-            {site.address.state} · Please drink responsibly.
+            <span>
+              © {new Date().getFullYear()} {site.name}
+            </span>{" "}
+            <span>
+              · {site.address.street}, {site.address.city} {site.address.state}
+            </span>{" "}
+            <span>· Please drink responsibly.</span>
           </p>
           <PauseMotion />
           {/* TODO(M7): the goblin hatch ("do not press" stamp) sits here. */}

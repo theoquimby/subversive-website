@@ -2,6 +2,9 @@
 
 import { Dialog, VisuallyHidden } from "radix-ui";
 import { useState } from "react";
+import { BarleyMark } from "../graphics/BarleyMark";
+import { slashBand, toPoints } from "../graphics/slash";
+import { Wordmark } from "../graphics/Wordmark";
 import { Link } from "../ui/Link";
 
 // Mobile menu (spec §4.1): a full-screen sheet that wipes in along the slash from the top
@@ -29,6 +32,22 @@ function Glyph({ open }: { open: boolean }) {
   );
 }
 
+// The close mark: a slash and a backslash cut as bands at the wordmark's 61°, so it is drawn
+// from the same geometry as the slash, not a typed ×.
+const BAND = slashBand({ height: 20, thickness: 3.4 });
+const BAND_W = 3.4 + (BAND[3]?.[0] ?? 0);
+function CutCross() {
+  const x = (24 - BAND_W) / 2;
+  return (
+    <svg viewBox="0 0 24 24" className="cut-cross" aria-hidden="true" focusable="false">
+      <g transform={`translate(${x.toFixed(2)} 2)`}>
+        <polygon points={toPoints(BAND)} />
+        <polygon points={toPoints(BAND)} transform={`translate(${BAND_W.toFixed(2)} 0) scale(-1 1)`} />
+      </g>
+    </svg>
+  );
+}
+
 export function MobileMenu({ nav, address, mapHref, phone, instagram, facebook }: Props) {
   const [open, setOpen] = useState(false);
   return (
@@ -43,9 +62,16 @@ export function MobileMenu({ nav, address, mapHref, phone, instagram, facebook }
           <VisuallyHidden.Root>
             <Dialog.Title>Menu</Dialog.Title>
           </VisuallyHidden.Root>
-          <Dialog.Close className="menu-button menu-sheet__close" aria-label="Close menu">
-            <Glyph open />
-          </Dialog.Close>
+          {/* the header row, kept: brand at left, the close mark where the menu button was */}
+          <div className="menu-sheet__top">
+            <span className="brand" aria-hidden="true">
+              <BarleyMark className="brand__mark" />
+              <Wordmark className="brand__word" />
+            </span>
+            <Dialog.Close className="menu-button" aria-label="Close menu">
+              <CutCross />
+            </Dialog.Close>
+          </div>
           <nav aria-label="Main" className="menu-sheet__nav">
             <ol>
               {nav.map((it, i) => (

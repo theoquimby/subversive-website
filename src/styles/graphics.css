@@ -867,3 +867,6 @@ body::after {
 .btn__icon {
   stroke-width: 2.67;
 }
+.checker[data-rows="1"] {
+  height: var(--sq-px);
+}

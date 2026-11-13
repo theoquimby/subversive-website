@@ -20,8 +20,11 @@ export function GlassGlyph({
   hazy = false,
   size = "glyph",
   rise = false,
+  mark = true,
   className,
 }: {
+  /** Hero size only: print the barley on the bowl. */
+  mark?: boolean;
   color: string;
   fill?: number;
   hazy?: boolean;
@@ -63,7 +66,7 @@ export function GlassGlyph({
           ) : null}
         </g>
       </g>
-      {size === "hero" ? (
+      {size === "hero" && mark ? (
         // the print spans about 60% of the bowl, as on the real glass (M1 review)
         <svg x="9.15" y="7.5" width="5.7" height="16.2" viewBox={BARLEY_VIEWBOX} className="glass__mark">
           {KERNELS.map((d) => (

@@ -11,7 +11,7 @@ import { StampIn } from "@/components/layout/StampIn";
 export default function SiteLayout({ children }: { children: ReactNode }) {
   return (
     <>
-      <Checker />
+      <Checker rows={1} />
       <Header />
       <main id="main" className="site-main">
         {children}
