@@ -129,3 +129,10 @@ describe("token contrast, measured as rendered", () => {
 // - pils box: carries a 2 px ink outline; the pils band is decoration inside it.
 // - rule (14%): hairline dividers between rows; meaning never depends on them.
 // - filtered-out menu rows at 30%: a "not matching" state announced through aria-live.
+
+describe("ticket stub label tab", () => {
+  it("paper on ink passes the label floor", () => {
+    expect(wcagRatio(raw.paper, raw.ink)).toBeGreaterThanOrEqual(4.5);
+    expect(Math.abs(apcaLc(raw.paper, raw.ink))).toBeGreaterThanOrEqual(60);
+  });
+});

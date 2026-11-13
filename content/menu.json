@@ -17,37 +17,37 @@
         {
           "title": "Light",
           "items": [
-            { "name": "Puff Puff Pils", "style": "Europils", "abv": 4.2, "description": "European pilsner brewed with 100% local grains.", "prices": { "half": 5, "full": 8 } },
-            { "name": "¡Chinga La Migra!", "style": "Light lager", "abv": 4.0, "description": "Lager brewed with local barley & corn in solidarity with and support for Columbia County Sanctuary Movement. 15% of draft and can sales go directly to CCSM.", "prices": { "half": 5, "full": 8 }, "badge": "15% to CCSM" }
+            { "name": "Puff Puff Pils", "style": "Europils", "abv": 4.2, "description": "European pilsner brewed with 100% local grains.", "prices": { "half": 5, "full": 8 }, "color": "#F2C744" },
+            { "name": "¡Chinga La Migra!", "style": "Light lager", "abv": 4.0, "description": "Lager brewed with local barley & corn in solidarity with and support for Columbia County Sanctuary Movement. 15% of draft and can sales go directly to CCSM.", "prices": { "half": 5, "full": 8 }, "badge": "15% to CCSM", "color": "#F5D76A" }
           ]
         },
         {
           "title": "Hoppy",
           "items": [
-            { "name": "New York Nectar", "style": "New York IPA", "abv": 7.0, "description": "Our flagship IPA brewed with 100% New York grown grains & hops.", "prices": { "half": 5, "full": 8 }, "badge": "Flagship" },
-            { "name": "Hoppy American Lager", "style": "Hoppy lager", "abv": 5.0, "description": "Hopped with Nelson, Elani & Loral hops.", "prices": { "half": 5, "full": 8 } },
-            { "name": "Off Axis", "style": "Southern Hemisphere pale ale", "abv": 5.5, "description": "Hazy pale ale brewed with local grain and hopped with New Zealand Rakau, Motueka and Nelson.", "prices": { "half": 5, "full": 8 } }
+            { "name": "New York Nectar", "style": "New York IPA", "abv": 7.0, "description": "Our flagship IPA brewed with 100% New York grown grains & hops.", "prices": { "half": 5, "full": 8 }, "badge": "Flagship", "color": "#E8A93A" },
+            { "name": "Hoppy American Lager", "style": "Hoppy lager", "abv": 5.0, "description": "Hopped with Nelson, Elani & Loral hops.", "prices": { "half": 5, "full": 8 }, "color": "#EDBE4B" },
+            { "name": "Off Axis", "style": "Southern Hemisphere pale ale", "abv": 5.5, "description": "Hazy pale ale brewed with local grain and hopped with New Zealand Rakau, Motueka and Nelson.", "prices": { "half": 5, "full": 8 }, "color": "#F0C55C", "hazy": true }
           ]
         },
         {
           "title": "Malty",
           "items": [
-            { "name": "Festbier", "style": "German-style lager", "abv": 4.5, "description": "Modern Oktoberfest lager brewed with 100% local grains. Lighter than a Märzen, but maltier than a pilsner.", "prices": { "half": 5, "full": 8 }, "seasonal": true },
-            { "name": "Mountain Märzen", "style": "Oktoberfest lager", "abv": 5.8, "description": "Traditional Oktoberfest lager, exhibiting rich malt character.", "prices": { "half": 5, "full": 8 }, "seasonal": true }
+            { "name": "Festbier", "style": "German-style lager", "abv": 4.5, "description": "Modern Oktoberfest lager brewed with 100% local grains. Lighter than a Märzen, but maltier than a pilsner.", "prices": { "half": 5, "full": 8 }, "seasonal": true, "color": "#E3A234" },
+            { "name": "Mountain Märzen", "style": "Oktoberfest lager", "abv": 5.8, "description": "Traditional Oktoberfest lager, exhibiting rich malt character.", "prices": { "half": 5, "full": 8 }, "seasonal": true, "color": "#B5651D" }
           ]
         },
         {
           "title": "Farmhouse",
           "items": [
-            { "name": "Subversive Saison", "style": "Classic farmhouse ale", "abv": 6.5, "description": "", "prices": { "half": 5, "full": 8 } },
-            { "name": "Sudachi Saison", "style": "Saison with citrus", "abv": 6.5, "description": "Subversive Saison with Japanese sudachi juice & Buddha’s hand.", "prices": { "half": 6, "full": 9 } }
+            { "name": "Subversive Saison", "style": "Classic farmhouse ale", "abv": 6.5, "description": "", "prices": { "half": 5, "full": 8 }, "color": "#EBB84A" },
+            { "name": "Sudachi Saison", "style": "Saison with citrus", "abv": 6.5, "description": "Subversive Saison with Japanese sudachi juice & Buddha’s hand.", "prices": { "half": 6, "full": 9 }, "color": "#F0CE62" }
           ]
         },
         {
           "title": "Sour",
           "items": [
-            { "name": "Forbidden Fruit", "style": "Black currant sour ale", "abv": 6.0, "description": "A tart & quenching sour ale brewed with local black currant juice.", "prices": { "half": 5, "full": 8 } },
-            { "name": "Cheap Dills", "style": "Pickle gose", "abv": 4.5, "description": "Tart & briny. Brewed with house pickle brine & pickling spice.", "prices": { "half": 5, "full": 8 } }
+            { "name": "Forbidden Fruit", "style": "Black currant sour ale", "abv": 6.0, "description": "A tart & quenching sour ale brewed with local black currant juice.", "prices": { "half": 5, "full": 8 }, "color": "#7A2748" },
+            { "name": "Cheap Dills", "style": "Pickle gose", "abv": 4.5, "description": "Tart & briny. Brewed with house pickle brine & pickling spice.", "prices": { "half": 5, "full": 8 }, "color": "#DCCB5A" }
           ]
         }
       ]

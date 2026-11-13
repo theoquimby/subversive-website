@@ -57,3 +57,12 @@ describe("tokens.css matches tokens.ts", () => {
     }
   });
 });
+
+describe("generated motion tokens", () => {
+  it("--spring-sticker is the simulated sticker spring", async () => {
+    const { springToLinear, SPRINGS } = await import("@/lib/motion/curves");
+    const r = springToLinear(SPRINGS.sticker);
+    expect(rootDecls.get("--spring-sticker")).toBe(r.css);
+    expect(rootDecls.get("--spring-sticker-d")).toBe(`${r.duration}ms`);
+  });
+});

@@ -149,3 +149,525 @@
     border: var(--stroke) solid CanvasText;
   }
 }
+
+/* ---------- Seal (spec §3.1) ---------- */
+.seal {
+  display: block;
+  width: 1em;
+  height: 1em;
+  overflow: visible;
+}
+.seal__disc {
+  fill: var(--fg);
+}
+.seal__ring {
+  fill: none;
+  stroke: var(--bg);
+  stroke-width: 1.5;
+}
+.seal__text {
+  fill: var(--bg);
+  font-family: var(--ff-utility);
+  font-weight: 700;
+  font-size: 15px;
+  letter-spacing: 0.08em;
+}
+.seal__mark {
+  fill: none;
+  stroke: var(--bg);
+  stroke-width: 3.5;
+  stroke-linejoin: miter;
+}
+.seal__type {
+  transform-origin: 100px 100px;
+}
+@media (prefers-reduced-motion: no-preference) {
+  .seal--spin .seal__type {
+    animation: seal-turn 40s linear infinite;
+  }
+  .seal--spin:hover .seal__type,
+  :root[data-motion="paused"] .seal--spin .seal__type {
+    animation-play-state: paused;
+  }
+}
+@keyframes seal-turn {
+  to {
+    rotate: 360deg;
+  }
+}
+
+/* ---------- Chevron band (spec §3.3) ---------- */
+.chevrons {
+  --c: var(--fg);
+  height: 30px;
+  background:
+    linear-gradient(135deg, transparent 46%, var(--c) 46% 54%, transparent 54%) 0 0 / 30px 30px,
+    linear-gradient(45deg, transparent 46%, var(--c) 46% 54%, transparent 54%) 15px 0 / 30px 30px;
+}
+.chevrons[data-tone="accent"] {
+  --c: var(--accent);
+}
+.chevrons[data-tone="bg"] {
+  --c: var(--bg);
+}
+@media (forced-colors: active) {
+  .chevrons {
+    --c: CanvasText;
+    forced-color-adjust: none;
+  }
+}
+
+/* ---------- Stickers (spec §3.5) ---------- */
+.sticker {
+  --sticker-fill: var(--pils);
+  --sticker-ink: var(--ink);
+  --rest: var(--rot-a);
+  --pop-from: 14deg;
+  --peel: 26%;
+  position: relative;
+  display: inline-grid;
+  place-items: center;
+  rotate: var(--rest);
+  font-family: var(--ff-display);
+  line-height: 0.95;
+  text-align: center;
+  isolation: isolate;
+}
+.sticker[data-color="ember"] {
+  --sticker-fill: var(--ember);
+  --sticker-ink: var(--card);
+}
+.sticker[data-color="sky"] {
+  --sticker-fill: var(--sky);
+}
+.sticker[data-color="currant"] {
+  --sticker-fill: var(--currant);
+  --sticker-ink: var(--paper);
+}
+.sticker[data-color="spruce"] {
+  --sticker-fill: var(--spruce);
+  --sticker-ink: var(--paper);
+}
+.sticker[data-rot="b"] {
+  --rest: var(--rot-b);
+  --pop-from: -14deg;
+}
+.sticker[data-rot="c"] {
+  --rest: var(--rot-c);
+  --pop-from: -14deg;
+}
+
+.sticker__body {
+  position: relative;
+  display: grid;
+  place-items: center;
+  width: 100%;
+  height: 100%;
+  clip-path: polygon(0 0, 100% 0, 100% 100%, 100% 100%, 0 100%);
+  transition: clip-path 180ms var(--ease-out);
+}
+.sticker__shape {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  fill: var(--sticker-fill);
+  overflow: visible;
+}
+.sticker__ring {
+  fill: none;
+  stroke: var(--sticker-ink);
+  stroke-width: 1.5;
+}
+.sticker__text {
+  position: relative;
+  display: grid;
+  padding: 0 0.6em;
+  color: var(--sticker-ink);
+  font-size: max(1.5rem, var(--sticker-size, 1.5rem));
+}
+.sticker__ink,
+.sticker__ghost {
+  grid-area: 1 / 1;
+}
+/* Misregistration: the same words, 1 px down-right, ink at 18% (behind the ink layer) */
+.sticker__ghost {
+  z-index: -1;
+  translate: 1px 1px;
+  color: color-mix(in srgb, var(--ink) 18%, transparent);
+}
+
+.sticker[data-shape="burst"],
+.sticker[data-shape="round"] {
+  width: var(--sticker-d, 7.5rem);
+  aspect-ratio: 1;
+  --peel: 36%;
+}
+.sticker[data-shape="slash"] {
+  height: 4.5rem;
+  aspect-ratio: 151.98 / 100;
+}
+.sticker[data-shape="tag"] {
+  padding: 0.35em 0.7em 0.45em;
+}
+.sticker__shape--tag {
+  border: var(--stroke) solid var(--ink);
+  border-radius: 10px;
+  background: var(--sticker-fill);
+  filter: url(#sv-print);
+}
+
+/* Peel (hover / focus): the bottom-right corner lifts; a darker flap with a hard 2 px shadow */
+.sticker__flap {
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  width: var(--peel);
+  height: var(--peel);
+  background: color-mix(in srgb, var(--sticker-fill) 72%, var(--ink));
+  clip-path: polygon(0 0, 100% 0, 0 100%);
+  filter: drop-shadow(2px 2px 0 var(--ink));
+  scale: 0;
+  transform-origin: 100% 100%;
+  transition: scale 180ms var(--ease-out);
+  pointer-events: none;
+}
+@media (hover: hover) {
+  .sticker:hover .sticker__body,
+  :hover > .sticker .sticker__body {
+    clip-path: polygon(0 0, 100% 0, 100% calc(100% - var(--peel)), calc(100% - var(--peel)) 100%, 0 100%);
+  }
+  .sticker:hover .sticker__flap,
+  :hover > .sticker .sticker__flap {
+    scale: 1;
+  }
+}
+:focus-visible > .sticker .sticker__body {
+  clip-path: polygon(0 0, 100% 0, 100% calc(100% - var(--peel)), calc(100% - var(--peel)) 100%, 0 100%);
+}
+:focus-visible > .sticker .sticker__flap {
+  scale: 1;
+}
+
+/* Pop-in (spec §3.5): scale 0 → 1 on the sticker spring, rotation settling from ±14°,
+   250 ms after its parent is visible. Without scripting, or with reduced motion, stickers
+   are simply there. A failsafe shows any sticker the observer never reached. */
+@media (scripting: enabled) and (prefers-reduced-motion: no-preference) {
+  .sticker[data-pop]:not([data-pop="in"]) {
+    animation: sticker-failsafe 1ms 2.5s both;
+  }
+  .sticker[data-pop="in"] {
+    animation: sticker-pop var(--spring-sticker-d) var(--spring-sticker) 250ms both;
+  }
+}
+@keyframes sticker-pop {
+  from {
+    scale: 0;
+    rotate: calc(var(--rest) + var(--pop-from));
+  }
+  to {
+    scale: 1;
+    rotate: var(--rest);
+  }
+}
+@keyframes sticker-failsafe {
+  from {
+    scale: 0;
+  }
+  to {
+    scale: 1;
+  }
+}
+
+/* Draggable wrapper */
+.sticker-drag {
+  display: inline-block;
+  cursor: grab;
+  user-select: none;
+  -webkit-user-select: none;
+}
+.sticker-drag__link {
+  display: inline-block;
+  color: inherit;
+  text-decoration: none;
+  border-radius: var(--r-pill);
+}
+
+/* ---------- Row badge (plan Q10) ---------- */
+.badge {
+  --badge-fill: var(--pils);
+  display: inline-block;
+  padding: 3px 8px 2px;
+  border: var(--stroke) solid var(--ink);
+  border-radius: var(--r-tag);
+  background: var(--badge-fill);
+  color: var(--ink);
+  font-family: var(--ff-utility);
+  font-weight: 700;
+  font-size: var(--t-label);
+  line-height: var(--lh-label);
+  letter-spacing: var(--track-label);
+  text-transform: uppercase;
+  white-space: nowrap;
+  rotate: var(--rot-a);
+}
+.badge[data-tone="currant"] {
+  --badge-fill: var(--currant);
+  color: var(--paper);
+}
+
+@media (forced-colors: active) {
+  .sticker__shape,
+  .sticker__shape--tag {
+    fill: Canvas;
+    stroke: CanvasText;
+    stroke-width: 2;
+    border-color: CanvasText;
+  }
+  .sticker__text {
+    color: CanvasText;
+  }
+}
+
+/* ---------- Ticket stub (spec §3.6) ---------- */
+.ticket {
+  --stub-w: 5.25rem;
+  --notch: 10px;
+  --stub-fill: var(--ember);
+  --stub-ink: var(--card);
+  display: grid;
+  grid-template-columns: var(--stub-w) minmax(0, 1fr);
+  color: var(--fg);
+  text-decoration: none;
+  isolation: isolate;
+}
+.ticket[data-kind="music"] {
+  --stub-fill: var(--pils);
+  --stub-ink: var(--ink);
+}
+.ticket[data-kind="trivia"] {
+  --stub-fill: var(--sky);
+  --stub-ink: var(--ink);
+}
+.ticket[data-kind="festival"] {
+  --stub-fill: var(--currant);
+  --stub-ink: var(--bone);
+}
+.ticket[data-kind="game"] {
+  --stub-fill: var(--court);
+  --stub-ink: var(--bone);
+}
+
+.ticket__stub,
+.ticket__body {
+  position: relative;
+  border: var(--edge);
+  clip-path: inset(0 round var(--r-card));
+}
+.ticket__stub {
+  display: grid;
+  place-content: center;
+  justify-items: center;
+  gap: 2px;
+  padding: var(--s-4) var(--s-2);
+  border-right: var(--stroke-dash) dashed var(--ink);
+  border-radius: var(--r-card) 0 0 var(--r-card);
+  clip-path: inset(0 round var(--r-card) 0 0 var(--r-card));
+  background: var(--stub-fill);
+  color: var(--stub-ink);
+  text-align: center;
+  transform-origin: 100% 0;
+  transition:
+    rotate var(--d-2) var(--ease-out),
+    translate var(--d-2) var(--ease-out);
+}
+.ticket__body {
+  display: grid;
+  align-content: center;
+  gap: var(--s-1);
+  padding: var(--s-4) var(--s-5);
+  border-left: 0;
+  border-radius: 0 var(--r-card) var(--r-card) 0;
+  clip-path: inset(0 round 0 var(--r-card) var(--r-card) 0);
+  background: var(--surface);
+}
+
+/* Notches: a page-coloured circle with the ink ring, centred on the seam; each piece shows
+   its own quarter, so together they read as one half-circle cut. */
+.ticket__stub::before,
+.ticket__stub::after,
+.ticket__body::before,
+.ticket__body::after {
+  content: "";
+  position: absolute;
+  width: calc(var(--notch) * 2);
+  height: calc(var(--notch) * 2);
+  border: var(--edge);
+  border-radius: 50%;
+  background: var(--bg);
+}
+.ticket__stub::before {
+  top: calc(var(--notch) * -1 - var(--stroke));
+  right: calc(var(--notch) * -1 - var(--stroke));
+}
+.ticket__stub::after {
+  bottom: calc(var(--notch) * -1 - var(--stroke));
+  right: calc(var(--notch) * -1 - var(--stroke));
+}
+.ticket__body::before {
+  top: calc(var(--notch) * -1 - var(--stroke));
+  left: calc(var(--notch) * -1);
+}
+.ticket__body::after {
+  bottom: calc(var(--notch) * -1 - var(--stroke));
+  left: calc(var(--notch) * -1);
+}
+.ticket__notch {
+  display: none;
+}
+
+/* Starting to tear: hover (pointer) or press (touch) */
+@media (hover: hover) {
+  .ticket:hover .ticket__stub {
+    rotate: -1.5deg;
+    translate: -3px 0;
+  }
+}
+.ticket:active .ticket__stub {
+  rotate: -1.5deg;
+  translate: -3px 0;
+}
+.ticket:focus-visible {
+  outline-offset: 4px;
+  border-radius: var(--r-card);
+}
+
+/* Torn off, once (event page hero): the stub drops away on a zigzag edge and stays there */
+.ticket[data-torn] .ticket__stub {
+  border-right: 0;
+  clip-path: var(--torn-edge);
+  rotate: -6deg;
+  translate: -14px 4px;
+}
+.ticket[data-torn] .ticket__body {
+  border-left: var(--stroke-dash) dashed var(--ink);
+}
+@media (prefers-reduced-motion: no-preference) {
+  .ticket[data-torn] .ticket__stub {
+    animation: ticket-tear var(--d-3) var(--ease-stamp) 300ms both;
+  }
+}
+@keyframes ticket-tear {
+  from {
+    rotate: 0deg;
+    translate: 0 0;
+  }
+}
+
+/* Date stub type */
+.ticket-date__day {
+  font-family: var(--ff-display);
+  font-size: 2.25rem;
+  line-height: 0.9;
+  font-variant-numeric: lining-nums;
+}
+.ticket-date__label {
+  font-family: var(--ff-utility);
+  font-weight: 700;
+  font-size: var(--t-label);
+  letter-spacing: var(--track-label);
+  text-transform: uppercase;
+  line-height: 1;
+}
+/* Small labels never sit directly on sky or ember (Lc 46 / 3.47:1 fail the label floor):
+   every stub sets them on an ink tab in paper type, which passes on every kind. */
+.ticket__stub .ticket-date__label {
+  padding: 3px 6px 2px;
+  border-radius: 4px;
+  background: var(--ink);
+  color: var(--paper);
+}
+
+/* ---------- Glass glyph (spec §4.4) ---------- */
+.glass {
+  display: block;
+  width: auto;
+  aspect-ratio: 24 / 32;
+  overflow: visible;
+}
+.glass--glyph {
+  height: 1.75rem;
+}
+.glass--hero {
+  height: 12rem;
+}
+.glass__outline {
+  fill: none;
+  stroke: var(--fg);
+  stroke-width: 2;
+  stroke-linejoin: miter;
+  stroke-linecap: square;
+}
+.glass--glyph .glass__outline {
+  vector-effect: non-scaling-stroke;
+}
+.glass--hero .glass__outline {
+  stroke-width: 0.9;
+}
+.glass__head {
+  fill: var(--card);
+}
+.glass__haze {
+  fill: var(--card);
+  opacity: 0.12;
+}
+.glass__mark {
+  fill: none;
+  stroke: var(--fg);
+  stroke-width: 5;
+  opacity: 0.85;
+}
+/* The pour: liquid and head rise from the bottom of the glass */
+@media (prefers-reduced-motion: no-preference) {
+  .glass--rise .glass__pour {
+    animation: glass-rise var(--d-4) var(--ease-out) both;
+  }
+}
+@keyframes glass-rise {
+  from {
+    translate: 0 var(--level);
+  }
+}
+
+/* ---------- Icons (spec §3.9) ---------- */
+.icon {
+  display: inline-block;
+  width: 1.5rem;
+  height: 1.5rem;
+  flex: none;
+  overflow: visible;
+}
+/* Optical nudges: arrows sit 1 px toward where they point (spec §3A) */
+.icon--arrow {
+  translate: 1px 0;
+}
+.icon--external {
+  translate: 1px -1px;
+}
+
+/* ---------- Paper grain (spec §3.8) ---------- */
+body::after {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: 2147482000;
+  pointer-events: none;
+  background: url("/brand/grain.png") 0 0 / 220px 220px repeat;
+  mix-blend-mode: var(--grain-blend);
+  opacity: var(--grain-opacity);
+}
+@media (forced-colors: active), (prefers-contrast: more) {
+  body::after {
+    content: none;
+  }
+}
