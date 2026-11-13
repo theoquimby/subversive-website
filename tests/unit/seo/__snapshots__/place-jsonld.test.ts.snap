@@ -1,0 +1,72 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`placeJsonLd (spec §8.7) > snapshot for the Schema.org validator 1`] = `
+{
+  "@context": "https://schema.org",
+  "@type": [
+    "Brewery",
+    "Restaurant",
+  ],
+  "acceptsReservations": false,
+  "address": {
+    "@type": "PostalAddress",
+    "addressCountry": "US",
+    "addressLocality": "Catskill",
+    "addressRegion": "NY",
+    "postalCode": "12414",
+    "streetAddress": "96 West Bridge Street",
+  },
+  "alternateName": "Subversive",
+  "description": "Farmhouse brewery, taproom & kitchen",
+  "email": "mhenry@drinksubversive.com",
+  "menu": "https://example.test/menu",
+  "name": "Subversive Brewing",
+  "openingHoursSpecification": [
+    {
+      "@type": "OpeningHoursSpecification",
+      "closes": "20:00",
+      "dayOfWeek": "https://schema.org/Monday",
+      "opens": "16:30",
+    },
+    {
+      "@type": "OpeningHoursSpecification",
+      "closes": "20:00",
+      "dayOfWeek": "https://schema.org/Wednesday",
+      "opens": "16:30",
+    },
+    {
+      "@type": "OpeningHoursSpecification",
+      "closes": "20:00",
+      "dayOfWeek": "https://schema.org/Thursday",
+      "opens": "16:30",
+    },
+    {
+      "@type": "OpeningHoursSpecification",
+      "closes": "20:30",
+      "dayOfWeek": "https://schema.org/Friday",
+      "opens": "16:30",
+    },
+    {
+      "@type": "OpeningHoursSpecification",
+      "closes": "20:30",
+      "dayOfWeek": "https://schema.org/Saturday",
+      "opens": "12:00",
+    },
+    {
+      "@type": "OpeningHoursSpecification",
+      "closes": "18:30",
+      "dayOfWeek": "https://schema.org/Sunday",
+      "opens": "12:00",
+    },
+  ],
+  "sameAs": [
+    "https://www.instagram.com/subversivebeer/",
+    "https://www.facebook.com/subversivemaltnbrew/",
+  ],
+  "servesCuisine": [
+    "Burgers",
+  ],
+  "telephone": "+15183031270",
+  "url": "https://example.test/",
+}
+`;

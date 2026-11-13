@@ -1,0 +1,337 @@
+/* Open-now pill (spec §4.2), hours card (§4.9) and the Visit page (§6.4). */
+
+/* ---------- Open-now pill ---------- */
+.open-now {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--s-2);
+  min-height: 44px;
+  padding: 0 var(--s-4) 0 var(--s-3);
+  border: var(--stroke) solid var(--rule-strong);
+  border-radius: var(--r-pill);
+  color: var(--fg);
+  font-family: var(--ff-text);
+  font-weight: 500;
+  font-size: var(--t-small);
+  line-height: 1.2;
+  text-decoration: none;
+  transition: background-color var(--d-1) var(--ease-out);
+}
+@media (hover: hover) {
+  .open-now:hover {
+    background: var(--surface);
+  }
+}
+.open-now:active {
+  translate: 0 1px;
+}
+.open-now:focus-visible {
+  outline: 3px solid var(--focus);
+  outline-offset: 3px;
+}
+.open-now__text {
+  text-wrap: balance;
+}
+.open-now__muted {
+  color: var(--fg-muted);
+  white-space: nowrap;
+}
+.open-now__dot {
+  position: relative;
+  flex: none;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  border: var(--stroke) solid var(--fg);
+}
+.open-now[data-dot="go"] .open-now__dot {
+  border-color: var(--go);
+  background: var(--go);
+}
+/* the amber state: pils with a 2 px ink ring (plan smaller assumptions) */
+.open-now[data-dot="amber"] .open-now__dot {
+  border-color: var(--ink);
+  background: var(--pils);
+}
+/* open: a ring breathes out from the dot every 2 s */
+@media (prefers-reduced-motion: no-preference) {
+  .open-now[data-dot="go"] .open-now__dot::after {
+    content: "";
+    position: absolute;
+    inset: -2px;
+    border-radius: 50%;
+    border: var(--stroke) solid var(--go);
+    animation: open-pulse 2s var(--ease-out) infinite;
+  }
+  [data-motion="paused"] .open-now__dot::after {
+    animation-play-state: paused;
+    opacity: 0;
+  }
+}
+@keyframes open-pulse {
+  from {
+    scale: 1;
+    opacity: 0.8;
+  }
+  to {
+    scale: 2.6;
+    opacity: 0;
+  }
+}
+
+/* ---------- Hours card ---------- */
+.hours {
+  width: 100%;
+  margin-top: var(--s-5);
+  border-collapse: collapse;
+  font-variant-numeric: tabular-nums lining-nums;
+}
+.hours__row {
+  /* the rule is the row's, so its dashes run unbroken across the cells */
+  border-bottom: var(--stroke-dash) dashed color-mix(in srgb, var(--fg) 38%, transparent);
+}
+.hours__row > * {
+  padding: var(--s-3) 0;
+  text-align: left;
+  vertical-align: baseline;
+}
+.hours tbody:first-of-type .hours__row:last-child {
+  border-bottom: var(--stroke) solid var(--rule-strong);
+}
+.hours__day {
+  position: relative;
+  font-weight: 400;
+  white-space: nowrap;
+}
+/* a solid kernel marks today; every row keeps its room so marking moves nothing */
+.hours__kernel {
+  position: absolute;
+  /* hangs in the margin, so the day names keep the grid edge */
+  left: -14px;
+  top: 50%;
+  width: 7px;
+  height: 13px;
+  translate: 0 -55%;
+  background: var(--accent);
+  clip-path: polygon(0 0, 100% 40%, 100% 100%, 0 60%);
+  opacity: 0;
+}
+.hours__row[data-today] .hours__kernel {
+  opacity: 1;
+}
+.hours__row[data-today] > * {
+  font-weight: 600;
+}
+.hours__time {
+  font-weight: 600;
+  white-space: nowrap;
+  padding-inline: var(--s-4);
+}
+.hours__kitchen {
+  color: var(--fg-muted);
+  font-size: var(--t-small);
+  text-align: right;
+}
+.hours__row:not([data-date]) > .hours__kitchen {
+  text-align: right;
+}
+.hours__row[data-closed] > .hours__time,
+.hours__row[data-closed] > .hours__day {
+  color: var(--fg-muted);
+  font-weight: 400;
+}
+.hours__special-head {
+  padding: var(--s-6) 0 var(--s-2);
+  border-bottom: var(--stroke) solid var(--rule-strong);
+  font-family: var(--ff-utility);
+  font-weight: 700;
+  font-size: var(--t-label);
+  letter-spacing: var(--track-label);
+  text-align: left;
+  text-transform: uppercase;
+}
+.hours__special .hours__kitchen {
+  text-align: right;
+  color: var(--fg);
+}
+
+/* ---------- Visit page ---------- */
+.page--visit {
+  padding-bottom: 0;
+}
+.visit-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--s-4) var(--s-6);
+}
+.visit-head .page__title {
+  margin: 0;
+}
+.visit-grid {
+  display: grid;
+  gap: var(--s-10);
+  margin-top: var(--s-9);
+}
+.visit-hours {
+  scroll-margin-top: calc(76px + env(safe-area-inset-top) + var(--s-4));
+}
+@media (min-width: 64rem) {
+  .visit-grid {
+    grid-template-columns: minmax(0, 7fr) minmax(0, 5fr);
+    column-gap: var(--s-11);
+    align-items: start;
+  }
+}
+
+.address-block__addr {
+  display: grid;
+  margin: 0;
+  font-family: var(--ff-display);
+  font-size: var(--t-h2);
+  font-style: normal;
+  line-height: var(--lh-h2);
+  margin-left: var(--optical-left);
+  text-wrap: balance;
+}
+@media (min-width: 64rem) {
+  .address-block {
+    padding-top: calc(var(--t-h2) + var(--s-6));
+  }
+  /* the street on one line in the five-column side */
+  .address-block__addr {
+    font-size: 2.125rem;
+  }
+}
+.visit-actions {
+  display: grid;
+  gap: var(--s-3);
+  margin-top: var(--s-6);
+}
+.visit-actions__btn {
+  width: 100%;
+}
+@media (min-width: 48rem) {
+  .visit-actions {
+    grid-template-columns: auto auto;
+    justify-content: start;
+  }
+  .visit-actions__btn {
+    width: auto;
+  }
+  .visit-actions__note {
+    grid-column: 1 / -1;
+  }
+}
+.visit-actions__note {
+  margin: 0;
+  color: var(--fg-muted);
+  font-size: var(--t-small);
+}
+
+.visit-pair {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--s-3);
+  margin-top: var(--section);
+}
+@media (min-width: 48rem) {
+  .visit-pair {
+    gap: var(--s-6);
+  }
+}
+
+.visit-section {
+  margin-top: var(--section);
+  scroll-margin-top: calc(76px + env(safe-area-inset-top) + var(--s-4));
+}
+
+/* Good to know: a ruled ledger, label column with the icon, the site's sentence */
+.ledger {
+  margin: var(--s-6) 0 0;
+  border-top: var(--stroke) solid var(--rule-strong);
+}
+.ledger__row {
+  display: grid;
+  gap: var(--s-2) var(--s-6);
+  padding: var(--s-5) 0;
+  border-bottom: var(--stroke-dash) dashed color-mix(in srgb, var(--fg) 38%, transparent);
+}
+@media (min-width: 48rem) {
+  .ledger__row {
+    grid-template-columns: 12rem minmax(0, 1fr);
+  }
+}
+.ledger__label {
+  display: flex;
+  align-items: center;
+  gap: var(--s-3);
+  font-family: var(--ff-utility);
+  font-weight: 700;
+  font-size: var(--t-label);
+  letter-spacing: var(--track-label);
+  text-transform: uppercase;
+}
+.ledger__icon {
+  width: 22px;
+  height: 22px;
+}
+.ledger__text {
+  display: grid;
+  justify-items: start;
+  gap: var(--s-3);
+  max-width: var(--measure-prose);
+  margin: 0;
+  text-wrap: pretty;
+}
+.tag-sky {
+  display: inline-flex;
+  align-items: center;
+  padding: 5px 9px 4px;
+  border-radius: var(--r-tag);
+  background: var(--sky-deep);
+  color: var(--card);
+  font-family: var(--ff-utility);
+  font-weight: 700;
+  font-size: var(--t-label);
+  line-height: var(--lh-label);
+  letter-spacing: var(--track-label);
+  text-transform: uppercase;
+}
+
+.visit-tent {
+  margin-top: var(--section);
+}
+
+.page--visit-end {
+  padding-top: 0;
+  padding-bottom: var(--section);
+}
+.visit-end {
+  display: grid;
+  gap: 0 var(--s-11);
+}
+@media (min-width: 64rem) {
+  .visit-end {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+.visit-prose {
+  max-width: var(--measure-prose);
+  margin: var(--s-5) 0 var(--s-5);
+}
+.contact-list {
+  display: grid;
+  margin: var(--s-4) 0 0;
+  padding: 0;
+  list-style: none;
+}
+.contact-list a {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  color: var(--fg);
+  text-decoration: underline var(--stroke) var(--accent);
+  text-underline-offset: 4px;
+}

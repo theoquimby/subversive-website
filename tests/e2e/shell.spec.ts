@@ -2,10 +2,10 @@ import { expect, test } from "@playwright/test";
 
 // Plan M2 shell flows, on phone and desktop projects.
 const PAGES = [
-  { href: "/menu", h1: "Menu" },
-  { href: "/events", h1: "Events" },
-  { href: "/visit", h1: "Visit" },
-  { href: "/beer", h1: "Our beer" },
+  { href: "/menu", label: "Menu", h1: "Menu" },
+  { href: "/events", label: "Events", h1: "Events" },
+  { href: "/visit", label: "Visit", h1: "Find us" },
+  { href: "/beer", label: "Our beer", h1: "Our beer" },
 ];
 
 test("every nav link navigates; the header persists; back returns", async ({ page, isMobile }) => {
@@ -15,10 +15,10 @@ test("every nav link navigates; the header persists; back returns", async ({ pag
       await page.getByRole("button", { name: "Menu", exact: true }).click();
       await page
         .getByRole("dialog")
-        .getByRole("link", { name: new RegExp(p.h1) })
+        .getByRole("link", { name: new RegExp(p.label) })
         .click();
     } else {
-      await page.getByRole("navigation", { name: "Main" }).getByRole("link", { name: p.h1 }).click();
+      await page.getByRole("navigation", { name: "Main" }).getByRole("link", { name: p.label }).click();
     }
     await expect(page).toHaveURL(p.href);
     await expect(page.getByRole("heading", { level: 1 })).toHaveText(p.h1);
@@ -26,7 +26,7 @@ test("every nav link navigates; the header persists; back returns", async ({ pag
   }
   await page.goBack();
   await expect(page).toHaveURL("/visit");
-  await expect(page.getByRole("heading", { level: 1 })).toHaveText("Visit");
+  await expect(page.getByRole("heading", { level: 1 })).toHaveText("Find us");
 });
 
 test("desktop nav marks the current page", async ({ page, isMobile }) => {

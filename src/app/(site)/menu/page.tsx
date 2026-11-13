@@ -13,6 +13,7 @@ import { PourLine } from "@/components/menu/PourLine";
 import { type Chip, SectionChips } from "@/components/menu/SectionChips";
 import { TodayFeatures } from "@/components/menu/TodayFeatures";
 import { Under21Note } from "@/components/menu/Under21Note";
+import { OpenNow } from "@/components/visit/OpenNow";
 import { weeklyFeatures } from "@/lib/menu/features";
 import { isBeer } from "@/lib/menu/kinds";
 import { applySeasonal } from "@/lib/menu/seasonal";
@@ -64,7 +65,7 @@ export default async function MenuPage() {
       <div className="page page--menu">
         <header className="menu-head">
           <h1 className="page__title">Menu</h1>
-          {/* TODO(M4): the open-now pill sits here (OpenNowSlot) */}
+          <OpenNow className="menu-head__open" />
           <p className="menu-head__updated">
             <time dateTime={view.updated}>{menuLabels.updated(formatMonthDay(view.updated))}</time>
           </p>

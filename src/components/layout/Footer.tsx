@@ -8,6 +8,7 @@ import { Checker } from "../graphics/Checker";
 import { Seal } from "../graphics/Seal";
 import { Wordmark } from "../graphics/Wordmark";
 import { Link } from "../ui/Link";
+import { OpenNow } from "../visit/OpenNow";
 import { PauseMotion } from "./PauseMotion";
 
 export function Footer() {
@@ -20,6 +21,7 @@ export function Footer() {
         <Link href="/" className="site-footer__word">
           <Wordmark name={site.name} />
         </Link>
+        <OpenNow className="site-footer__open" />
         <div className="site-footer__cols">
           <section aria-labelledby="f-visit">
             <h2 id="f-visit" className="site-footer__head">

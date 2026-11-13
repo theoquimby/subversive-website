@@ -21,6 +21,8 @@ interface Props {
   phone: { display: string; tel: string };
   instagram: string;
   facebook: string;
+  /** the open-now pill, rendered on the server (spec §4.1 "today's hours line") */
+  status?: React.ReactNode;
 }
 
 function Glyph({ open }: { open: boolean }) {
@@ -49,7 +51,7 @@ function CutCross() {
   );
 }
 
-export function MobileMenu({ nav, address, mapHref, phone, instagram, facebook }: Props) {
+export function MobileMenu({ nav, address, mapHref, phone, instagram, facebook, status }: Props) {
   // The sheet is open for the page it was opened on. Following a link closes it in the
   // same commit that brings the new page, with no exit animation of its own: the page
   // wipe takes the sheet away with the old page (one motion, not two). The close mark
@@ -110,6 +112,7 @@ export function MobileMenu({ nav, address, mapHref, phone, instagram, facebook }
             </ol>
           </nav>
           <div className="menu-sheet__facts">
+            {status}
             <a href={mapHref} target="_blank" rel="noopener" className="menu-sheet__fact">
               {address}
             </a>

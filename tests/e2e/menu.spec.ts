@@ -79,7 +79,8 @@ test("/menu#cheap-dills opens the row and scrolls it into view", async ({ page }
 const pastFirstSection = (page: Page) =>
   page.evaluate(() => {
     const first = document.querySelector('[data-list="drinks"] [data-section]') as HTMLElement;
-    window.scrollTo({ top: first.offsetTop + first.offsetHeight + 200, behavior: "instant" });
+    const bottom = first.getBoundingClientRect().bottom + window.scrollY;
+    window.scrollTo({ top: bottom + 200, behavior: "instant" });
   });
 
 test("the order bar appears after the first section and links to Square", async ({ page }) => {

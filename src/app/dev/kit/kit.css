@@ -864,3 +864,16 @@
 .motion-sheet__sheet {
   background: var(--pils);
 }
+
+.kit-pills {
+  display: grid;
+  gap: var(--s-4);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.kit-pills li {
+  display: grid;
+  justify-items: start;
+  gap: var(--s-2);
+}

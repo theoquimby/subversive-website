@@ -493,7 +493,9 @@ html:has(.menu-bar[data-stuck]) .site-header[data-solid] {
   text-transform: uppercase;
   white-space: nowrap;
 }
-.msec__head .pill {
+.msec__head .pill,
+.visit-section > .pill,
+.visit-hours > .pill {
   /* Theo 11/13, "nothing heavy-handed": the menu's sections are many and close
      together, so their pills step down from --t-h2 to sit on one line */
   padding: 6px 18px 8px;

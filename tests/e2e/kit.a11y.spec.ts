@@ -7,11 +7,16 @@ test.skip(process.env.NEXT_PUBLIC_DEV_KIT !== "1", "the kit exists only in dev-k
 for (const skin of ["paper", "overtime"] as const) {
   test(`/dev/kit passes axe in the ${skin} skin`, async ({ page }) => {
     await page.emulateMedia({ reducedMotion: "reduce" });
-    await page.goto("/dev/kit");
+    await page.goto("/dev/kit", { waitUntil: "networkidle" });
     if (skin === "overtime") {
       await page.getByText("Overtime", { exact: true }).click();
       await expect(page.locator(".kit-root")).toHaveAttribute("data-skin", "overtime");
     }
+    // axe reads computed colours: let the skin switch repaint before it looks
+    await page.evaluate(async () => {
+      await document.fonts.ready;
+      await new Promise((r) => requestAnimationFrame(() => requestAnimationFrame(r)));
+    });
     const results = await new AxeBuilder({ page }).analyze();
     expect(results.violations.map((v) => `${v.id}: ${v.help} (${v.nodes.length})`)).toEqual([]);
   });

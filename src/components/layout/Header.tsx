@@ -7,6 +7,7 @@ import { BarleyMark } from "../graphics/BarleyMark";
 import { Wordmark } from "../graphics/Wordmark";
 import { Button } from "../ui/Button";
 import { Link } from "../ui/Link";
+import { OpenNow } from "../visit/OpenNow";
 import { HeaderScroll } from "./HeaderScroll";
 import { MobileMenu } from "./MobileMenu";
 import { NavLinks } from "./NavLinks";
@@ -34,6 +35,7 @@ export function Header() {
             phone={site.phone}
             instagram={site.links.instagram}
             facebook={site.links.facebook}
+            status={<OpenNow className="menu-sheet__open" />}
           />
         </div>
       </div>

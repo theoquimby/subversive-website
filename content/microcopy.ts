@@ -50,3 +50,23 @@ export const menuLabels = {
     "dog-friendly": "Dog-friendly",
   },
 } as const;
+
+// Visit page and hours labels (spec §6.4, §4.9, §6.1). Interface labels named in the spec.
+export const visitLabels = {
+  title: "Find us",
+  hours: "Hours",
+  specialHours: "Special hours",
+  closed: "Closed",
+  kitchenTil: (t: string) => `kitchen til ${t}`,
+  call: (display: string) => `Call ${display}`,
+  goodToKnow: "Good to know",
+  seating: "Seating",
+  tent: "The tent",
+  parking: "Parking",
+  dogs: "Dogs",
+  dogsTag: "Dogs welcome in the tent",
+  giftCards: "Gift cards",
+  eGiftCards: "eGift cards",
+  contact: "Contact",
+  bookYourBand: "Book your band",
+} as const;

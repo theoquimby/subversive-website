@@ -8,6 +8,8 @@ import { Checker } from "@/components/graphics/Checker";
 import { Wordmark } from "@/components/graphics/Wordmark";
 import { Pill } from "@/components/layout/Pill";
 import { StampIn } from "@/components/layout/StampIn";
+import { OpenNowPill } from "@/components/visit/OpenNowPill";
+import type { StatusLine } from "@/lib/hours/format";
 import { adjustments, cssVar, raw, semanticNames } from "@/styles/tokens";
 import legacyBarley from "../../../../docs/source/legacy/barley-mark-legacy.webp";
 
@@ -24,6 +26,17 @@ type Beer = {
 const isBeerItem = (i: object): i is Beer => "abv" in i && "prices" in i;
 const beer = (menu.drinks[0]?.groups[0]?.items as object[] | undefined)?.find(isBeerItem);
 const burgers = menu.food[0];
+
+// The open-now pill in each of its seven states (spec §4.2, plan M4 "done when")
+const PILL_STATES: { state: string; line: StatusLine }[] = [
+  { state: "open", line: { dot: "go", text: "Open now · til 8:30", muted: "· kitchen til 8:15" } },
+  { state: "open-late", line: { dot: "go", text: "Open late tonight · Knicks at 7:00" } },
+  { state: "kitchen-closed", line: { dot: "amber", text: "Bar open til 8:30 · kitchen closed" } },
+  { state: "opens-later", line: { dot: "hollow", text: "Opens today at 4:30" } },
+  { state: "closed-for-day", line: { dot: "hollow", text: "Closed now · opens Sat at 12" } },
+  { state: "closed-weekday", line: { dot: "hollow", text: "Closed Tuesdays · back Wed at 4:30" } },
+  { state: "closed-special", line: { dot: "hollow", text: "Closed today · Thanksgiving" } },
+];
 
 const ROLES: Record<string, string> = {
   paper: "Menu stock. Default background.",
@@ -237,6 +250,17 @@ export default function KitPage() {
             </div>
           </Section>
         </div>
+
+        <Section id="kit-open-now" title="Open-now pill">
+          <ul className="kit-pills">
+            {PILL_STATES.map((p) => (
+              <li key={p.state}>
+                <span className="kit-label">{p.state}</span>
+                <OpenNowPill line={p.line} />
+              </li>
+            ))}
+          </ul>
+        </Section>
 
         <Section id="kit-motion" title="Motion">
           <KitMotion />
