@@ -17,7 +17,7 @@ This document is the brief for whoever plans and builds the site. It is opiniona
 | Path | What it is |
 | --- | --- |
 | `content/menu.json` | Full drink and food menu, transcribed from the October 2026 PDFs and checked against the rendered pages. Real names, descriptions, prices. |
-| `content/site.json` | Name, address, phone, hours, visit policies, links, sourcing facts, About / Malthouse / Brewery copy (verbatim). |
+| `content/site.json` | Name, address, phone, hours, visit policies, links, sourcing facts, About and Brewery copy (verbatim). The old Malthouse page copy is kept under `_archived` for reference only and is not published. |
 | `content/events.seed.json` | Upcoming events in the exact shape of the Ops feed. Fallback and test fixture. |
 | `public/photos/*.webp` | 15 photographs from the current site, 1500 px wide. |
 | `public/brand/*.svg` | First-pass vector redraws made for this spec: `barley-mark.svg`, `barley-mark-solid.svg`, `wordmark-heritage.svg`, `sticker-burst.svg`, `checker-tile.svg`, `favicon.svg`. Starting points to refine, not final art. |
@@ -33,6 +33,7 @@ This document is the brief for whoever plans and builds the site. It is opiniona
 | O2 | Hours. Home page lists kitchen closing 15 min early Fri–Sun; old footer says kitchen and taproom close together. | Values in `content/site.json`. |
 | O3 | Menu source of truth: Square catalog (needs a read-only Square token) or the JSON file. | JSON file behind a `MenuSource` interface (§8.4). |
 | O4 | Long-form name after dropping "Malting". | "Subversive" everywhere; "Subversive Brewing" only in legal/meta. |
+| O10 | **Malting is being retired from the brand.** The business is moving away from malting, so the site does not present Subversive as a maltster. Do they still malt any of their own grain, and may the site say so in one line? | Say nothing about in-house malting anywhere. The grain claim is "100% New York grain", which their menu and site both state. No malthouse page, section, nav item, photo caption or metadata. |
 | O5 | Lager goblin art and scream audio from Max. Label art, logo vectors, more photos. Instagram is login-walled and could not be read. | Placeholder goblin (§5.2), redrawn marks (§3.1), existing photos. |
 | O6 | Newsletter provider. | Form posts to a route handler that validates and no-ops behind `NEWSLETTER_PROVIDER=none`; UI says "Coming soon" is **not** acceptable, so hide the block until a provider is set. |
 | O7 | Seasonal specials in `menu.json` (`seasonal: true`) are October's. | Hidden by a date window (§8.4). |
@@ -68,7 +69,7 @@ Two skins, one system:
 
 | Signal | How it shows up |
 | --- | --- |
-| Serious brewery | Precise typography, tabular prices, ABV and style on every beer, a real malthouse page with their own words. |
+| Serious brewery | Precise typography, tabular prices, ABV and style on every beer, a brewery page in their own words. |
 | Real food | Food photography gets the largest frames. Burgers are first-class on the menu, not an appendix. |
 | Family friendly | Kid-friendly and dog-friendly tags on real items ("Chicken or Beef: for a dog or a human"), Tractor sodas listed with the same care as beer, daylight photos, a gate that never blocks the food menu. |
 | New York grown | The sourcing ledger and the map (§6.1): named farms, bakeries, towns. No adjectives. |
@@ -102,7 +103,7 @@ Raw palette:
 | `--ember-deep` | `#B4460F` | Ember for small text on paper. |
 | `--sky` | `#2F9BE0` | The specials-panel blue. Secondary accent, family/dog notes. |
 | `--sky-deep` | `#17639B` | Sky for small text on paper. |
-| `--spruce` | `#1E3A2F` | Sourcing ledger, malthouse page background, "open" states. |
+| `--spruce` | `#1E3A2F` | Sourcing ledger, brewery page bands, "open" states. |
 | `--currant` | `#6B2D5C` | Rare. Sour beers, one sticker. |
 | `--night` | `#0F0E0C` | Overtime background. |
 | `--night-raised` | `#191712` | Cards on night. |
@@ -158,7 +159,7 @@ Typographic care that separates this from a template:
 - Real punctuation: `’ “ ” – — ×`, non-breaking space before units (`9 oz`, `7 PM`), en dash in ranges (`4:30–8:30`).
 - `text-wrap: balance` on headings, `text-wrap: pretty` on paragraphs. Max line length 62ch for prose, 38ch for hero sublines.
 - Display type gets optical nudges: negative letter-spacing `-0.02em` at mega size, and a `-0.04em` left margin so round letters align to the grid edge.
-- Hanging punctuation for pull quotes on the malthouse page (`hanging-punctuation: first` with a negative text-indent fallback).
+- Hanging punctuation for pull quotes on the brewery page (`hanging-punctuation: first` with a negative text-indent fallback).
 
 ### 2.4 Space, shape, depth
 
@@ -237,7 +238,7 @@ Compare against `public/brand/barley-mark-legacy.webp` and adjust proportions un
 - *Heritage:* thin geometric caps, wide tracking (as `wordmark-legacy.webp`, without the "MALTING | BREWING" line). A monoline redraw is in `public/brand/wordmark-heritage.svg`; tighten its spacing and letter shapes against the legacy file, or replace it with Max's vector if he has one. Use it small: in metadata, the seal and the footer small print.
 - *Loud:* the name in Caprasimo with the slash drawn as an ember parallelogram cut at the same angle as a barley kernel (about 61° from horizontal). This is the hero and footer version. The slash is a recurring device: it is the divider in `5 / 8`, the wipe angle in page transitions, the cut on ticket stubs.
 
-**Seal.** Circular badge, ink fill: barley mark centered, "SUBVERSIVE · CATSKILL NY · EST. 2018 ·" on a text path. Rotates slowly (one turn per 40 s) where used as a decorative stamp; static in the favicon and OG images. The old seal says "Malting · Brewing"; the new one does not.
+**Seal.** Circular badge, ink fill: barley mark centered, "SUBVERSIVE · CATSKILL NY · EST. 2018 ·" on a text path. Rotates slowly (one turn per 40 s) where used as a decorative stamp; static in the favicon and OG images. The old seal and wordmark say "Malting · Brewing"; nothing on the new site does. Do not use `wordmark-legacy.webp` or `lockup-legacy.webp` anywhere public.
 
 ### 3.2 Checker rail
 
@@ -305,7 +306,7 @@ Fifteen real photos exist (`public/photos/`). They are good and warm; treat them
 - No filters, duotones or overlays on food. Two scrims only, for text on photos: bottom `linear-gradient(transparent, rgb(15 14 12 / .82))` over the lower 55%, and top `rgb(15 14 12 / .55) → transparent` over the upper 25% for the header.
 - Aspect ratios: 4:3 and 1:1 on phone, 3:2 and 16:10 on desktop, 4:5 for portrait pairs. Always `object-fit: cover` with an explicit `object-position` per image, stored in the photo manifest (`content/photos.ts`: `src`, `alt`, `focal: [x, y]`, `credit?`).
 - Write real alt text: what is in the picture ("Smash burger and a pint with the barley mark, on the bar").
-- Suggested roles: `burger-and-beer` (home hero, menu food header) · `firepit-beers` (Overtime hero, events header) · `heated-tent` and `beer-garden-night` and `exterior-dusk` (visit) · `giant-pretzel`, `lobster-roll`, `patio-plate` (menu, home strip) · `malt-raking`, `malt-in-hands`, `brewhouse-copper`, `kettle-dark` (beer/malthouse) · `founders-doorway` (about) · `can-in-hand` (beer page, to-go).
+- Suggested roles: `burger-and-beer` (home hero, menu food header) · `firepit-beers` (Overtime hero, events header) · `heated-tent` and `beer-garden-night` and `exterior-dusk` (visit) · `giant-pretzel`, `lobster-roll`, `patio-plate` (menu, home strip) · `brewhouse-copper`, `kettle-dark`, `malt-in-hands` captioned simply as New York grain (brewery page). `malt-raking` shows the malting floor: do not use it (O10) · `founders-doorway` (about) · `can-in-hand` (beer page, to-go).
 - A photo reveals by its frame drawing first (outline stroke 300 ms), then the image fading up 420 ms from `--paper-deep`. `next/image` with a generated blur placeholder, correct `sizes`, AVIF/WebP.
 - Ask Max for more: hands holding food, kids at the picnic tables, a dog in the tent, the bar on a busy night, cans with label art. Until then, do not pad with stock.
 
@@ -316,6 +317,72 @@ One fixed, pointer-events-none overlay on `body::after`: a 220 × 220 px tiled n
 ### 3.9 Icons
 
 No icon library. Draw a set of about 14 icons in the same 2 px miter stroke as the barley mark, on a 24 px grid: pin, clock, phone, dog, tent, parking "P", fork, glass (pint), stein, arrow, external arrow, calendar plus, speaker on/off, close. Geometric, slightly chunky, no rounded caps. One `<Icon name>` component reading from an SVG sprite.
+
+---
+
+## 3A. Craft rules
+
+These are the working rules of a senior designer, written down so they are applied on purpose and can be checked. They matter more than any single effect in §5. When a screen feels "off", the cause is almost always one of these.
+
+### Composition
+
+- **One loud thing per viewport.** Each screenful has exactly one element at display scale or full saturation (a headline, a photo, a sticker cluster). Everything else is quiet and small. If two things compete, shrink one.
+- **Scale contrast, not weight contrast.** Hierarchy comes from a big jump in size (at least 2.5× between a section's display line and its body) and from space, not from making many things bold. Three text levels per section at most: display, body, label.
+- **Few edges.** On phone, content aligns to one left edge and one right edge; prices own the right edge. On desktop, a section uses at most three vertical alignment lines. Draw them as dev-only guides in `/dev/kit` and check screenshots against them.
+- **Asymmetry with a reason.** Headlines are left-aligned. Centered text appears only inside small contained objects (stickers, intro boxes, tickets' date blocks). A centered page is the fastest way to look generated.
+- **Pacing.** Alternate loud and quiet, contained and full-bleed, Paper and color, like spreads in a magazine: hero (loud) → ticker (thin) → tap list (quiet, dense) → kitchen photos (loud, full-bleed) → events (medium) → sourcing (color field) → visit (quiet). Two dense sections never touch; two full-bleed photos never touch.
+- **Space is unequal on purpose.** Related things sit close (4–12 px); unrelated things sit far (56 px and up). Space above a heading is at least twice the space below it. Uniform 24 px gaps everywhere reads as a template.
+- **The first viewport is a poster.** At 390 × 844 the home hero must work as a still image: status pill, three-word headline, one line, two buttons, and the top third of the photo with a sticker breaking its edge, so the eye is pulled down. Compose it, screenshot it, and judge it as a poster before adding motion.
+- **Break the frame once.** In each major section one element crosses a boundary: a sticker overlapping a photo's corner, a headline's descender touching a rule, a photo bleeding off one side. Once, not everywhere.
+- **Squint test.** Blur a screenshot 8 px. The loud thing, the primary action and the section structure must still be obvious. If it turns to even grey, the hierarchy is too flat.
+
+### Typography
+
+- Set display type tight and large; set labels small, uppercase and tracked. The contrast between the fat soft serif and the narrow caps is the typographic identity, so they should always appear together: a Caprasimo headline with a Barlow Condensed eyebrow above or a label beside it.
+- Lines of display type are broken by hand for sense and shape (`Beer. / Burgers. / Catskill.`), never left to wrap. Provide explicit breaks per breakpoint where the wrap would be ugly.
+- Body copy is never wider than 62 characters and never justified. Left rag is cleaned with `text-wrap: pretty`.
+- Numbers are designed: tabular in columns, old-style nowhere, a thin space around the slash in `5 / 8`, the slash drawn at the wordmark angle where it appears at display size.
+- Uppercase text always gets tracking (0.08–0.14em); lowercase display never does (0 to −0.02em).
+- Line height shrinks as size grows: 1.5 at 16 px, 1.1 at 26 px, 0.86–0.9 at display sizes.
+- Nothing is set in grey on Paper. Secondary text is ink at reduced opacity on the same hue, so it stays warm.
+
+### Color and surface
+
+- Roughly 70% paper, 20% ink, 10% spot color on any Paper screen. Color is information (kind of event, today, open) or a single flourish, never wallpaper.
+- Neutrals are warm and tinted (ink `#151412`, not `#000`; paper, not white). Pure white and pure black appear nowhere.
+- Radii are concentric: an inner radius equals the outer radius minus the padding between them (a 22 px box with 8 px padding holds 14 px corners).
+- One stroke weight, one shadow style, three rotation angles (§2.4, §9.3). Consistency of these small constants is what makes a site look drawn by one hand.
+- Icons and glyphs are optically centered, not mathematically: nudge arrows 1 px toward their direction, raise text in pills by 1 px to account for descender space.
+
+### Motion
+
+- **Respond within 100 ms.** Every press shows its pressed state immediately; navigation and data come after. Nothing ever waits for an animation to finish before it can be used, and every animation can be interrupted (springs, not fixed timelines, for anything the finger drives).
+- **Duration follows distance.** 120 ms for a press, 220 ms for a control, 420 ms for a panel, 800 ms or more only for a set piece that happens once. Exits take about 70% of the entrance time.
+- **Easing has a reason.** Things entering decelerate (`--ease-out`). Things leaving accelerate. Physical objects (stickers, the goblin, stamps) overshoot; typographic and layout elements never bounce.
+- **One focal motion at a time.** On load, choreograph a sequence with a clear lead: pill, then headline, then photo, then stickers. Stagger 40–60 ms; the whole entrance finishes inside 900 ms. Two things never start moving in the same frame unless they are one object.
+- **Reveal, don't fade.** Headlines enter line by line from behind a mask (each line in an `overflow: hidden` wrapper, translating up from 110%); photos are uncovered by a clip-path; rules draw from left to right. Plain opacity fades are for cross-fading content in place only. When opacity is used, pair it with a move of 12 px or less.
+- **Motion comes from somewhere.** Menus grow from the button that opened them (`transform-origin` at the trigger), the gate's wipe starts at the pressed pill, a ticket expands from its list position into the event hero. Nothing appears from nowhere.
+- **Scroll-linked motion is decorative only** and scrubs with the scroll position (rail, parallax, pour line). Content never depends on it, and nothing is pinned or hijacked.
+- **Texture of time.** Idle motion is slow and sparse: the open dot's pulse, the seal's rotation, the ticker. At rest, the page is still. A page where everything loops is noise.
+
+### Photography and objects
+
+- A photo is cropped for one subject and one focal point, with consistent headroom. Food is shot-size dominant: it fills at least 60% of its frame after cropping.
+- Photos sit in designed frames at designed ratios; they never appear at their native aspect by accident. Hovering a photo scales the image 1.03 inside its fixed frame over 420 ms; the frame does not move.
+- Graphic objects behave like their real counterparts: stickers have a cut edge and peel, tickets have perforations and tear, the glass fills from the bottom with a meniscus, stamps land with weight and leave slightly uneven ink (the displacement filter in §3.5). The illusion is in two or three such details per object, not in realism.
+
+### The review loop
+
+After every milestone, before calling it done:
+
+1. Capture screenshots of each changed route at 390 and 1280 px, both skins, plus a short screen recording of any new motion.
+2. Critique them against this section and §9.3 as a hostile senior designer would, writing down at least five specific faults (misaligned edges, competing emphasis, cramped or equal spacing, weak crops, motion that draws attention to itself).
+3. Fix them. Then do a **subtraction pass**: remove one element, one color or one animation from each screen and keep the removal if the screen is no worse.
+4. Compare the screen against `docs/source/food-menu-2026-10.png`. If the site no longer looks related to that menu, it has drifted toward generic; pull it back.
+
+### Tells of a generated site (reject on sight)
+
+Everything centered · identical cards in a three-up grid · icon-heading-blurb feature rows · soft grey drop shadows · the same medium radius on every element · equal spacing between all sections · purple or blue gradients · a default sans for everything · emoji as icons · fade-up on every element as it scrolls in · hero text over a darkened stock photo · sentences that would fit any business · sections that exist because sites usually have them.
 
 ---
 
@@ -386,7 +453,7 @@ For `GAME` events whose title matches `Knicks (at|vs\.?) {Opponent}`. **Do not u
 
 ### 4.8 Sourcing ledger
 
-A ruled table-like grid with no icons: label (`GRAIN`), maker (`100% New York`), place (`malted in-house, Catskill`). Data from `site.json → sourcing`. Two columns on phone, up to six across on desktop, 2 px outer rule, 1.5 px inner rules. On the malthouse page it is paired with the map (§6.1).
+A ruled table-like grid with no icons: label (`GRAIN`), maker (`100% New York`), place (`grown in New York State`). Data from `site.json → sourcing`. Two columns on phone, up to six across on desktop, 2 px outer rule, 1.5 px inner rules. On the malthouse page it is paired with the map (§6.1).
 
 ### 4.9 Hours card
 
@@ -487,9 +554,9 @@ When a `GAME` event is in progress or starts within 3 hours (client clock, NY ti
 
 ## 6. Pages
 
-URL map: `/` · `/menu` · `/events` · `/events/[slug]` · `/visit` · `/beer` (malthouse + brewery) · `/about` · `/gift-cards` · `/bands` · `/order` (redirect to Square) · `/privacy` · 404.
+URL map: `/` · `/menu` · `/events` · `/events/[slug]` · `/visit` · `/beer` (the brewery) · `/about` · `/gift-cards` · `/bands` · `/order` (redirect to Square) · `/privacy` · 404.
 
-Redirects from the old site (permanent): `/events-1` → `/events`; `/events-1/*` → `/events` (or the matching event when the slug resolves); `/about-us` → `/about`; `/malt-house-brewery` → `/beer`; `/contact-us` → `/visit#contact`; `/s/Inside-Menu-1.pdf` → `/menu`; `/s/OCTOBER-MONTH-MENU-1.pdf` → `/menu?show=food`; `/cart`, `/search` → `/`.
+Redirects from the old site (permanent): `/events-1` → `/events`; `/events-1/*` → `/events` (or the matching event when the slug resolves); `/about-us` → `/about`; `/malt-house-brewery` → `/beer` (redirect only; the word does not appear on the new site); `/contact-us` → `/visit#contact`; `/s/Inside-Menu-1.pdf` → `/menu`; `/s/OCTOBER-MONTH-MENU-1.pdf` → `/menu?show=food`; `/cart`, `/search` → `/`.
 
 ### 6.1 Home
 
@@ -501,7 +568,7 @@ Order of sections on a phone. Each is one screenful or less.
 4. **On tap** pill → the first eight draft beers as menu rows in two groups, with glass glyphs → link "Full drink & food menu". This is a live slice of `/menu`, not a hand-picked list.
 5. **From the kitchen** pill → a horizontally snapping row of three large food photos (burger, pretzel, plate) each with one real caption (name + price from the menu) → section intro box about the smash burgers (beef and bun sources) → `See the food menu`.
 6. **Coming up** pill → three tickets (next three non-closure events) → `All events`. On desktop, three across.
-7. **Where it comes from** (spruce background, chevron band above). Sourcing ledger plus the **map**: an outline of New York State in bone 2 px stroke with dots at Catskill (taproom, marked with the barley mark), Hudson Falls, Cairo, Altamont, Hammondsport, and Livingston (the original barn, hollow dot labelled "2018"). Lines from each source draw toward Catskill on scroll, labels set in Utility. Generate the state outline at build time from a public-domain boundary file (US Census cartographic boundary or Natural Earth), simplified to under 4 KB of path data, projected with a fixed Albers or Mercator fit; do not hand-draw it and do not ship a map library. Approximate coordinates to verify (O8): Catskill 42.217, −73.865 · Hudson Falls 43.301, −73.586 · Cairo 42.299, −73.998 · Altamont 42.700, −74.034 · Hammondsport 42.408, −77.224 · Livingston 42.142, −73.778. One sentence only, from the site: "All of our beers feature 100% locally sourced grains, and many feature locally sourced hops, fruits, and herbs as well." Link: `Our beer & malthouse`.
+7. **Where it comes from** (spruce background, chevron band above). Sourcing ledger plus the **map**: an outline of New York State in bone 2 px stroke with dots at Catskill (taproom, marked with the barley mark), Hudson Falls, Cairo, Altamont, Hammondsport, and Livingston (the original barn, hollow dot labelled "2018"). Lines from each source draw toward Catskill on scroll, labels set in Utility. Generate the state outline at build time from a public-domain boundary file (US Census cartographic boundary or Natural Earth), simplified to under 4 KB of path data, projected with a fixed Albers or Mercator fit; do not hand-draw it and do not ship a map library. Approximate coordinates to verify (O8): Catskill 42.217, −73.865 · Hudson Falls 43.301, −73.586 · Cairo 42.299, −73.998 · Altamont 42.700, −74.034 · Hammondsport 42.408, −77.224 · Livingston 42.142, −73.778. One sentence only, from the site: "All of our beers feature 100% locally sourced grains, and many feature locally sourced hops, fruits, and herbs as well." Link: `Our beer`.
 8. **Visit** pill → hours card + address block (address in Display, `Directions` and phone buttons) + four fact chips (first come first served · heated tent · 8 spots + street parking · leashed dogs outside and in the tent) + `heated-tent` photo.
 9. **Mailing list** (only when O6 is resolved) and **gift cards** as a single two-up band: "eGift cards" button (external) with the line "Physical gift cards are always available in the taproom."
 10. **Footer.**
@@ -559,18 +626,19 @@ Events are entered once in Ops. The site only reads.
 
 ### 6.5 Our beer (`/beer`)
 
-Spruce + Paper alternating bands. This is the one long-read page; set it like a small magazine feature.
+Spruce + Paper alternating bands. The one long-read page; set it like a small magazine feature. It is about the beer and where its ingredients come from. It is not about malting (O10): no malthouse section, no process diagram of malting, no "soul of beer" copy.
 
-- Opening: `--t-h1` **"Malthouse & brewery"** over `malt-raking`, full-bleed.
-- **Malthouse:** the four paragraphs from `site.json`, 680 px measure. The sentence "We deeply believe that a true regional grain economy is not just possible, but vitally necessary in the 21st Century." is the pull quote: Display 30–44 px, hanging quote mark, ember slash before it.
-- A three-step strip, built only from facts in their copy, labelled in Utility with large numerals: `01 Grain from our neighbors` → `02 Malted in-house` → `03 Brewed around the malt`, each with a photo (`malt-in-hands`, `malt-raking`, `brewhouse-copper`). No invented process detail.
-- **Brewery:** the three paragraphs, with `kettle-dark` and `can-in-hand`.
+- Opening: `--t-h1` **"Our beer"** over `brewhouse-copper`, full-bleed.
+- **The brewery:** their Brewery paragraphs from `site.json`, 680 px measure, with one edit pending Max's answer to O10: the clause about malts "we are able to produce ourselves" is cut, leaving "The beers that we choose to brew are inherently driven by the grains, hops, and other raw agricultural inputs we are able to source from our neighbors." That sentence is the pull quote: Display 30–44 px, hanging quote mark, ember slash before it. Send the edit to Max for approval before launch.
+- **What goes in:** three facts, each a large numeral-free statement with a photo, all taken from their menu and site: `100% New York grain` · `New York hops in New York Nectar` · `Local fruit and herbs: black currant, house pickle brine`. No invented process detail.
+- **The range:** the five style families from the menu (Light, Hoppy, Malty, Farmhouse, Sour) as five large glass glyphs in a row filled with a representative beer color, each linking to that filter on `/menu`. On phone this is a snapping horizontal row.
 - Sourcing ledger + map (shared with home).
+- `can-in-hand` photo with a line on cans to go and the `Order pickup` button.
 - Closing band: current draft list preview (four rows) → `See what's on tap`.
 
 ### 6.6 About
 
-Short. `founders-doorway` photo with caption "Zane Coffey and Max Ocean." Three paragraphs from `site.json` (update "Subversive Malting + Brewing" to the new name once O4 is answered; until then leave verbatim). A two-point timeline drawn as a dashed line with two kernels: **2018** small barn, Livingston NY → **2020** taproom opens in an old mechanic's garage, Catskill. Then links to Visit and Our beer.
+Short. `founders-doorway` photo with caption "Zane Coffey and Max Ocean." Three paragraphs from `site.json`, with "Subversive Malting + Brewing" already changed to "Subversive" in the data. A two-point timeline drawn as a dashed line with two kernels: **2018** small barn, Livingston NY → **2020** taproom opens in an old mechanic's garage, Catskill. Then links to Visit and Our beer.
 
 ### 6.7 Gift cards, Bands, Order, Privacy
 
@@ -776,7 +844,7 @@ Dependencies on people: O1 (Ops fix) before M5 is "live"; O5 art before M9; O3/O
 
 ### 11.1 Content inventory from the old site
 
-Carried over in `content/`: tagline facts, hours, phone note, seating, parking, dogs, gift cards, mailing list prompt, band form link, socials, map link, About, Malthouse, Brewery, the full menus, upcoming events. Dropped on purpose: the Squarespace cart and search, the broken newsletter block, "CLICK HERE" phrasing, all-caps paragraphs, NBA team logos.
+Carried over in `content/`: tagline facts, hours, phone note, seating, parking, dogs, gift cards, mailing list prompt, band form link, socials, map link, About, Brewery, the full menus, upcoming events. Dropped on purpose: the Malthouse page and every "Malting" reference (O10), the Squarespace cart and search, the broken newsletter block, "CLICK HERE" phrasing, all-caps paragraphs, NBA team logos.
 
 Old-site event history (useful as test data and to show Max the range the design must hold): Knicks watch nights ("Subversive Overtime"), biweekly trivia with Smarty Pints, Oktoberfest (stein-holding contest, German band, the lager goblin's DJ set), the Catskill pumpkin carving contest, free movie nights with Story Screen Cinema, First Friday parties and beer releases, Sunday live music, lobster roll and seafood pop-ups.
 
