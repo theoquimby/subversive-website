@@ -249,11 +249,6 @@
  * (100svh / tan 61° = 55.43svh). Forward: the edge sweeps left → right, the old page
  * retreats to the upper right. Back: mirrored.
  */
-@property --wipe-x {
-  syntax: "<length-percentage>";
-  inherits: false;
-  initial-value: 0%;
-}
 ::view-transition-image-pair(.wipe),
 ::view-transition-image-pair(.wipe-back) {
   isolation: isolate;
@@ -270,28 +265,28 @@
   animation-timing-function: var(--ease-in-out);
   animation-fill-mode: both;
 }
+/* The polygon itself animates (a registered custom property inside clip-path forced a
+   style recalc every frame). Both ends have the same four corners. */
 ::view-transition-old(.wipe) {
   animation-name: wipe-forward;
-  clip-path: polygon(calc(var(--wipe-x) + var(--run)) 0, 100% 0, 100% 100%, var(--wipe-x) 100%);
 }
 ::view-transition-old(.wipe-back) {
   animation-name: wipe-back;
-  clip-path: polygon(0 0, calc(var(--wipe-x) + var(--run)) 0, var(--wipe-x) 100%, 0 100%);
 }
 @keyframes wipe-forward {
   from {
-    --wipe-x: calc(-1 * var(--run));
+    clip-path: polygon(0 0, 100% 0, 100% 100%, calc(-1 * var(--run)) 100%);
   }
   to {
-    --wipe-x: 100%;
+    clip-path: polygon(calc(100% + var(--run)) 0, 100% 0, 100% 100%, 100% 100%);
   }
 }
 @keyframes wipe-back {
   from {
-    --wipe-x: 100%;
+    clip-path: polygon(0 0, calc(100% + var(--run)) 0, 100% 100%, 0 100%);
   }
   to {
-    --wipe-x: calc(-1 * var(--run));
+    clip-path: polygon(0 0, 0 0, calc(-1 * var(--run)) 100%, 0 100%);
   }
 }
 /* The header holds still through every wipe */
