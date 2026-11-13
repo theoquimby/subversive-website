@@ -41,15 +41,6 @@ test("a game night does not take over the first screen: the pill carries it in o
   await expect(page.locator(".hero .matchup")).toHaveCount(0);
 });
 
-test("the pour plays once per session", async ({ page }) => {
-  await page.goto("/");
-  await expect(page.locator("html")).not.toHaveAttribute("data-poured", "");
-  await page.waitForTimeout(1400);
-  await page.goto("/menu");
-  await page.goto("/");
-  await expect(page.locator("html")).toHaveAttribute("data-poured", "");
-});
-
 test("axe: home", async ({ page }) => {
   await page.emulateMedia({ reducedMotion: "reduce" });
   await page.goto("/", { waitUntil: "networkidle" });

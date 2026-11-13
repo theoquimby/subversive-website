@@ -15,16 +15,27 @@ html:has(.page--menu) {
   }
 }
 
+/* A fixed two-row layout: title and date on the first line, the status pill on its own
+   line. As a wrapping flex row it re-wrapped when the fonts arrived or the status line
+   changed length, pushing the whole menu down (CLS 0.039 in Lighthouse). */
 .menu-head {
-  display: flex;
-  flex-wrap: wrap;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
   align-items: baseline;
   column-gap: var(--s-5);
   row-gap: var(--s-3);
 }
 .menu-head .page__title {
   margin-block: 0;
-  margin-right: auto;
+}
+.menu-head__open,
+.menu-head .under21 {
+  grid-column: 1 / -1;
+  justify-self: start;
+}
+.menu-head__updated {
+  grid-row: 1;
+  grid-column: 2;
 }
 .menu-head__updated {
   margin: 0;

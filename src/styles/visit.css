@@ -159,12 +159,18 @@
 .page--visit {
   padding-bottom: 0;
 }
+/* stacked on a phone, one row from tablet width: never a wrapping row that can re-wrap
+   when the fonts arrive or the status line changes length */
 .visit-head {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  justify-content: space-between;
+  display: grid;
+  justify-items: start;
   gap: var(--s-4) var(--s-6);
+}
+@media (min-width: 48rem) {
+  .visit-head {
+    grid-template-columns: minmax(0, 1fr) auto;
+    align-items: center;
+  }
 }
 .visit-head .page__title {
   margin: 0;
