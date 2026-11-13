@@ -3,7 +3,7 @@
 // DraggableSticker wrapper. Never more than three in one viewport.
 import type { ReactNode } from "react";
 import { PRINT_FILTER_ID } from "./PrintFilter";
-import { BURST_POINTS, SLASH_STICKER } from "./sticker-geometry";
+import { BURST_POINTS } from "./sticker-geometry";
 
 export type StickerShape = "burst" | "round" | "tag" | "slash";
 export type StickerColor = "pils" | "ember" | "sky" | "currant" | "spruce";
@@ -41,17 +41,8 @@ function Shape({ shape }: { shape: StickerShape }) {
         </svg>
       );
     case "slash":
-      return (
-        <svg
-          viewBox={`0 0 ${SLASH_STICKER.width.toFixed(2)} 100`}
-          className="sticker__shape"
-          preserveAspectRatio="none"
-          aria-hidden="true"
-          focusable="false"
-        >
-          <polygon points={SLASH_STICKER.points} filter={`url(#${PRINT_FILTER_ID})`} />
-        </svg>
-      );
+      // A band cut at the slash angle that grows with its words (CSS clip-path, graphics.css).
+      return <span className="sticker__shape sticker__shape--slash" aria-hidden="true" />;
     case "tag":
       return <span className="sticker__shape sticker__shape--tag" aria-hidden="true" />;
   }

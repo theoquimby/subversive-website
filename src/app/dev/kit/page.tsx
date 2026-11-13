@@ -1,5 +1,7 @@
 import menu from "@content/menu.json";
 import { CurvePlot } from "@/components/dev/CurvePlot";
+import { KitMotion } from "@/components/dev/KitMotion";
+import { KitPrimitives } from "@/components/dev/KitPrimitives";
 import { SkinSwitch } from "@/components/dev/SkinSwitch";
 import { BARLEY_VIEWBOX, BarleyMark, KERNELS } from "@/components/graphics/BarleyMark";
 import { Checker } from "@/components/graphics/Checker";
@@ -20,7 +22,7 @@ type Beer = {
   prices: { half: number; full: number };
 };
 const isBeerItem = (i: object): i is Beer => "abv" in i && "prices" in i;
-const beer = menu.drinks[0]?.groups[0]?.items.find(isBeerItem);
+const beer = (menu.drinks[0]?.groups[0]?.items as object[] | undefined)?.find(isBeerItem);
 const burgers = menu.food[0];
 
 const ROLES: Record<string, string> = {
@@ -139,6 +141,8 @@ export default function KitPage() {
           </div>
         </Section>
 
+        <KitPrimitives />
+
         <Section id="kit-colour" title="Colour">
           <ul className="kit-swatches">
             {Object.entries(raw).map(([key, hex]) => (
@@ -235,6 +239,7 @@ export default function KitPage() {
         </div>
 
         <Section id="kit-motion" title="Motion">
+          <KitMotion />
           <div className="kit-curves">
             {CURVES.map((c) => (
               <CurvePlot key={c.name} name={c.name} values={c.values} job={c.job} />

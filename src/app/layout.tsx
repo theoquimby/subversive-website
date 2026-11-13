@@ -3,6 +3,7 @@ import site from "@content/site.json";
 import type { Metadata, Viewport } from "next";
 import dynamic from "next/dynamic";
 import type { ReactNode } from "react";
+import { PrintFilter } from "@/components/graphics/PrintFilter";
 import { raw } from "@/styles/tokens";
 import { fontVariables } from "./fonts";
 import "@/styles/globals.css";
@@ -33,6 +34,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
   return (
     <html lang="en" className={fontVariables} data-skin="paper">
       <body>
+        <PrintFilter />
         <a className="skip-link" href="#main">
           {microcopy.skipToContent}
         </a>

@@ -1,15 +1,17 @@
-// Glass glyph (spec §4.4, §2.2): a pint drawn in the icon stroke, filled to `fill` with the
-// beer's own colour under a card-coloured head. Hazy beers get a 12% card veil. The hero size
-// carries a small barley mark printed on the glass and draws its stroke with the drawing;
-// the glyph size keeps a 2 px stroke at any scale. `rise` pours it in from the bottom.
-// Decorative: style and ABV are always in text next to it (spec §9.2).
+// Glass glyph (spec §4.4, §2.2): their own stemmed glass, as in the photographs, drawn in
+// the icon stroke and filled to `fill` with the beer's colour under a card-coloured head.
+// Hazy beers get a 12% card veil. The hero size carries the barley printed on the bowl and
+// scales its stroke with the drawing; the glyph keeps a 2 px stroke at any size. `rise`
+// pours it from the bottom. Decorative: style and ABV are always in text beside it (§9.2).
 import { BARLEY_VIEWBOX, KERNELS } from "./BarleyMark";
 
-// A tapered pint on a 24 × 32 grid: rim 3–21 at y 2, base 5–19 at y 30.
-const OUTLINE = "M3 2 5 30h14l2-28";
-const INSIDE = "M4.1 2.5 5.95 29h12.1L19.9 2.5z";
-const BOTTOM = 29;
-const TOP = 5; // a full pour's liquid line; the head sits above it
+// On a 24 × 38 grid: a tall bowl (rim 6–18 at y 2) narrowing to a rounded base at y 29.5,
+// a short stem and a flat foot. The spec says "pint"; the photographs show this stemmed
+// glass with the barley on the bowl, so the glyph draws what they actually pour into.
+const OUTLINE = "M6 2l1.6 23.4Q8 29.5 12 29.5t4.4-4.1L18 2M12 29.5V36M7 36h10";
+const INSIDE = "M7.1 2.5 8.6 25.3Q9 28.4 12 28.4t3.4-3.1L16.9 2.5z";
+const BOTTOM = 28.5;
+const TOP = 6; // a full pour's liquid line; the head sits above it
 
 export function GlassGlyph({
   color,
@@ -29,10 +31,10 @@ export function GlassGlyph({
   const f = Math.max(0, Math.min(1, fill));
   const level = BOTTOM - f * (BOTTOM - TOP);
   const head = Math.min(2.6, f * 2.6);
-  const clipId = `glass-${size}`;
+  const clipId = `glass-${size}-${color.replace(/\W/g, "")}-${Math.round(f * 100)}${hazy ? "h" : ""}`;
   return (
     <svg
-      viewBox="0 0 24 32"
+      viewBox="0 0 24 38"
       className={["glass", `glass--${size}`, rise ? "glass--rise" : "", className ?? ""]
         .filter(Boolean)
         .join(" ")}
@@ -61,7 +63,7 @@ export function GlassGlyph({
         </g>
       </g>
       {size === "hero" ? (
-        <svg x="9.9" y="11" width="4.2" height="11.9" viewBox={BARLEY_VIEWBOX} className="glass__mark">
+        <svg x="9.9" y="10.5" width="4.2" height="11.9" viewBox={BARLEY_VIEWBOX} className="glass__mark">
           {KERNELS.map((d) => (
             <path key={d} d={d} />
           ))}

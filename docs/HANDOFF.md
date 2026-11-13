@@ -22,10 +22,26 @@
    - Use spruce, the grain and the fire pit (Overtime) for depth.
    - No diner tells: chrome, red and teal, script neon, pastel, "Eats" signage, booth-card layouts.
    - Max's label art and typefaces (spec O5, §11.3 item 2) are the strongest lever. Ask for them before M1 is signed off.
-3. **The lager goblin** is Max's Oktoberfest PR character and he wants him in the site in fun ways.
+3. **Refined and high-end, never early 2000s.** Most of this brand's print vocabulary turns
+   into clip-art the moment it's overused. The refinement comes from restraint:
+   - The hard offset shadow belongs to the one primary action per screen.
+   - In practice, at most one sticker per screen.
+   - Row badges are flat and straight.
+   - Fat outlines only on things you press or that frame a photo.
+   - Generous paper, precise type and real photography carry the page.
+
+   Reject on sight:
+   - Starbursts as decoration.
+   - Bevels, glows or gradients.
+   - Tilted everything.
+   - Chunky borders on every box.
+   - Busy patterns.
+   - Clip-art icons.
+   - Visible "fun" that isn't earned.
+4. **The lager goblin** is Max's Oktoberfest PR character and he wants him in the site in fun ways.
    The spec's appearances (§5.1, §5.2: gate, footer hatch, typing `lager`, 404, Oktoberfest event pages) stand.
    He is drawn by Max, never invented by us. Until his art arrives, he is the marked placeholder.
-4. **References Theo pointed to:**
+5. **References Theo pointed to:**
    - [Fable 5.2 design and motion tests](https://productwithattitude.com/articles/claude-fable-5-2-design-motion-tests-prompts)
    - [Five things with Fable 5.2](https://abhijayvuyyuru.substack.com/p/fable-52-five-insane-things-you-can)
    - [designprompts.dev](https://designprompts.dev/)

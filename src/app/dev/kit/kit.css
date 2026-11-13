@@ -516,3 +516,295 @@
 .kit-section > .pill {
   margin-bottom: var(--s-7);
 }
+
+/* ---- M1: glasses ---- */
+.kit-glasses {
+  display: grid;
+  grid-template-columns: repeat(var(--kit-cols, 2), minmax(0, 1fr));
+  gap: var(--s-6) var(--s-5);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.kit-glasses li {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  grid-template-rows: auto auto;
+  column-gap: var(--s-3);
+  align-items: center;
+}
+.kit-glasses .glass {
+  grid-row: 1 / 3;
+}
+.kit-glasses__name {
+  font-family: var(--ff-display);
+  font-size: var(--t-h3);
+  line-height: var(--lh-h3);
+  align-self: end;
+}
+.kit-glasses .kit-label {
+  align-self: start;
+  color: var(--fg-muted);
+}
+.kit-glass-hero {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: end;
+  gap: var(--s-7);
+  margin-top: var(--s-9);
+}
+.kit-glass-hero .kit-note {
+  flex-basis: 16rem;
+}
+
+/* ---- M1: stickers ---- */
+.kit-stickers {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--s-7);
+}
+.kit-stickers .sticker[data-shape="burst"] {
+  --sticker-d: 8.5rem;
+  --sticker-size: 2rem;
+}
+.kit-badges {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--s-4) var(--s-5);
+  margin: var(--s-8) 0 var(--s-4);
+}
+.kit-playground {
+  position: relative;
+  display: grid;
+  place-items: center;
+  height: 14rem;
+  margin-top: var(--s-4);
+  border: var(--stroke-dash) dashed var(--rule-strong);
+  border-radius: var(--r-box);
+  overflow: hidden;
+}
+
+/* ---- M1: tickets ---- */
+.kit-tickets {
+  display: grid;
+  gap: var(--s-6);
+  max-width: 34rem;
+  margin-bottom: var(--s-4);
+}
+.kit-ticket__title {
+  font-family: var(--ff-display);
+  font-size: var(--t-h3);
+  line-height: var(--lh-h3);
+}
+.kit-ticket__meta {
+  font-weight: 600;
+  font-size: var(--t-price);
+  color: var(--fg-muted);
+}
+
+/* ---- M1: seal and chevrons ---- */
+.kit-seal {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: var(--s-7);
+  align-items: center;
+}
+.kit-seal__mark {
+  font-size: clamp(7rem, 5rem + 8vw, 10rem);
+}
+.kit-seal__bands {
+  display: grid;
+  gap: var(--s-5);
+}
+
+/* ---- M1: icon sheet (3× with grid, live area and keyline; spec §3.9) ---- */
+.kit-icons {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(6.5rem, 1fr));
+  gap: var(--s-6) var(--s-4);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.kit-icons li {
+  display: grid;
+  gap: var(--s-2);
+  justify-items: start;
+}
+.kit-icons__plate {
+  position: relative;
+  display: grid;
+  place-items: center;
+  width: 72px;
+  height: 72px;
+  background:
+    linear-gradient(var(--rule) 1px, transparent 1px) 0 0 / 3px 3px,
+    linear-gradient(90deg, var(--rule) 1px, transparent 1px) 0 0 / 3px 3px;
+  outline: 1px solid var(--rule);
+}
+/* live area: 18 of 24 units */
+.kit-icons__plate::before {
+  content: "";
+  position: absolute;
+  inset: 9px;
+  border: 1px dashed var(--accent);
+}
+/* keyline circle: 20 units */
+.kit-icons__plate::after {
+  content: "";
+  position: absolute;
+  inset: 6px;
+  border: 1px solid var(--accent);
+  border-radius: 50%;
+  opacity: 0.6;
+}
+.kit-icons__big {
+  position: relative;
+  z-index: 1;
+  width: 72px;
+  height: 72px;
+}
+.kit-icons__row {
+  display: flex;
+  align-items: center;
+  gap: var(--s-2);
+}
+/* review fix: one column on phones so names never break across three lines */
+.kit-glasses {
+  --kit-cols: 1;
+}
+@media (min-width: 48rem) {
+  .kit-glasses {
+    --kit-cols: 2;
+  }
+}
+@media (min-width: 64rem) {
+  .kit-glasses {
+    --kit-cols: 3;
+  }
+}
+
+/* ---- M1: motion sheets ---- */
+.kit-sheets {
+  display: grid;
+  gap: var(--s-9);
+  margin-bottom: var(--s-10);
+}
+.motion-sheet {
+  display: grid;
+  gap: var(--s-4);
+  margin: 0;
+  padding-top: var(--s-5);
+  border-top: var(--stroke-dash) dashed var(--rule-strong);
+}
+.motion-sheet__head {
+  display: grid;
+  gap: var(--s-1);
+}
+.motion-sheet__strip {
+  display: grid;
+  grid-template-columns: repeat(7, minmax(4.5rem, 1fr));
+  gap: var(--s-2);
+  margin: 0;
+  padding: 0 0 var(--s-2);
+  list-style: none;
+  overflow-x: auto;
+  scroll-snap-type: x proximity;
+}
+.motion-sheet__frame {
+  display: grid;
+  gap: 2px;
+  justify-items: center;
+  scroll-snap-align: start;
+}
+.motion-sheet__stage {
+  display: grid;
+  place-items: center;
+  width: 100%;
+  height: 6rem;
+  border: 1px solid var(--rule);
+  border-radius: 6px;
+  overflow: hidden;
+}
+.motion-sheet__gap {
+  color: var(--accent-text);
+  font-size: var(--t-meta);
+  font-weight: 600;
+}
+.motion-sheet__obj {
+  display: inline-block;
+}
+.motion-sheet__obj .pill {
+  font-size: 1.25rem;
+  padding: 4px 12px 6px;
+}
+.motion-sheet__sticker {
+  --sticker-d: 4rem;
+}
+.motion-sheet__sticker .sticker__text {
+  font-size: 0.8rem;
+}
+.motion-sheet__peel {
+  width: 3.5rem;
+  height: 2.25rem;
+  border-radius: 8px;
+  background: var(--pils);
+}
+.motion-sheet__glass {
+  height: 4.5rem;
+}
+.motion-sheet__tear {
+  display: flex;
+  align-items: center;
+}
+.motion-sheet__stub,
+.motion-sheet__ticket {
+  height: 3rem;
+  border: var(--edge);
+}
+.motion-sheet__stub {
+  width: 1.4rem;
+  border-radius: 8px 0 0 8px;
+  background: var(--court);
+  transform-origin: 100% 0;
+}
+.motion-sheet__ticket {
+  width: 2.75rem;
+  border-left: 0;
+  border-radius: 0 8px 8px 0;
+  background: var(--surface);
+}
+
+/* ---- M1: buttons and photos ---- */
+.kit-buttons {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--s-4) var(--s-3);
+  align-items: center;
+}
+.kit-buttons__links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--s-6);
+  margin: var(--s-6) 0 var(--s-4);
+}
+.kit-photos {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--s-4);
+  align-items: start;
+}
+.kit-photos .photo:first-child {
+  grid-column: 1 / -1;
+}
+@media (min-width: 64rem) {
+  .kit-photos {
+    grid-template-columns: 2fr 1fr 1fr;
+    gap: var(--s-6);
+  }
+  .kit-photos .photo:first-child {
+    grid-column: auto;
+  }
+}

@@ -197,12 +197,19 @@
 }
 
 /* ---------- Chevron band (spec §3.3) ---------- */
+/* Kernels in herringbone (the tent wall's pattern on its side). The spec's two-gradient
+   recipe drew crossed lines that read as stitching; this is the barley kernel itself. */
 .chevrons {
   --c: var(--fg);
+  display: block;
+  width: 100%;
   height: 30px;
-  background:
-    linear-gradient(135deg, transparent 46%, var(--c) 46% 54%, transparent 54%) 0 0 / 30px 30px,
-    linear-gradient(45deg, transparent 46%, var(--c) 46% 54%, transparent 54%) 15px 0 / 30px 30px;
+}
+.chevrons path {
+  fill: none;
+  stroke: var(--c);
+  stroke-width: var(--stroke);
+  stroke-linejoin: miter;
 }
 .chevrons[data-tone="accent"] {
   --c: var(--accent);
@@ -303,9 +310,19 @@
   aspect-ratio: 1;
   --peel: 36%;
 }
+/* Slash: a band that grows with its words; both ends cut at 61° (run = height / tan 61°) */
 .sticker[data-shape="slash"] {
-  height: 4.5rem;
-  aspect-ratio: 151.98 / 100;
+  --slash-h: 4.5rem;
+  --run: calc(var(--slash-h) * 0.5543);
+  height: var(--slash-h);
+}
+.sticker[data-shape="slash"] .sticker__text {
+  padding-inline: calc(var(--run) * 0.85);
+}
+.sticker__shape--slash {
+  background: var(--sticker-fill);
+  clip-path: polygon(var(--run) 0, 100% 0, calc(100% - var(--run)) 100%, 0 100%);
+  filter: url(#sv-print);
 }
 .sticker[data-shape="tag"] {
   padding: 0.35em 0.7em 0.45em;
@@ -396,10 +413,11 @@
 /* ---------- Row badge (plan Q10) ---------- */
 .badge {
   --badge-fill: var(--pils);
+  /* Refined, not clip-art (Theo, 11/13): flat and straight, no outline, no tilt. The
+     stickers are the playful objects; row badges are typography on a spot of colour. */
   display: inline-block;
-  padding: 3px 8px 2px;
-  border: var(--stroke) solid var(--ink);
-  border-radius: var(--r-tag);
+  padding: 4px 7px 3px;
+  border-radius: 4px;
   background: var(--badge-fill);
   color: var(--ink);
   font-family: var(--ff-utility);
@@ -409,7 +427,6 @@
   letter-spacing: var(--track-label);
   text-transform: uppercase;
   white-space: nowrap;
-  rotate: var(--rot-a);
 }
 .badge[data-tone="currant"] {
   --badge-fill: var(--currant);
@@ -470,7 +487,7 @@
   justify-items: center;
   gap: 2px;
   padding: var(--s-4) var(--s-2);
-  border-right: var(--stroke-dash) dashed var(--ink);
+  border-right: var(--stroke-dash) dashed var(--rule-strong);
   border-radius: var(--r-card) 0 0 var(--r-card);
   clip-path: inset(0 round var(--r-card) 0 0 var(--r-card));
   background: var(--stub-fill);
@@ -543,6 +560,10 @@
 }
 
 /* Torn off, once (event page hero): the stub drops away on a zigzag edge and stays there */
+/* the torn stub hangs out by 14 px + its tilt; the ticket reserves that room itself */
+.ticket[data-torn] {
+  margin-left: var(--s-5);
+}
 .ticket[data-torn] .ticket__stub {
   border-right: 0;
   clip-path: var(--torn-edge);
@@ -550,7 +571,7 @@
   translate: -14px 4px;
 }
 .ticket[data-torn] .ticket__body {
-  border-left: var(--stroke-dash) dashed var(--ink);
+  border-left: var(--stroke-dash) dashed var(--rule-strong);
 }
 @media (prefers-reduced-motion: no-preference) {
   .ticket[data-torn] .ticket__stub {
@@ -592,11 +613,11 @@
 .glass {
   display: block;
   width: auto;
-  aspect-ratio: 24 / 32;
+  aspect-ratio: 24 / 38;
   overflow: visible;
 }
 .glass--glyph {
-  height: 1.75rem;
+  height: 2.25rem;
 }
 .glass--hero {
   height: 12rem;
@@ -611,11 +632,18 @@
 .glass--glyph .glass__outline {
   vector-effect: non-scaling-stroke;
 }
+/* hero: the stroke scales with the drawing, about 2.3 px at 12rem tall */
 .glass--hero .glass__outline {
-  stroke-width: 0.9;
+  stroke-width: 0.45;
 }
 .glass__head {
   fill: var(--card);
+}
+/* Card foam on cream paper all but vanishes at hero size: a hairline draws the head's dome
+   and the meniscus where it meets the beer. */
+.glass--hero .glass__head {
+  stroke: var(--fg);
+  stroke-width: 0.25;
 }
 .glass__haze {
   fill: var(--card);
@@ -624,7 +652,7 @@
 .glass__mark {
   fill: none;
   stroke: var(--fg);
-  stroke-width: 5;
+  stroke-width: 3.5;
   opacity: 0.85;
 }
 /* The pour: liquid and head rise from the bottom of the glass */
@@ -670,4 +698,179 @@ body::after {
   body::after {
     content: none;
   }
+}
+
+/* ---------- Photo frame (spec §3.7) ---------- */
+@property --sweep {
+  syntax: "<angle>";
+  inherits: false;
+  initial-value: 360deg;
+}
+.photo {
+  position: relative;
+  margin: 0;
+  overflow: hidden;
+  border-radius: var(--r-box);
+  background: var(--paper-deep);
+  isolation: isolate;
+}
+/* The frame is its own layer so it can draw itself (a conic sweep, clockwise from the top) */
+.photo::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  border: var(--edge);
+  border-radius: inherit;
+  pointer-events: none;
+  mask: conic-gradient(currentColor var(--sweep), transparent 0);
+}
+.photo--bleed {
+  border-radius: 0;
+}
+.photo--bleed::after {
+  content: none;
+}
+.photo img {
+  transition: scale var(--d-3) var(--ease-out);
+}
+@media (hover: hover) {
+  .photo:hover img {
+    scale: 1.03;
+  }
+}
+@media (scripting: enabled) and (prefers-reduced-motion: no-preference) {
+  /* hidden until StampIn marks it seen; the failsafe uncovers it regardless after 2.5 s */
+  .photo[data-pop]:not([data-pop="in"]) img {
+    clip-path: inset(100% 0 0 0);
+    animation: photo-failsafe 1ms 2.5s both;
+  }
+  .photo[data-pop="in"]::after {
+    animation: frame-draw 300ms var(--ease-out) both;
+  }
+  .photo[data-pop="in"] img {
+    animation: photo-uncover var(--d-3) var(--ease-out) 300ms both;
+  }
+}
+@keyframes frame-draw {
+  from {
+    --sweep: 0deg;
+  }
+}
+@keyframes photo-uncover {
+  from {
+    clip-path: inset(100% 0 0 0);
+  }
+  to {
+    clip-path: inset(0 0 0 0);
+  }
+}
+@keyframes photo-failsafe {
+  to {
+    clip-path: inset(0 0 0 0);
+  }
+}
+
+/* ---------- Buttons (spec §4.3) ---------- */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--s-2);
+  min-height: 48px;
+  padding: 0 var(--s-6);
+  border: var(--stroke) solid transparent;
+  border-radius: var(--r-pill);
+  font-family: var(--ff-utility);
+  font-weight: 700;
+  font-size: 1rem;
+  line-height: 1;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  text-decoration: none;
+  cursor: pointer;
+  user-select: none;
+  transition:
+    translate var(--d-1) var(--ease-out),
+    box-shadow var(--d-1) var(--ease-out),
+    background-color var(--d-2) var(--ease-out);
+}
+.btn__label {
+  translate: 0 1px; /* caps sit optically centred */
+}
+.btn__icon {
+  width: 1.125rem;
+  height: 1.125rem;
+}
+.btn:focus-visible {
+  outline: 3px solid var(--focus);
+  outline-offset: 3px;
+}
+.btn--primary {
+  border-color: var(--ink);
+  background: var(--cta-bg);
+  color: var(--cta-fg);
+  box-shadow: var(--shadow-press);
+}
+@media (hover: hover) {
+  .btn--primary:hover {
+    translate: 0 -2px;
+    box-shadow: calc(var(--press-offset) + 2px) calc(var(--press-offset) + 2px) 0 var(--ink);
+  }
+}
+.btn--primary:active {
+  translate: var(--press-offset) var(--press-offset);
+  box-shadow: 0 0 0 var(--ink);
+}
+[data-skin="overtime"] .btn--primary {
+  border-color: transparent;
+}
+.btn--secondary {
+  background: var(--fg);
+  color: var(--bg);
+}
+.btn--quiet {
+  border-color: var(--fg);
+  background: transparent;
+  color: var(--fg);
+}
+.btn--secondary:active,
+.btn--quiet:active {
+  translate: 0 1px;
+}
+.btn:disabled,
+.btn[aria-disabled="true"] {
+  cursor: not-allowed;
+  opacity: 0.45;
+  box-shadow: none;
+  translate: none;
+}
+
+/* ---------- Text links (spec §4.3) ---------- */
+/* The underline is a background band; hover grows it up behind the words. It fills with
+   the accent at 30% so ink stays readable (ink on full ember is Lc 41). */
+.text-link {
+  color: inherit;
+  text-decoration: none;
+  background:
+    linear-gradient(color-mix(in srgb, var(--accent) 30%, transparent) 0 0) 0 100% / 100% 2px no-repeat;
+  padding-bottom: 4px;
+  transition: background-size var(--d-2) var(--ease-out);
+  box-decoration-break: clone;
+  -webkit-box-decoration-break: clone;
+}
+.text-link {
+  background-image: linear-gradient(var(--accent) 0 0);
+}
+@media (hover: hover) {
+  .text-link:hover {
+    background-image: linear-gradient(color-mix(in srgb, var(--accent) 30%, transparent) 0 0);
+    background-size: 100% 100%;
+  }
+}
+.text-link__icon {
+  width: 0.9em;
+  height: 0.9em;
+  margin-left: 0.2em;
+  vertical-align: -0.05em;
 }
