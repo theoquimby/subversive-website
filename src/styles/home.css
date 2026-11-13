@@ -1,58 +1,451 @@
-/* Home (spec §6.1, §5.3, §5.6). */
+/* Home (spec §6.1; first screen: the overhaul's direction contract, "The label, poured"). */
 
-/* ---------- Hero ---------- */
+/* ---------- Hero: the label, standing up ---------- */
 .hero {
-  /* the stickers hang off the photo's corners; they never make the page scroll sideways */
+  /* one line weight for everything drawn here: the glass, the ridge, the horizon */
+  --line: 1.5px;
+  /* the horizon rule runs the full width of the screen; it never makes the page scroll */
   overflow-x: clip;
   background: var(--bg);
   color: var(--fg);
 }
 .hero__inner {
   display: grid;
-  gap: var(--s-8);
+  /* never wider than the screen: in the fallback face the button row is a little wider,
+     and an auto column grew with it, setting the name larger until the fonts arrived
+     (CLS 0.046) */
+  grid-template-columns: minmax(0, 1fr);
+  gap: var(--s-4);
   max-width: var(--content-max);
   margin-inline: auto;
-  padding: var(--s-7) var(--gutter) var(--s-9);
+  padding: var(--s-3) var(--gutter) var(--s-6);
 }
-@media (min-width: 64rem) {
-  .hero__inner {
-    grid-template-columns: minmax(0, 7fr) minmax(0, 5fr);
-    align-items: end;
-    column-gap: var(--s-10);
-    padding-top: var(--s-9);
+.hero__open {
+  justify-self: start;
+}
+/* the status line, in the label's terms: no box, a gold dot (filled when open) */
+.hero .open-now {
+  padding: 0;
+  border: 0;
+  border-radius: var(--s-1);
+}
+@media (hover: hover) {
+  .hero .open-now:hover {
+    background: none;
+    color: var(--gold);
   }
 }
-.hero__text {
+.hero .open-now .open-now__dot {
+  border: var(--line) solid var(--gold);
+  background: transparent;
+}
+.hero .open-now[data-dot="go"] .open-now__dot {
+  background: var(--gold);
+}
+.hero .open-now .open-now__dot::after {
+  content: none;
+}
+.hero__scene {
+  /* the glass's column: the grid uses it, and the name's size is the scene's width */
+  --glass-col: clamp(7rem, 42%, 15rem);
+  --name-size: min(12cqi, 5rem);
+  position: relative;
   container-type: inline-size;
+}
+/* the horizon: one gold line, edge to edge, that the glass stands on */
+.hero__scene::after {
+  content: "";
+  position: absolute;
+  left: 50%;
+  bottom: 0;
+  width: 100vw;
+  border-top: var(--line) solid var(--gold);
+  translate: -50% 0;
+}
+/* the Catskill ridge: one line along the horizon, passing behind the glass */
+.hero__ridge {
+  position: absolute;
+  right: calc(-1 * var(--gutter));
+  bottom: 0;
+  width: calc(64% + var(--gutter));
+  height: auto;
+  overflow: visible;
+  pointer-events: none;
+}
+.hero__ridge path {
+  fill: none;
+  stroke: var(--gold);
+  stroke-width: var(--line);
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  vector-effect: non-scaling-stroke;
+}
+
+.tap-hero {
+  position: relative;
   display: grid;
-  justify-items: start;
-  gap: var(--s-5);
+  grid-template-columns: minmax(0, 1fr) var(--glass-col);
+  grid-template-areas:
+    "name name"
+    "side glass";
+  gap: var(--s-3);
 }
-.hero__title {
-  margin: 0 0 0 var(--optical-left);
-  font-family: var(--ff-display);
-  /* --t-mega, but "Burgers." always fits its column (it is ~4.7 em wide) */
-  font-size: min(var(--t-mega), 20.5cqi);
-  font-weight: 400;
-  line-height: var(--lh-mega);
-  letter-spacing: var(--track-mega);
+.tap-hero__head {
+  grid-area: name;
 }
-.hero__title span {
+/* Two lines are always kept for the name (a fixed block, so neither the next beer nor a
+   late font moves the page). Lines fill from the left, which leaves the second line
+   short: the glass's rim rises into that space. A long name sets a size down. */
+.tap-hero__name {
+  height: 2.16em;
+  margin: 0;
+  color: var(--accent);
+  font-family: var(--ff-label);
+  font-size: var(--name-size);
+  font-weight: 300;
+  line-height: 1.08;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  text-wrap: wrap;
+}
+.tap-hero__name > span {
   display: block;
 }
-.hero__accent {
-  color: var(--accent);
+.tap-hero__name--long > span {
+  font-size: 0.74em;
+  line-height: 1.16;
 }
-.hero__sub {
+.tap-hero__side {
+  grid-area: side;
+  position: relative;
+  z-index: 1;
+  display: grid;
+  grid-template-rows: auto auto auto 1fr;
+  justify-items: start;
+  gap: var(--s-2);
+}
+/* the small voice: the label's own face, tracked, for everything that is not the name */
+.tap-hero__meta,
+.tap-hero__hint,
+.tap-hero__count,
+.tap-hero__more {
+  font-family: var(--ff-label);
+  font-size: 0.875rem;
+  font-weight: 400;
+  line-height: 1.4;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+.tap-hero__meta {
+  min-height: 2lh;
+  margin: 0;
+  text-wrap: balance;
+}
+.tap-hero__desc {
+  display: -webkit-box;
+  max-width: 30rem;
+  min-height: 3lh;
+  margin: 0;
+  overflow: hidden;
+  color: var(--fg-muted);
+  font-size: var(--t-small);
+  line-height: 1.45;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 3;
+}
+.tap-hero__more {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  color: var(--accent);
+  text-decoration: underline;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 5px;
+}
+@media (hover: hover) {
+  .tap-hero__more:hover {
+    color: var(--fg);
+  }
+}
+/* the arrows and the count sit on the horizon */
+.tap-hero__controls {
+  align-self: end;
+  display: grid;
+  grid-template-columns: repeat(3, auto);
+  align-items: center;
+  justify-content: start;
+  margin-left: -13px;
+}
+.tap-hero__arrow {
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  background: transparent;
+  color: var(--gold);
+  cursor: pointer;
+  transition:
+    background-color var(--d-1) var(--ease-out),
+    scale var(--d-1) var(--ease-out);
+}
+@media (hover: hover) {
+  .tap-hero__arrow:hover {
+    background: color-mix(in srgb, var(--gold) 14%, transparent);
+  }
+}
+.tap-hero__arrow:active {
+  background: color-mix(in srgb, var(--gold) 24%, transparent);
+  scale: 0.9;
+}
+.tap-hero__arrow:focus-visible,
+.tap-hero__glass:focus-visible,
+.tap-hero__more:focus-visible {
+  outline: 2px solid var(--focus);
+  outline-offset: 3px;
+}
+.tap-hero__arrow-icon {
+  width: 1.125rem;
+  height: 1.125rem;
+}
+.tap-hero__arrow-icon--back {
+  rotate: 180deg;
+  translate: -1px 0;
+}
+.tap-hero__count {
+  min-width: 6.5ch;
+  margin: 0;
+  color: var(--fg-muted);
+  text-align: center;
+}
+
+/* the glass is the button: tap it, or swipe it sideways. It is drawn 124 × 321, stands
+   on the rule, and its rim rises one line into the name's block. */
+.tap-hero__glass {
+  grid-area: glass;
+  position: relative;
+  z-index: 2;
+  align-self: end;
+  justify-self: center;
+  width: min(100%, 45svh * 0.386);
+  margin-top: calc(var(--name-size) * -1);
+  padding: 0;
+  border: 0;
+  border-radius: var(--s-3);
+  background: none;
+  color: inherit;
+  cursor: pointer;
+  touch-action: pan-y;
+  -webkit-tap-highlight-color: transparent;
+  transform-origin: 50% 100%;
+  transition: scale var(--d-1) var(--ease-out);
+}
+.tap-hero__glass:active {
+  scale: 0.985;
+}
+/* printed up the glass's side, as small type runs up the edge of a label */
+.tap-hero__hint {
+  position: absolute;
+  right: calc(100% + 2px);
+  bottom: 26%;
+  color: var(--fg-muted);
+  white-space: nowrap;
+  writing-mode: vertical-rl;
+  rotate: 180deg;
+  transition: opacity var(--d-3) var(--ease-out);
+}
+.tap-hero:not([data-pours="0"]) .tap-hero__hint {
+  opacity: 0;
+}
+
+.lglass {
+  display: block;
+  width: 100%;
+  height: auto;
+  overflow: visible;
+}
+.lglass__line > * {
+  fill: none;
+  stroke: var(--gold);
+  stroke-width: var(--line);
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  vector-effect: non-scaling-stroke;
+}
+.lglass__foam {
+  fill: var(--bone);
+}
+.lglass__haze {
+  fill: var(--bone);
+  opacity: 0.2;
+}
+.lglass__mark {
+  fill: var(--bone);
+  opacity: 0.92;
+}
+.lglass__shine {
+  fill: none;
+  stroke: var(--bone);
+  stroke-width: var(--line);
+  stroke-linecap: round;
+  vector-effect: non-scaling-stroke;
+  opacity: 0.45;
+}
+.lglass__bubbles circle {
+  fill: var(--bone);
+  opacity: 0;
+}
+.lglass__stream {
+  opacity: 0;
+  transform-box: fill-box;
+  transform-origin: 50% 0;
+}
+
+/* The motion here is one grammar. The pour: the old beer drains, a stream falls from the
+   rim, the new beer rises with its head riding on it and settles. The line: the glass and
+   the ridge draw once. A new name sets in. All of it transform, opacity, clip-path or a
+   dash offset; none of it holds back the first paint of the text. */
+@media (prefers-reduced-motion: no-preference) {
+  .lglass__drain {
+    animation: lglass-drain 260ms cubic-bezier(0.5, 0, 0.9, 0.6) both;
+  }
+  .lglass__pour {
+    animation: lglass-rise 1100ms cubic-bezier(0.22, 1.1, 0.36, 1) 380ms both;
+  }
+  .lglass__stream {
+    animation: lglass-stream 1150ms var(--ease-out) 300ms both;
+  }
+  .lglass__pour--after {
+    animation-delay: 300ms;
+  }
+  .lglass__stream--after {
+    animation-delay: 200ms;
+  }
+  /* a fresh pour fizzes for a few seconds, then rests: nothing on the page runs forever
+     (an endless SVG repaint also slowed WebKit enough to time out its tests) */
+  .lglass__bubbles circle {
+    animation: lglass-bubble 4.2s linear 3;
+  }
+  .lglass__bubbles circle:nth-child(2) {
+    animation-delay: -1.3s;
+    animation-duration: 5.1s;
+  }
+  .lglass__bubbles circle:nth-child(3) {
+    animation-delay: -2.2s;
+  }
+  .lglass__bubbles circle:nth-child(4) {
+    animation-delay: -3.1s;
+    animation-duration: 4.7s;
+  }
+  .lglass__bubbles circle:nth-child(5) {
+    animation-delay: -0.6s;
+    animation-duration: 5.6s;
+  }
+  :root[data-motion="paused"] .lglass__bubbles circle {
+    animation-play-state: paused;
+  }
+  .hero__ridge,
+  .lglass__line {
+    animation: line-draw 1100ms var(--ease-out) both;
+  }
+  .hero__ridge {
+    animation-duration: 1500ms;
+    animation-delay: 150ms;
+  }
+  .tap-hero:not([data-pours="0"]) :is(.tap-hero__name > span, .tap-hero__meta, .tap-hero__desc) {
+    animation: tap-in var(--d-3) var(--ease-out) both;
+  }
+  .tap-hero:not([data-pours="0"]) :is(.tap-hero__meta, .tap-hero__desc) {
+    animation-delay: 70ms;
+  }
+}
+@keyframes lglass-drain {
+  to {
+    transform: translateY(var(--rise));
+  }
+}
+@keyframes lglass-rise {
+  from {
+    transform: translateY(var(--rise));
+  }
+}
+@keyframes lglass-stream {
+  0% {
+    opacity: 0;
+    transform: scaleY(0);
+  }
+  14% {
+    opacity: 1;
+    transform: scaleY(1);
+  }
+  62% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+  }
+}
+@keyframes lglass-bubble {
+  0% {
+    opacity: 0;
+    transform: translateY(0);
+  }
+  12% {
+    opacity: 0.6;
+  }
+  80% {
+    opacity: 0.45;
+  }
+  100% {
+    opacity: 0;
+    transform: translateY(-150px);
+  }
+}
+/* the ridge wipes in from the left; the glass from its foot up */
+@keyframes line-draw {
+  from {
+    clip-path: inset(-8px 100% -8px -8px);
+  }
+  to {
+    clip-path: inset(-8px);
+  }
+}
+@keyframes tap-in {
+  from {
+    opacity: 0;
+    transform: translateY(0.3em);
+  }
+}
+@media (prefers-reduced-motion: no-preference) {
+  .lglass__line {
+    animation-name: glass-draw;
+  }
+}
+@keyframes glass-draw {
+  from {
+    clip-path: inset(100% -8px -8px -8px);
+  }
+  to {
+    clip-path: inset(-8px);
+  }
+}
+
+.hero__foot {
+  display: grid;
+  gap: var(--s-4);
+}
+.hero__line {
   max-width: var(--measure-subline);
   margin: 0;
+  font-family: var(--ff-text);
   font-size: var(--t-subline);
+  font-weight: 400;
   line-height: var(--lh-body);
   text-wrap: pretty;
 }
-/* The row's shape depends on the screen's width, never on which font has loaded: as a
-   wrapping row it sat on two lines in the fallback face and snapped to one when Barlow
-   Condensed arrived, pulling the photo up 60 px (CLS 0.074 in Lighthouse). */
+/* The row's shape depends on the screen's width, never on which font has loaded. */
 .hero__actions {
   display: grid;
   grid-auto-flow: column;
@@ -62,48 +455,85 @@
 .hero__actions .btn {
   white-space: nowrap;
 }
+.hero .btn--primary {
+  border-color: transparent;
+}
+.hero .btn--quiet {
+  border-width: var(--line);
+  border-color: var(--gold);
+}
+/* the narrowest and shortest phones: both actions still clear the fold */
 @media (max-width: 22.5rem) {
   .hero__actions {
-    grid-auto-flow: row;
-    justify-content: stretch;
+    gap: var(--s-2);
+  }
+  .hero__actions .btn {
+    padding-inline: var(--s-4);
+  }
+  .tap-hero__desc {
+    display: none;
+  }
+}
+@media (max-height: 37.5rem) {
+  .tap-hero__glass {
+    width: min(100%, 40svh * 0.386);
   }
 }
 
-.hero__art {
-  position: relative;
-}
-.hero__frame {
-  position: relative;
-  max-width: 30rem;
-  margin-inline: auto;
+@media (min-width: 48rem) {
+  .tap-hero__meta {
+    min-height: 1lh;
+    font-size: 1rem;
+  }
+  .tap-hero__desc {
+    font-size: 1rem;
+    line-height: var(--lh-body);
+  }
 }
 @media (min-width: 64rem) {
-  .hero__frame {
-    max-width: none;
+  .hero__inner {
+    gap: var(--s-5);
+    padding-top: var(--s-5);
+    padding-bottom: var(--s-7);
+  }
+  .hero__scene {
+    --glass-col: calc((100% - var(--s-10)) / 2);
+    /* the name's column is half the scene here */
+    --name-size: min(5.6cqi, 5rem);
+  }
+  .tap-hero {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    grid-template-areas:
+      "name glass"
+      "side glass";
+    column-gap: var(--s-10);
+    row-gap: var(--s-4);
+  }
+  .tap-hero__side {
+    gap: var(--s-3);
+  }
+  /* a little right of the screen's centre, tall */
+  .tap-hero__glass {
+    justify-self: start;
+    width: min(100%, min(60svh, 36rem) * 0.386);
+    margin-top: 0;
+    margin-left: var(--s-6);
+  }
+  .hero__ridge {
+    right: auto;
+    left: calc(50% - 21rem);
+    width: 40rem;
+  }
+  .hero__foot {
+    grid-template-columns: minmax(0, 1fr) auto;
+    align-items: center;
   }
 }
 
-/* stickers: at most two, on the photo's corners */
-.hero-stickers {
-  position: absolute;
-  inset: 0;
-  pointer-events: none;
-}
-.hero-stickers > * {
-  pointer-events: auto;
-}
-.hero-stickers__event {
-  position: absolute;
-  top: -1.25rem;
-  right: -0.75rem;
-  width: 6.5rem;
-}
-.hero-stickers__tag {
-  position: absolute;
-  left: -0.75rem;
-  bottom: var(--s-6);
-  /* wide enough that the longest tag ("Dogs welcome in the tent") sets in two lines */
-  width: min(15rem, 70%);
+/* below the first screen Home is still the paper build, until the rollout */
+.home-paper {
+  background: var(--bg);
+  color: var(--fg);
 }
 
 /* ---------- Sections ---------- */

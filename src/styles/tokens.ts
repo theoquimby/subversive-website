@@ -14,6 +14,8 @@ export const raw = {
   sky: "#2F9BE0",
   skyDeep: "#17639B",
   spruce: "#1E3A2F",
+  spruceDeep: "#152A22",
+  gold: "#E6C56E",
   currant: "#6B2D5C",
   night: "#0F0E0C",
   nightRaised: "#191712",

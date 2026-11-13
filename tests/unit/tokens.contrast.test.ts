@@ -75,6 +75,24 @@ pairs.push(
   { name: "sticker: paper on currant", skin: "paper", fg: r("paper"), bg: r("currant"), role: "label" },
   { name: "sticker: paper on spruce", skin: "paper", fg: r("paper"), bg: r("spruce"), role: "label" },
   { name: "ledger: paper on spruce", skin: "paper", fg: r("paper"), bg: r("spruce"), role: "body" },
+  // the label skin (overhaul): gold and bone on spruce, spruce on gold
+  { name: "label: bone on spruce (body)", skin: "paper", fg: r("bone"), bg: r("spruce"), role: "body" },
+  { name: "label: gold on spruce (labels)", skin: "paper", fg: r("gold"), bg: r("spruce"), role: "label" },
+  { name: "label: gold on spruce-deep", skin: "paper", fg: r("gold"), bg: r("spruceDeep"), role: "label" },
+  {
+    name: "label CTA: spruce-deep on gold",
+    skin: "paper",
+    fg: r("spruceDeep"),
+    bg: r("gold"),
+    role: "label",
+  },
+  {
+    name: "label: gold line against spruce",
+    skin: "paper",
+    fg: r("gold"),
+    bg: r("spruce"),
+    role: "boundary",
+  },
   // menu (M3): the under-21 tag, the micro-chips, the muted text in a pressed row
   { name: "under-21 tag: card on sky-deep", skin: "paper", fg: r("card"), bg: r("skyDeep"), role: "label" },
   { name: "menu tag: ink on paper-deep", skin: "paper", fg: r("ink"), bg: r("paperDeep"), role: "label" },

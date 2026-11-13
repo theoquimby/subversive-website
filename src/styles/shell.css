@@ -160,6 +160,18 @@
     background: color-mix(in srgb, var(--pils) 82%, var(--ink));
   }
 }
+/* on a label page the header is the label: no checker rail above it, a gold Order */
+:root:has([data-page-skin="label"]) .checker:has(+ .site-header) {
+  display: none;
+}
+:root:has([data-page-skin="label"]) .site-header__order {
+  border-color: transparent;
+}
+@media (hover: hover) {
+  :root:has([data-page-skin="label"]) .site-header__order:hover {
+    background: color-mix(in srgb, var(--gold) 86%, var(--bone));
+  }
+}
 .site-header__order:active {
   translate: 0 1px;
   box-shadow: none;

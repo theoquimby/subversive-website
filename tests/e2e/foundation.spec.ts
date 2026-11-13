@@ -27,8 +27,9 @@ test("home is served with no console errors and no CSP violations", async ({ pag
   expect(problems).toEqual([]);
 });
 
+// on a paper page; Home is a label page and carries no rail (tests/e2e/home.spec.ts)
 test("the checker rail is the first thing on the page", async ({ page }) => {
-  await page.goto("/");
+  await page.goto("/visit");
   const rail = page.locator("[data-checker]").first();
   await expect(rail).toBeVisible();
   const box = await rail.boundingBox();

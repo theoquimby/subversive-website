@@ -17,6 +17,8 @@
   --sky: #2f9be0;
   --sky-deep: #17639b;
   --spruce: #1e3a2f;
+  --spruce-deep: #152a22;
+  --gold: #e6c56e;
   --currant: #6b2d5c;
   --night: #0f0e0c;
   --night-raised: #191712;
@@ -182,6 +184,33 @@
   --grain-blend: multiply;
   --grain-opacity: 0.06;
   color-scheme: light;
+}
+
+/* The label skin (overhaul direction, 2026-11-13: "the label leads"): Max's beer label as
+   a skin. Spruce ground, one thin gold line, bone text; the only saturated colour on it
+   is the beer. Brand surfaces use it (Home's first screen first); utility surfaces stay
+   paper. A page marks itself data-page-skin="label" and the whole document follows. */
+[data-skin="label"],
+:root:has([data-page-skin="label"]) {
+  --bg: var(--spruce);
+  --surface: var(--spruce-deep);
+  --fg: var(--bone);
+  --fg-muted: color-mix(in srgb, var(--bone) 82%, transparent);
+  --rule: color-mix(in srgb, var(--gold) 34%, transparent);
+  --rule-strong: var(--gold);
+  --accent: var(--gold);
+  --accent-text: var(--gold);
+  --highlight: var(--gold);
+  --cta-bg: var(--gold);
+  --cta-fg: var(--spruce-deep);
+  --focus: var(--bone);
+  --shadow-press: none;
+  --shadow-feature: none;
+  --press-offset: 0px;
+  --edge: 1px solid var(--gold);
+  --grain-blend: screen;
+  --grain-opacity: 0.02;
+  color-scheme: dark;
 }
 
 /* A page that is night throughout (/events, its pages, /bands) marks itself

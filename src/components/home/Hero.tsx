@@ -1,59 +1,36 @@
-// Home hero (spec §6.1.2, §5.3, §5.6). Stack on a phone, a 7/5 split on desktop: the
-// open-now pill, "Beer. / Burgers. / Catskill." (the last in ember), the subline, See the
-// menu and Order pickup; the photo in its frame with up to two stickers. A game night
-// does not take over the first screen (Theo, 11/13): the open-now pill carries it in one
-// line, "Open late tonight · Knicks at 7:00".
-//
-// No entrance effect on the photo (2026-11-13): the pour masked it at first paint and held
-// Largest Contentful Paint to 3.5 s on a throttled phone, against a 1.8 s budget. The
-// overhaul rebuilds this screen around the beer; any motion there starts from a painted frame.
+// Home's first screen (direction contract in .impeccable/surfaces: "The label, poured").
+// Spruce edge to edge, header included (data-page-skin="label"). The status pill; the
+// tap list as one glass the visitor pours (TapHero); the glass standing on a full-width
+// gold rule with the Catskill ridge drawn beside it; under the rule the brewery's line
+// and the two actions. No photograph here, so the screen paints with the page; no
+// game-night takeover (the pill carries it in one line).
 import { homeLabels, microcopy } from "@content/microcopy";
-import type { SiteEvent } from "@/lib/events/enrich";
-import { formatDateShort, weekdayLabel } from "@/lib/hours/format";
 import type { Site } from "@/lib/site/schema";
-import { weekdayOf } from "@/lib/time/ny";
-import { PhotoFrame } from "../graphics/PhotoFrame";
 import { Button } from "../ui/Button";
 import { OpenNow } from "../visit/OpenNow";
-import { HeroStickers } from "./HeroStickers";
+import { type TapBeer, TapHero } from "./TapHero";
 
-export function Hero({ site, next, today }: { site: Site; next: SiteEvent | null; today: string }) {
-  const [a, b, c] = homeLabels.headline;
-  const sticker = next
-    ? {
-        href: `/events/${next.slug}`,
-        // "Tonight" on the day; otherwise the day it falls on (the label carries the rest)
-        text: next.date === today ? microcopy.tonight : weekdayLabel(weekdayOf(next.date), "long"),
-        label: `${formatDateShort(next.date)} · ${next.displayTitle}`,
-      }
-    : null;
+export function Hero({ site, beers }: { site: Site; beers: TapBeer[] }) {
   return (
-    <section className="hero" data-hero="" data-skin="paper" aria-labelledby="hero-title">
+    <section className="hero" data-hero="" data-page-skin="label" aria-labelledby="hero-title">
       <div className="hero__inner">
-        <div className="hero__text">
-          <OpenNow className="hero__open" />
-          <h1 id="hero-title" className="hero__title">
-            <span>{a}</span>
-            <span>{b}</span>
-            <span className="hero__accent">{c}</span>
+        <OpenNow className="hero__open" />
+        <div className="hero__scene">
+          {/* the Catskill ridge, as on the label: one line along the horizon, drawn once */}
+          <svg viewBox="0 0 400 90" className="hero__ridge" aria-hidden="true" focusable="false">
+            <path d="M0 90L38 70L62 78L118 34L140 50L176 18L214 52L236 44L292 74L318 66L400 90" />
+          </svg>
+          <TapHero beers={beers} />
+        </div>
+        <div className="hero__foot">
+          <h1 id="hero-title" className="hero__line">
+            {homeLabels.subline(site.address.street)}
           </h1>
-          <p className="hero__sub">{homeLabels.subline(site.address.street)}</p>
           <div className="hero__actions">
             <Button href="/menu">{microcopy.seeTheMenu}</Button>
-            <Button href={site.links.order} external variant="secondary">
-              {microcopy.orderPickup}
+            <Button href={site.links.map} external variant="quiet">
+              {microcopy.directions}
             </Button>
-          </div>
-        </div>
-        <div className="hero__art">
-          <div className="hero__frame hero__frame--day">
-            <PhotoFrame
-              id="burger-and-beer"
-              ratio="4/5"
-              priority
-              sizes="(min-width: 1024px) 40vw, (min-width: 768px) 60vw, 92vw"
-            />
-            <HeroStickers next={sticker} />
           </div>
         </div>
       </div>

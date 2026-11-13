@@ -114,6 +114,15 @@ export const homeLabels = {
     "Leashed dogs outside and in the tent",
   ],
   weekdayTag: { wed: "Wing Wednesday", thu: "Rodeo Thursdays", other: "Dogs welcome in the tent" },
+  // the tap-list glass on the first screen: interface labels
+  tap: {
+    // the glass button's name; it begins with the words printed above the glass
+    pour: "Tap to pour the next beer",
+    hint: "Tap to pour",
+    previous: "Previous beer",
+    next: "Next beer",
+    onTheMenu: "On the menu",
+  },
   mapTitle:
     "Where our ingredients come from: Catskill, with Hudson Falls, Cairo, Altamont and Hammondsport, and Livingston, where it began in 2018",
   since: "2018",
