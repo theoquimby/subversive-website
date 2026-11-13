@@ -1,0 +1,88 @@
+/* Dev only. Spec §2.4 grid: 4 columns phone, 8 tablet, 12 desktop; 16/24/24 px gutters. */
+.grid-overlay {
+  --cols: 4;
+  --col-gap: 16px;
+  --split: 3; /* the second alignment edge starts this column */
+  position: fixed;
+  inset: 0;
+  z-index: 2147483000;
+  pointer-events: none;
+}
+@media (min-width: 48rem) {
+  .grid-overlay {
+    --cols: 8;
+    --col-gap: 24px;
+    --split: 5;
+  }
+}
+@media (min-width: 80rem) {
+  .grid-overlay {
+    --cols: 12;
+    --split: 7;
+  }
+}
+
+.grid-overlay__baseline {
+  position: absolute;
+  inset: 0;
+  background: repeating-linear-gradient(
+    to bottom,
+    color-mix(in srgb, var(--sky) 22%, transparent) 0 1px,
+    transparent 1px var(--s-2)
+  );
+}
+
+.grid-overlay__frame {
+  position: absolute;
+  inset: 0;
+  left: 50%;
+  width: min(100% - 2 * var(--gutter), var(--content-max) - 2 * var(--gutter));
+  translate: -50% 0;
+  display: grid;
+  grid-template-columns: repeat(var(--cols), 1fr);
+  column-gap: var(--col-gap);
+}
+
+.grid-overlay__col {
+  background: color-mix(in srgb, var(--ember) 9%, transparent);
+  border-inline: 1px solid color-mix(in srgb, var(--ember) 30%, transparent);
+}
+.grid-overlay__col:nth-child(n + 5) {
+  display: none;
+}
+@media (min-width: 48rem) {
+  .grid-overlay__col:nth-child(n + 5) {
+    display: block;
+  }
+  .grid-overlay__col:nth-child(n + 9) {
+    display: none;
+  }
+}
+@media (min-width: 80rem) {
+  .grid-overlay__col:nth-child(n + 9) {
+    display: block;
+  }
+}
+
+.grid-overlay__edge {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 0;
+  border-left: 1px dashed var(--court);
+}
+.grid-overlay__edge--left {
+  left: 0;
+}
+.grid-overlay__edge--right {
+  right: 0;
+}
+.grid-overlay__edge--split {
+  left: calc(
+    (100% - (var(--cols) - 1) * var(--col-gap)) /
+    var(--cols) *
+    (var(--split) - 1) +
+    var(--col-gap) *
+    (var(--split) - 1)
+  );
+}

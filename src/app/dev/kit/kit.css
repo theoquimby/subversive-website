@@ -1,0 +1,427 @@
+/* /dev/kit only. Built from tokens; set like the printed menu (pills, outlined boxes). */
+
+.kit-root {
+  min-height: 100dvh;
+  transition:
+    background-color var(--d-2) var(--ease-out),
+    color var(--d-2) var(--ease-out);
+}
+
+.kit-main {
+  max-width: var(--content-max);
+  margin-inline: auto;
+  padding: var(--s-9) var(--gutter) var(--section);
+}
+
+.kit-head {
+  display: grid;
+  gap: var(--s-2);
+  margin-bottom: var(--s-10);
+}
+.kit-head .kit-t-h1 {
+  margin-left: var(--optical-left);
+}
+
+/* Labels: Utility 700, tracked caps (spec §2.3) */
+.kit-label {
+  font-family: var(--ff-utility);
+  font-weight: 700;
+  font-size: var(--t-label);
+  line-height: var(--lh-label);
+  letter-spacing: var(--track-label);
+  text-transform: uppercase;
+}
+.kit-code {
+  font-family: var(--ff-text);
+  font-weight: 600;
+  font-size: var(--t-meta);
+}
+.kit-note {
+  color: var(--fg-muted);
+  font-size: var(--t-small);
+  line-height: var(--lh-small);
+  max-width: var(--measure-prose);
+}
+
+/* Section pill: black pill, paper Caprasimo, exactly as on the menu (spec §3.4).
+ * Text sits 1 px high for descender space (spec §3A optical rule). */
+.kit-section {
+  margin-top: var(--section);
+}
+.kit-pill {
+  display: inline-block;
+  margin: 0 0 var(--s-7);
+  padding: 8px 26px 11px;
+  border-radius: var(--r-pill);
+  background: var(--fg);
+  color: var(--bg);
+  font-family: var(--ff-display);
+  font-size: var(--t-h2);
+  line-height: var(--lh-h2);
+}
+.kit-sub {
+  margin: var(--s-9) 0 var(--s-4);
+  font-family: var(--ff-utility);
+  font-weight: 700;
+  font-size: var(--t-label);
+  letter-spacing: var(--track-label);
+  text-transform: uppercase;
+}
+
+/* ---- Skin switch: one outlined pill, ink thumb slides behind the choice ---- */
+.kit-switch {
+  position: fixed;
+  right: max(var(--gutter), env(safe-area-inset-right));
+  bottom: max(var(--s-5), env(safe-area-inset-bottom));
+  z-index: 10;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  padding: 4px;
+  border: var(--stroke) solid var(--fg);
+  border-radius: var(--r-pill);
+  background: var(--bg);
+  box-shadow: var(--shadow-press);
+  isolation: isolate;
+}
+.kit-switch__option {
+  position: relative;
+  z-index: 1;
+  min-height: 44px;
+  padding: 0 var(--s-5);
+  border: 0;
+  border-radius: var(--r-pill);
+  background: transparent;
+  color: var(--fg);
+  font-family: var(--ff-utility);
+  font-weight: 700;
+  font-size: var(--t-label);
+  letter-spacing: var(--track-label);
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: color var(--d-2) var(--ease-out);
+}
+.kit-switch__option[data-checked="true"] {
+  color: var(--bg);
+}
+.kit-switch__option:active {
+  transform: translateY(1px);
+}
+.kit-switch__thumb {
+  position: absolute;
+  inset: 4px auto 4px 4px;
+  width: calc(50% - 4px);
+  border-radius: var(--r-pill);
+  background: var(--fg);
+  transition: translate var(--d-2) var(--ease-out);
+}
+.kit-switch__thumb[data-pos="overtime"] {
+  translate: 100% 0;
+}
+
+/* ---- Colour ---- */
+.kit-swatches {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 15rem), 1fr));
+  gap: var(--s-7) var(--s-6);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.kit-swatch {
+  display: grid;
+  gap: var(--s-1);
+}
+.kit-swatch__chip {
+  display: block;
+  aspect-ratio: 3 / 2;
+  margin-bottom: var(--s-2);
+  border: var(--stroke) solid var(--fg);
+  border-radius: var(--r-card);
+}
+.kit-semantic {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 11rem), 1fr));
+  gap: var(--s-3) var(--s-6);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.kit-semantic li {
+  display: flex;
+  align-items: center;
+  gap: var(--s-3);
+}
+.kit-semantic__chip {
+  flex: none;
+  width: var(--s-7);
+  height: var(--s-7);
+  border: var(--stroke) solid var(--fg);
+  border-radius: var(--r-pill);
+}
+.kit-ledger {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  border-top: var(--stroke) solid var(--fg);
+}
+.kit-ledger li {
+  display: grid;
+  gap: var(--s-1) var(--s-6);
+  padding: var(--s-4) 0;
+  border-bottom: var(--stroke-dash) dashed var(--fg);
+}
+@media (min-width: 48rem) {
+  .kit-ledger li {
+    grid-template-columns: 14rem 12rem 1fr;
+    align-items: baseline;
+  }
+}
+
+/* ---- Type ---- */
+.kit-type {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.kit-type li {
+  display: grid;
+  gap: var(--s-2);
+  padding: var(--s-6) 0;
+  border-top: var(--stroke-dash) dashed var(--rule-strong);
+}
+.kit-type__meta {
+  display: flex;
+  gap: var(--s-4);
+  align-items: baseline;
+}
+@media (min-width: 64rem) {
+  .kit-type li {
+    grid-template-columns: 12rem 1fr;
+    align-items: baseline;
+  }
+  .kit-type__meta {
+    display: grid;
+    gap: var(--s-1);
+  }
+}
+.kit-t-mega {
+  font-family: var(--ff-display);
+  font-size: var(--t-mega);
+  line-height: var(--lh-mega);
+  letter-spacing: var(--track-mega);
+  margin-left: var(--optical-left);
+}
+.kit-t-h1 {
+  font-family: var(--ff-display);
+  font-size: var(--t-h1);
+  line-height: var(--lh-h1);
+}
+.kit-t-h2 {
+  font-family: var(--ff-display);
+  font-size: var(--t-h2);
+  line-height: var(--lh-h2);
+}
+.kit-t-h3 {
+  font-family: var(--ff-display);
+  font-size: var(--t-h3);
+  line-height: var(--lh-h3);
+}
+.kit-t-label {
+  font-family: var(--ff-utility);
+  font-weight: 700;
+  font-size: var(--t-label);
+  line-height: var(--lh-label);
+  letter-spacing: var(--track-label);
+  text-transform: uppercase;
+}
+.kit-t-body {
+  font-size: var(--t-body);
+  line-height: var(--lh-body);
+  max-width: var(--measure-prose);
+}
+.kit-t-small {
+  font-size: var(--t-small);
+  line-height: var(--lh-small);
+  color: var(--fg-muted);
+  max-width: var(--measure-prose);
+}
+.kit-t-price {
+  font-weight: 600;
+  font-size: var(--t-price);
+  line-height: var(--lh-price);
+}
+
+/* ---- Space ---- */
+.kit-space,
+.kit-durations {
+  display: grid;
+  gap: var(--s-3);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.kit-space li {
+  display: grid;
+  grid-template-columns: 4.5rem 1fr;
+  align-items: center;
+  gap: var(--s-4);
+}
+.kit-space li .kit-code {
+  grid-column: 2;
+  margin-top: calc(var(--s-1) * -2);
+}
+.kit-space__bar {
+  height: var(--s-3);
+  background: var(--fg);
+}
+
+/* ---- Shape ---- */
+.kit-shapes,
+.kit-angles {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--s-7);
+  align-items: end;
+}
+.kit-angles {
+  margin-top: var(--s-9);
+}
+.kit-shapes figure,
+.kit-angles figure {
+  display: grid;
+  gap: var(--s-3);
+  justify-items: start;
+  margin: 0;
+}
+.kit-shape {
+  display: block;
+  width: 6.5rem;
+  height: 5rem;
+  border: var(--stroke) solid var(--fg);
+  background: var(--surface);
+}
+.kit-shape--box {
+  border-radius: var(--r-box);
+}
+.kit-shape--card {
+  border-radius: var(--r-card);
+}
+.kit-shape--tag {
+  border-radius: var(--r-tag);
+}
+.kit-angle {
+  display: block;
+  width: 5.5rem;
+  height: 2.75rem;
+  border: var(--stroke) solid var(--fg);
+  border-radius: var(--r-tag);
+  background: var(--highlight);
+}
+
+/* The stamp: pressable things carry a hard offset that collapses on press (spec §2.4) */
+.kit-stamp {
+  min-height: 48px;
+  padding: 0 var(--s-7);
+  border: var(--stroke) solid var(--ink);
+  border-radius: var(--r-pill);
+  background: var(--cta-bg);
+  color: var(--cta-fg);
+  font-family: var(--ff-utility);
+  font-weight: 700;
+  font-size: var(--t-label);
+  letter-spacing: var(--track-label);
+  text-transform: uppercase;
+  box-shadow: var(--shadow-press);
+  cursor: pointer;
+  transition:
+    transform var(--d-1) var(--ease-out),
+    box-shadow var(--d-1) var(--ease-out);
+}
+[data-skin="overtime"] .kit-stamp {
+  border-color: transparent;
+}
+.kit-stamp:active {
+  transform: translate(var(--press-offset), var(--press-offset));
+  box-shadow: 0 0 0 var(--ink);
+}
+
+/* ---- Motion ---- */
+.kit-curves {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 10.5rem), 1fr));
+  gap: var(--s-7) var(--s-6);
+}
+.kit-curve {
+  display: grid;
+  gap: var(--s-2);
+  margin: 0;
+}
+.kit-curve figcaption {
+  display: grid;
+  gap: var(--s-1);
+}
+.kit-curve svg {
+  width: 100%;
+  overflow: visible;
+}
+.kit-curve__frame {
+  fill: none;
+  stroke: var(--fg);
+  stroke-width: 1.5;
+  vector-effect: non-scaling-stroke;
+}
+.kit-curve__target {
+  stroke: var(--fg);
+  stroke-width: 1;
+  stroke-dasharray: 3 3;
+  vector-effect: non-scaling-stroke;
+}
+.kit-curve__handle {
+  stroke: var(--accent);
+  stroke-width: 1.5;
+  vector-effect: non-scaling-stroke;
+}
+.kit-curve__knob {
+  fill: var(--bg);
+  stroke: var(--accent);
+  stroke-width: 1.5;
+  vector-effect: non-scaling-stroke;
+}
+.kit-curve__line {
+  fill: none;
+  stroke: var(--fg);
+  stroke-width: 2.5;
+  stroke-linecap: square;
+  vector-effect: non-scaling-stroke;
+}
+.kit-durations {
+  margin-top: var(--s-9);
+}
+.kit-durations li {
+  display: grid;
+  grid-template-columns: 4.5rem 1fr 4.5rem;
+  align-items: center;
+  gap: var(--s-2) var(--s-4);
+}
+.kit-durations li .kit-note {
+  grid-column: 2 / -1;
+}
+.kit-durations__bar {
+  height: var(--s-3);
+  background: var(--fg);
+}
+
+/* fieldset reset + option layout for the radio-input version of the switch */
+.kit-switch {
+  margin: 0;
+  min-inline-size: 0;
+}
+.kit-switch__option {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+.kit-switch__option:has(:focus-visible) {
+  outline: var(--stroke) solid var(--focus);
+  outline-offset: 3px;
+}

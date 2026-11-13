@@ -1,0 +1,48 @@
+/*
+ * Graphic primitives that utilities would obscure (spec §3, §8.1).
+ */
+
+/* ---------- Checker rail (spec §3.2) ----------
+ * Two rows of squares, 22 px on phone → 28 px on desktop, snapped to whole pixels so
+ * edges stay crisp on 2× and 3× screens. The pattern layer is 4 squares wider than the
+ * rail and translates with page scroll, so the rail rolls like a tread. Transform only.
+ */
+.checker {
+  --sq-px: round(down, var(--sq), 1px);
+  position: relative;
+  height: calc(var(--sq-px) * 2);
+  overflow: hidden;
+  color: var(--fg);
+  contain: strict;
+}
+
+.checker::before {
+  content: "";
+  position: absolute;
+  inset: 0 calc(var(--sq-px) * -4) 0 0;
+  background:
+    conic-gradient(currentColor 25%, transparent 0 50%, currentColor 0 75%, transparent 0) 0 0 /
+    calc(var(--sq-px) * 2) calc(var(--sq-px) * 2);
+}
+
+@supports (animation-timeline: scroll()) {
+  @media (prefers-reduced-motion: no-preference) {
+    .checker::before {
+      animation: checker-roll linear both;
+      animation-timeline: scroll(root block);
+    }
+  }
+}
+
+@keyframes checker-roll {
+  to {
+    transform: translateX(calc(var(--sq-px) * -4));
+  }
+}
+
+@media (forced-colors: active) {
+  .checker::before {
+    forced-color-adjust: none;
+    background-image: conic-gradient(CanvasText 25%, Canvas 0 50%, CanvasText 0 75%, Canvas 0);
+  }
+}

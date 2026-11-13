@@ -1,0 +1,241 @@
+@import "tailwindcss";
+@import "./tokens.css";
+@import "./graphics.css";
+
+/*
+ * Tailwind sees only our tokens: its stock colours, fonts, sizes, radii, shadows and
+ * easings are cleared so nothing off-system can be typed as a utility.
+ */
+@theme {
+  --color-*: initial;
+  --font-*: initial;
+  --text-*: initial;
+  --radius-*: initial;
+  --shadow-*: initial;
+  --ease-*: initial;
+  --animate-*: initial;
+  --breakpoint-*: initial;
+
+  --breakpoint-sm: 30rem;
+  --breakpoint-md: 48rem;
+  --breakpoint-lg: 64rem;
+  --breakpoint-xl: 80rem;
+}
+
+@theme inline {
+  --color-bg: var(--bg);
+  --color-surface: var(--surface);
+  --color-fg: var(--fg);
+  --color-fg-muted: var(--fg-muted);
+  --color-rule: var(--rule);
+  --color-rule-strong: var(--rule-strong);
+  --color-accent: var(--accent);
+  --color-accent-text: var(--accent-text);
+  --color-highlight: var(--highlight);
+  --color-cta-bg: var(--cta-bg);
+  --color-cta-fg: var(--cta-fg);
+  --color-focus: var(--focus);
+
+  --font-display: var(--ff-display);
+  --font-utility: var(--ff-utility);
+  --font-text: var(--ff-text);
+
+  --text-mega: var(--t-mega);
+  --text-mega--line-height: var(--lh-mega);
+  --text-h1: var(--t-h1);
+  --text-h1--line-height: var(--lh-h1);
+  --text-h2: var(--t-h2);
+  --text-h2--line-height: var(--lh-h2);
+  --text-h3: var(--t-h3);
+  --text-h3--line-height: var(--lh-h3);
+  --text-label: var(--t-label);
+  --text-label--line-height: var(--lh-label);
+  --text-body: var(--t-body);
+  --text-body--line-height: var(--lh-body);
+  --text-small: var(--t-small);
+  --text-small--line-height: var(--lh-small);
+  --text-price: var(--t-price);
+  --text-price--line-height: var(--lh-price);
+  --text-subline: var(--t-subline);
+  --text-nav: var(--t-nav);
+  --text-meta: var(--t-meta);
+
+  --radius-pill: var(--r-pill);
+  --radius-box: var(--r-box);
+  --radius-card: var(--r-card);
+  --radius-tag: var(--r-tag);
+
+  --shadow-stamp: var(--shadow-press);
+  --shadow-lift: var(--shadow-feature);
+}
+
+/* ---------- Base ---------- */
+
+@layer base {
+  html {
+    -webkit-text-size-adjust: 100%;
+    text-size-adjust: 100%;
+    background: var(--bg);
+    scroll-padding-top: var(--s-10);
+    scrollbar-width: thin;
+    scrollbar-color: var(--fg) transparent;
+  }
+
+  body {
+    min-height: 100dvh;
+    margin: 0;
+    background: var(--bg);
+    color: var(--fg);
+    font-family: var(--ff-text);
+    font-size: var(--t-body);
+    line-height: var(--lh-body);
+    font-kerning: normal;
+    font-optical-sizing: auto;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    overflow-x: clip;
+  }
+
+  /* The skins set colour on whatever carries data-skin, so a skinned block paints itself */
+  [data-skin] {
+    background: var(--bg);
+    color: var(--fg);
+  }
+
+  h1,
+  h2,
+  h3,
+  h4 {
+    margin: 0;
+    font-weight: 400;
+    text-wrap: balance;
+  }
+
+  p,
+  li,
+  dd,
+  figcaption {
+    text-wrap: pretty;
+  }
+
+  p {
+    margin: 0;
+  }
+
+  a {
+    color: inherit;
+    text-decoration-thickness: var(--stroke);
+    text-underline-offset: 0.18em;
+  }
+
+  img,
+  svg,
+  video {
+    display: block;
+    max-width: 100%;
+  }
+
+  button,
+  input,
+  textarea,
+  select {
+    font: inherit;
+    color: inherit;
+  }
+
+  /* No grey flash on tap; every control draws its own pressed state (spec §2.5) */
+  * {
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  ::selection {
+    background: var(--pils);
+    color: var(--ink);
+  }
+
+  /* Focus: one designed ring everywhere, never the browser default (spec §0.3.3, §9.2) */
+  :focus {
+    outline: none;
+  }
+  :focus-visible {
+    outline: var(--stroke) solid var(--focus);
+    outline-offset: 3px;
+  }
+
+  /* Scrollbars (spec §4.11) */
+  ::-webkit-scrollbar {
+    width: 10px;
+    height: 10px;
+  }
+  ::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  ::-webkit-scrollbar-thumb {
+    background: var(--fg);
+    border: 3px solid transparent;
+    border-radius: var(--r-pill);
+    background-clip: padding-box;
+  }
+
+  .tabular {
+    font-variant-numeric: tabular-nums lining-nums;
+  }
+}
+
+/* Skip link: off-screen until focused, then a stamped pill at the top-left */
+.skip-link {
+  position: fixed;
+  top: max(var(--s-3), env(safe-area-inset-top));
+  left: max(var(--s-3), env(safe-area-inset-left));
+  z-index: 100;
+  padding: var(--s-3) var(--s-5);
+  border: var(--stroke) solid var(--ink);
+  border-radius: var(--r-pill);
+  background: var(--pils);
+  color: var(--ink);
+  font-family: var(--ff-utility);
+  font-weight: 700;
+  font-size: var(--t-label);
+  letter-spacing: var(--track-label);
+  text-transform: uppercase;
+  text-decoration: none;
+  box-shadow: var(--shadow-press);
+  transform: translateY(calc(-100% - var(--s-6)));
+}
+.skip-link:focus-visible {
+  transform: none;
+}
+
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* ---------- Preferences ---------- */
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+@media (forced-colors: active) {
+  :focus-visible {
+    outline-color: Highlight;
+  }
+  .skip-link {
+    border-color: CanvasText;
+  }
+}
