@@ -7,7 +7,13 @@ import type { HHmm, IsoDate } from "@/lib/time/ny";
 const site = getSite();
 const seed = seedHoursEvents();
 const d = (s: string) => s as IsoDate;
-const ev = (o: Partial<HoursEvent> & { date: string }): HoursEvent => ({
+const ev = (
+  o: Partial<Omit<HoursEvent, "date" | "startTime" | "endTime">> & {
+    date: string;
+    startTime?: string;
+    endTime?: string;
+  },
+): HoursEvent => ({
   id: o.id ?? `t-${o.date}-${o.title ?? "x"}`,
   title: o.title ?? "Test",
   displayTitle: o.displayTitle ?? o.title ?? "Test",
