@@ -59,7 +59,7 @@
   },
   "overrides": [
     {
-      "includes": ["src/styles/globals.css"],
+      "includes": ["src/styles/globals.css", "src/styles/print.css"],
       "linter": {
         "rules": {
           "complexity": {

@@ -124,6 +124,35 @@ export function nyInstant(date: IsoDate, at: Minutes): Date {
   return new Date(wallMs + 300 * 60_000);
 }
 
+/**
+ * The same weekday as nyParts(new Date()).weekday, as a JavaScript expression for inline
+ * scripts that run before React (the menu's today box). Kept here so every time-zone
+ * rule lives in this one file.
+ */
+export const NY_WEEKDAY_JS = `new Intl.DateTimeFormat("en-US",{timeZone:"${NY_TZ}",weekday:"short"}).format(new Date()).slice(0,3).toLowerCase()`;
+
+const MONTHS = [
+  "January",
+  "February",
+  "March",
+  "April",
+  "May",
+  "June",
+  "July",
+  "August",
+  "September",
+  "October",
+  "November",
+  "December",
+] as const;
+
+/** "2026-10-23" → "October 23" (a calendar date; no time zone involved). */
+export function formatMonthDay(date: IsoDate): string {
+  const m = ISO_DATE.exec(date);
+  if (!m) throw new Error(`Not an ISO date: ${date}`);
+  return `${MONTHS[Number(m[2]) - 1]} ${Number(m[3])}`;
+}
+
 export function isoWithOffset(date: IsoDate, at: Minutes): string {
   const instant = nyInstant(date, at);
   const p = nyParts(instant);

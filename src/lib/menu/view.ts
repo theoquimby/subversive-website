@@ -1,7 +1,8 @@
 // What the menu components render (plan §5.5): stable ids for deep links, the style
 // family of each beer, the one badge, and the chip each section answers to.
 import type { IsoDate } from "@/lib/time/ny";
-import { type Group, type Item, isBeer, type Menu } from "./schema";
+import { isBeer } from "./kinds";
+import type { Group, Item, Menu } from "./schema";
 
 export type StyleFamily = "light" | "hoppy" | "malty" | "farmhouse" | "sour";
 const FAMILIES: readonly StyleFamily[] = ["light", "hoppy", "malty", "farmhouse", "sour"];

@@ -53,9 +53,9 @@ export function GlassGlyph({
       </defs>
       <g clipPath={`url(#${clipId})`}>
         <g className="glass__pour" style={{ "--level": `${BOTTOM - level}px` } as React.CSSProperties}>
-          <rect x="0" y={level} width="24" height={BOTTOM - level + 1} fill={color} />
+          <rect x="0" y={level} width="24" height={BOTTOM - level + 4} fill={color} />
           {hazy ? (
-            <rect x="0" y={level} width="24" height={BOTTOM - level + 1} className="glass__haze" />
+            <rect x="0" y={level} width="24" height={BOTTOM - level + 4} className="glass__haze" />
           ) : null}
           {head > 0 ? (
             // the head: a band of foam whose top domes slightly between the walls

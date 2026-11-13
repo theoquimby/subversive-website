@@ -2,6 +2,8 @@
 @import "./tokens.css";
 @import "./graphics.css";
 @import "./shell.css";
+@import "./menu.css";
+@import "./print.css";
 
 /*
  * Tailwind sees only our tokens: its stock colours, fonts, sizes, radii, shadows and

@@ -20,7 +20,8 @@
     "e2e:all": "playwright test",
     "e2e:visual": "playwright test --config=playwright.visual.config.ts",
     "lhci": "lhci autorun",
-    "contrast": "node scripts/check-contrast.ts"
+    "contrast": "node scripts/check-contrast.ts",
+    "budget": "node scripts/check-js-budget.ts"
   },
   "dependencies": {
     "@vercel/analytics": "^2.0.1",

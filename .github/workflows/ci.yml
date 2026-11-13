@@ -40,6 +40,12 @@ jobs:
       - name: E2E against the build (real WebKit for phones and tablets)
         run: pnpm e2e:all
 
+      - name: JS budget for /menu (plan Q3)
+        run: |
+          pnpm start -p 3200 > /tmp/next.log 2>&1 &
+          for i in $(seq 1 30); do curl -sf http://localhost:3200/menu > /dev/null && break; sleep 1; done
+          pnpm budget http://localhost:3200
+
       - name: Lighthouse budgets
         run: pnpm lhci
 

@@ -1,7 +1,7 @@
 // Menu filters (spec §6.2, plan smaller assumptions). Style families are OR'd; Under 5%
 // is AND'd with them and means ABV below 5.0. Drink filters touch beer rows only. Food
 // filters are AND'd, and a vegan item counts as vegetarian.
-import { isBeer } from "./schema";
+import { isBeer } from "./kinds";
 import type { ItemView, StyleFamily } from "./view";
 
 export type DrinkFilter = StyleFamily | "under-5";

@@ -1,0 +1,1110 @@
+/* Menu page (spec §6.2, §4.4, §4.5, §4.11): title row, the sticky bar (Drinks | Food,
+   section chips, filters), sections, rows, the burger columns, sauces, today's box, the
+   order bar and the pour line. Print is in print.css. */
+
+/* ---------- Page frame ---------- */
+.page--menu {
+  padding-top: var(--s-8);
+}
+html:has(.page--menu) {
+  scroll-padding-top: 0;
+}
+@media (prefers-reduced-motion: no-preference) {
+  html:has(.page--menu) {
+    scroll-behavior: smooth;
+  }
+}
+
+.menu-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  column-gap: var(--s-5);
+  row-gap: var(--s-3);
+}
+.menu-head .page__title {
+  margin-block: 0;
+  margin-right: auto;
+}
+.menu-head__updated {
+  margin: 0;
+  color: var(--fg-muted);
+  font-family: var(--ff-utility);
+  font-weight: 600;
+  font-size: var(--t-label);
+  line-height: var(--lh-label);
+  letter-spacing: var(--track-label);
+  text-transform: uppercase;
+}
+
+.menu {
+  /* the dashed row rule, quieter than the 2 px group rules it sits between */
+  --fg-faint: color-mix(in srgb, var(--fg) 38%, transparent);
+  --header-h: calc(60px + env(safe-area-inset-top));
+  --menu-bar-h: 7rem;
+  --price-w: 3ch;
+  position: relative;
+  margin-top: var(--s-6);
+}
+@media (min-width: 64rem) {
+  .menu {
+    --header-h: calc(76px + env(safe-area-inset-top));
+  }
+}
+/* every anchor target clears the header and the bar */
+.menu [id] {
+  scroll-margin-top: calc(var(--header-h) + var(--menu-bar-h) + var(--s-4));
+}
+
+/* the other list is hidden before first paint (menu-boot.ts); with no script both show */
+.menu[data-show="drinks"] [data-list="food"],
+.menu[data-show="food"] [data-list="drinks"] {
+  display: none;
+}
+@media (prefers-reduced-motion: no-preference) {
+  .menu[data-switched][data-show="food"] [data-list="food"] {
+    animation: list-in-right var(--d-2) var(--ease-out);
+  }
+  .menu[data-switched][data-show="drinks"] [data-list="drinks"] {
+    animation: list-in-left var(--d-2) var(--ease-out);
+  }
+}
+@keyframes list-in-right {
+  from {
+    translate: var(--s-5) 0;
+    opacity: 0.4;
+  }
+}
+@keyframes list-in-left {
+  from {
+    translate: calc(-1 * var(--s-5)) 0;
+    opacity: 0.4;
+  }
+}
+
+/* ---------- The sticky bar ---------- */
+.menu-bar {
+  position: sticky;
+  top: var(--header-h);
+  z-index: 40;
+  display: grid;
+  /* the scrolling chip rows must never widen the bar */
+  grid-template-columns: minmax(0, 1fr);
+  gap: var(--s-2);
+  padding-block: var(--s-2);
+  background: var(--bg);
+  /* full bleed: the band and its 2 px rule run to the viewport edges */
+  box-shadow:
+    100vmax 0 0 var(--bg),
+    -100vmax 0 0 var(--bg),
+    0 var(--stroke) 0 var(--rule-strong),
+    100vmax var(--stroke) 0 var(--rule-strong),
+    -100vmax var(--stroke) 0 var(--rule-strong);
+  clip-path: inset(0 -100vmax calc(-1 * var(--stroke)));
+  transition: translate var(--d-2) var(--ease-out);
+}
+/* the header hides on scroll down; a stuck bar rides up with it */
+html:has(.site-header[data-hidden]) .menu-bar[data-stuck] {
+  translate: 0 calc(-1 * var(--header-h));
+}
+/* one rule under the header-and-bar assembly, not two */
+html:has(.menu-bar[data-stuck]) .site-header[data-solid] {
+  box-shadow: none;
+}
+
+.menu-bar__row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--s-2);
+}
+.menu-bar__nojs {
+  display: none;
+}
+
+/* ---------- Segmented control (spec §4.11) ---------- */
+.seg {
+  position: relative;
+  display: grid;
+  grid-auto-flow: column;
+  grid-auto-columns: 1fr;
+  flex: 1 1 0;
+  min-width: 0;
+  max-width: 22rem;
+  height: 48px;
+  padding: 3px;
+  border: var(--stroke) solid var(--rule-strong);
+  border-radius: var(--r-pill);
+}
+.seg__thumb {
+  position: absolute;
+  inset-block: 3px;
+  left: 3px;
+  width: calc((100% - 6px) / var(--seg-n, 2));
+  border-radius: var(--r-pill);
+  background: var(--fg);
+  translate: calc(var(--seg-i, 0) * 100%) 0;
+  transition: translate var(--d-2) var(--ease-out);
+}
+.seg__opt {
+  position: relative;
+  z-index: 1;
+  min-width: 0;
+  padding: 0 var(--s-3);
+  border: 0;
+  border-radius: var(--r-pill);
+  background: none;
+  color: var(--fg);
+  font-family: var(--ff-utility);
+  font-weight: 700;
+  font-size: 1rem;
+  line-height: 1;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: color var(--d-2) var(--ease-out);
+}
+.seg__opt[data-state="checked"] {
+  color: var(--bg);
+}
+.seg__opt:focus-visible {
+  outline: 3px solid var(--focus);
+  outline-offset: 4px;
+}
+.seg__opt:active {
+  translate: 0 1px;
+}
+/* on the menu the wrapper's data-show is the truth, before and after hydration */
+.menu[data-show="food"] .seg__thumb {
+  translate: 100% 0;
+}
+.menu[data-show="drinks"] .seg__thumb {
+  translate: 0 0;
+}
+.menu[data-show="food"] .seg__opt[data-value="food"],
+.menu[data-show="drinks"] .seg__opt[data-value="drinks"] {
+  color: var(--bg);
+}
+.menu[data-show="food"] .seg__opt[data-value="drinks"],
+.menu[data-show="drinks"] .seg__opt[data-value="food"] {
+  color: var(--fg);
+}
+
+/* ---------- Filter pill and chips (spec §6.2) ---------- */
+.fpill {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--s-2);
+  height: 48px;
+  padding: 0 var(--s-5);
+  border: var(--stroke) solid var(--rule-strong);
+  border-radius: var(--r-pill);
+  background: transparent;
+  color: var(--fg);
+  font-family: var(--ff-utility);
+  font-weight: 700;
+  font-size: 1rem;
+  line-height: 1;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: background-color var(--d-2) var(--ease-out);
+}
+.fpill[aria-expanded="true"] {
+  background: var(--fg);
+  color: var(--bg);
+}
+.fpill:active {
+  translate: 0 1px;
+}
+.fpill:focus-visible {
+  outline: 3px solid var(--focus);
+  outline-offset: 3px;
+}
+.fpill__n {
+  display: inline-grid;
+  place-items: center;
+  min-width: 1.375rem;
+  height: 1.375rem;
+  padding-inline: 4px;
+  border-radius: var(--r-pill);
+  background: var(--pils);
+  color: var(--ink);
+  font-size: var(--t-label);
+  letter-spacing: 0;
+}
+
+.filters {
+  display: none;
+  flex-basis: 100%;
+  align-items: center;
+  gap: var(--s-3);
+  min-width: 0;
+}
+.filters[data-open] {
+  display: flex;
+  flex-wrap: wrap;
+}
+.filters__chips {
+  display: flex;
+  flex: 1 1 100%;
+  gap: var(--s-2);
+  min-width: 0;
+  margin: 0 calc(-1 * var(--gutter));
+  padding: 2px var(--gutter);
+  border: 0;
+  /* one scrolling row on a phone, so opening the filters adds one line, not three */
+  overflow-x: auto;
+  scrollbar-width: none;
+  mask-image: linear-gradient(
+    to right,
+    transparent,
+    black var(--gutter),
+    black calc(100% - var(--gutter)),
+    transparent
+  );
+}
+.filters__chips::-webkit-scrollbar {
+  display: none;
+}
+.fchip {
+  flex: none;
+}
+/* the count is announced on every width; on a phone the dimming already shows it */
+@media (max-width: 47.99rem) {
+  .filters__count {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
+  }
+}
+.filters__count {
+  margin: 0;
+  color: var(--fg-muted);
+  font-family: var(--ff-utility);
+  font-weight: 600;
+  font-size: var(--t-label);
+  letter-spacing: var(--track-label);
+  text-transform: uppercase;
+}
+
+.fchip {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  height: 40px;
+  padding: 0 var(--s-4);
+  border: var(--stroke) solid var(--rule-strong);
+  border-radius: var(--r-pill);
+  background: transparent;
+  color: var(--fg);
+  font-family: var(--ff-utility);
+  font-weight: 700;
+  font-size: var(--t-label);
+  line-height: 1;
+  letter-spacing: var(--track-label);
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: background-color var(--d-1) var(--ease-out);
+}
+/* 44 px to the thumb, 40 px to the eye */
+.fchip::after {
+  content: "";
+  position: absolute;
+  inset: -2px 0;
+}
+.fchip[aria-pressed="true"] {
+  background: var(--pils);
+  color: var(--ink);
+}
+@media (hover: hover) {
+  .fchip:hover:not([aria-pressed="true"]) {
+    background: var(--surface);
+  }
+}
+.fchip:active {
+  translate: 0 1px;
+}
+.fchip:focus-visible {
+  outline: 3px solid var(--focus);
+  outline-offset: 2px;
+}
+
+@media (min-width: 48rem) {
+  .fpill {
+    display: none;
+  }
+  .filters,
+  .filters[data-open] {
+    display: flex;
+    flex: 1 1 auto;
+    flex-basis: auto;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+  }
+  .filters__chips {
+    flex: 0 1 auto;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+    margin: 0;
+    padding: 0;
+    overflow: visible;
+    mask-image: none;
+  }
+  .filters__count {
+    order: -1;
+  }
+}
+
+/* ---------- Section chips ---------- */
+.chips {
+  display: none;
+  gap: var(--s-1);
+  margin-inline: calc(-1 * var(--gutter));
+  padding: 2px var(--gutter);
+  overflow-x: auto;
+  overscroll-behavior-x: contain;
+  scroll-snap-type: x proximity;
+  scroll-padding-inline: var(--gutter);
+  scrollbar-width: none;
+  mask-image: linear-gradient(
+    to right,
+    transparent,
+    black var(--gutter),
+    black calc(100% - var(--gutter)),
+    transparent
+  );
+}
+.chips::-webkit-scrollbar {
+  display: none;
+}
+.menu[data-show="drinks"] .chips[data-for="drinks"],
+.menu[data-show="food"] .chips[data-for="food"] {
+  display: flex;
+}
+.chip {
+  position: relative;
+  flex: none;
+  display: inline-flex;
+  align-items: center;
+  height: 40px;
+  padding: 0 var(--s-4);
+  border: var(--stroke) solid transparent;
+  border-radius: var(--r-pill);
+  color: var(--fg);
+  font-family: var(--ff-utility);
+  font-weight: 700;
+  font-size: var(--t-label);
+  line-height: 1;
+  letter-spacing: var(--track-label);
+  text-transform: uppercase;
+  text-decoration: none;
+  white-space: nowrap;
+  scroll-snap-align: start;
+  transition:
+    background-color var(--d-2) var(--ease-out),
+    color var(--d-2) var(--ease-out);
+}
+.chip::after {
+  content: "";
+  position: absolute;
+  inset: -2px 0;
+}
+@media (hover: hover) {
+  .chip:hover:not([aria-current]) {
+    border-color: var(--rule-strong);
+  }
+}
+.chip[aria-current]::before {
+  content: "";
+  width: 6px;
+  height: 11px;
+  margin-right: 7px;
+  background: var(--accent);
+  /* one kernel of the barley mark, as the header marks the current page */
+  clip-path: polygon(0 0, 100% 40%, 100% 100%, 0 60%);
+}
+.chip[aria-current] {
+  border-color: var(--rule-strong);
+}
+.chip:active {
+  translate: 0 1px;
+}
+.chip:focus-visible {
+  outline: 3px solid var(--focus);
+  outline-offset: -1px;
+}
+@media (min-width: 64rem) {
+  .chips {
+    margin-inline: 0;
+    padding-inline: 0;
+    mask-image: none;
+  }
+}
+
+/* ---------- Under-21 tag (spec §5.1) ---------- */
+.under21 {
+  display: inline-flex;
+  align-items: center;
+  min-height: 32px;
+  padding: 6px 10px 5px;
+  border-radius: var(--r-tag);
+  background: var(--sky-deep);
+  color: var(--card);
+  font-family: var(--ff-utility);
+  font-weight: 700;
+  font-size: var(--t-label);
+  line-height: var(--lh-label);
+  letter-spacing: var(--track-label);
+  text-transform: uppercase;
+  text-decoration: none;
+}
+
+/* ---------- Sections ---------- */
+.menu-list {
+  padding-top: var(--s-7);
+}
+.msec + .msec,
+.today + .msec {
+  margin-top: var(--s-10);
+}
+/* each section is the query container for its rows (a list cannot query its own width) */
+.msec {
+  container-type: inline-size;
+}
+.msec__head {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: var(--s-4);
+}
+.msec__legend {
+  flex: none;
+  margin: 0 0 var(--s-2);
+  color: var(--fg-muted);
+  font-family: var(--ff-utility);
+  font-weight: 700;
+  font-size: var(--t-label);
+  line-height: 1;
+  letter-spacing: var(--track-label);
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+.msec__head .pill {
+  /* Theo 11/13, "nothing heavy-handed": the menu's sections are many and close
+     together, so their pills step down from --t-h2 to sit on one line */
+  padding: 6px 18px 8px;
+  font-size: clamp(1.375rem, 1.2083rem + 0.8333vw, 1.875rem);
+}
+.msec__note {
+  max-width: var(--measure-prose);
+  margin: var(--s-3) 0 0;
+  color: var(--fg-muted);
+  font-size: var(--t-small);
+  line-height: var(--lh-small);
+}
+.msec--pours {
+  --price-w: 4.25ch;
+}
+
+/* group header: Utility caps over a 2 px rule, note beneath in muted text */
+.mgroup {
+  margin-top: var(--s-6);
+}
+.mgroup__head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  column-gap: var(--s-3);
+  margin: 0;
+  padding-bottom: var(--s-2);
+  border-bottom: var(--stroke) solid var(--rule-strong);
+}
+.mgroup__title {
+  font-family: var(--ff-utility);
+  font-weight: 700;
+  font-size: var(--t-label);
+  line-height: var(--lh-label);
+  letter-spacing: var(--track-label);
+  text-transform: uppercase;
+}
+.mgroup__note {
+  color: var(--fg-muted);
+  font-family: var(--ff-text);
+  font-weight: 400;
+  font-size: var(--t-small);
+  line-height: var(--lh-small);
+}
+.mgroup__head--note {
+  border-bottom: 0;
+  padding-bottom: 0;
+}
+
+/* ---------- Rows (spec §4.4) ---------- */
+.mlist {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.mrow + .mrow {
+  border-top: var(--stroke-dash) dashed var(--fg-faint);
+}
+.mrow[data-dim] {
+  opacity: 0.3;
+}
+.mrow,
+.sauces__item {
+  transition: opacity var(--d-2) var(--ease-out);
+}
+
+.mrow__sum {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) minmax(var(--price-w), auto);
+  grid-template-rows: auto 1fr;
+  column-gap: var(--s-4);
+  margin-inline: calc(-1 * var(--s-2));
+  padding: var(--s-4) var(--s-2);
+  border-radius: var(--r-tag);
+  list-style: none;
+}
+.mrow__sum:not(:has(.mrow__glass)) {
+  grid-template-columns: minmax(0, 1fr) minmax(var(--price-w), auto);
+}
+summary.mrow__sum {
+  cursor: pointer;
+  transition: background-color var(--d-1) var(--ease-out);
+}
+summary.mrow__sum::-webkit-details-marker {
+  display: none;
+}
+summary.mrow__sum:active {
+  background: var(--paper-deep);
+}
+summary.mrow__sum:focus-visible {
+  outline: 3px solid var(--focus);
+  outline-offset: 0;
+}
+
+.mrow__glass {
+  grid-row: 1 / span 2;
+  padding-top: 1px;
+}
+.mrow__glass .glass--glyph {
+  height: 2.125rem;
+}
+.mrow__main {
+  display: grid;
+  grid-row: 1 / span 2;
+  align-content: start;
+  gap: var(--s-1);
+  min-width: 0;
+}
+.mrow__line {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--s-1) var(--s-2);
+}
+.mrow__name {
+  font-family: var(--ff-display);
+  font-size: var(--t-h3);
+  line-height: var(--lh-h3);
+  text-wrap: balance;
+  border-radius: 3px;
+  box-decoration-break: clone;
+  -webkit-box-decoration-break: clone;
+}
+.mrow__meta {
+  font-family: var(--ff-utility);
+  font-weight: 600;
+  font-size: var(--t-meta);
+  line-height: var(--lh-label);
+  letter-spacing: 0.02em;
+}
+.mrow__desc {
+  max-width: var(--measure-prose);
+  color: var(--fg-muted);
+  font-size: var(--t-small);
+  line-height: var(--lh-small);
+  text-wrap: pretty;
+}
+details.mrow__box:not([open]) .mrow__desc {
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  line-clamp: 2;
+  overflow: hidden;
+}
+.mrow__tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--s-1);
+  margin-top: var(--s-1);
+}
+.mtag {
+  display: inline-block;
+  padding: 3px 7px 2px;
+  border-radius: 4px;
+  background: var(--paper-deep);
+  color: var(--fg);
+  font-family: var(--ff-utility);
+  font-weight: 700;
+  font-size: 0.75rem;
+  line-height: 1.2;
+  letter-spacing: var(--track-label);
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+.mrow__price {
+  grid-row: 1;
+  justify-self: end;
+  padding-top: 0.2em;
+  font-family: var(--ff-text);
+  font-weight: 600;
+  font-size: var(--t-price);
+  line-height: var(--lh-price);
+  font-variant-numeric: tabular-nums lining-nums;
+  text-align: right;
+  white-space: nowrap;
+}
+/* the "more" mark: a small cross that turns to × when the row is open */
+.mrow__toggle {
+  grid-column: -2;
+  grid-row: 2;
+  align-self: end;
+  justify-self: end;
+  width: 12px;
+  height: 12px;
+  margin-top: var(--s-2);
+  background:
+    linear-gradient(var(--fg-muted) 0 0) center / 100% 2px no-repeat,
+    linear-gradient(var(--fg-muted) 0 0) center / 2px 100% no-repeat;
+  transition: rotate var(--d-2) var(--ease-out);
+}
+details[open] > summary .mrow__toggle {
+  rotate: 45deg;
+}
+details[data-plain] .mrow__toggle {
+  display: none;
+}
+@media (hover: hover) {
+  summary.mrow__sum:hover .mrow__toggle {
+    background:
+      linear-gradient(var(--fg) 0 0) center / 100% 2px no-repeat,
+      linear-gradient(var(--fg) 0 0) center / 2px 100% no-repeat;
+  }
+}
+.mrow__more {
+  max-width: var(--measure-prose);
+  margin: calc(-1 * var(--s-2)) 0 0;
+  padding-bottom: var(--s-4);
+  color: var(--fg-muted);
+  font-size: var(--t-small);
+  line-height: var(--lh-small);
+}
+/* line the extra text up under the description, past the glass when there is one */
+.mrow__box:has(.mrow__glass) .mrow__more {
+  padding-left: calc(2.125rem * 24 / 38 + var(--s-4));
+}
+
+/* the glass pours when its row comes into view (spec §4.4): 600 ms, 40 ms per row, once */
+@media (scripting: enabled) and (prefers-reduced-motion: no-preference) {
+  .mrow[data-pour]:not([data-pour="in"]) .glass__pour {
+    translate: 0 var(--level);
+  }
+  .mrow[data-pour="in"] .glass__pour {
+    animation: glass-rise 600ms var(--ease-stamp) both;
+    animation-delay: calc(var(--i, 0) * 40ms);
+  }
+}
+
+/* arriving at a row flashes a pils highlight behind its name, once */
+.mrow__box:target .mrow__name,
+.sauces__item:target .sauces__name {
+  animation: row-flash 1600ms var(--ease-out) both;
+}
+@keyframes row-flash {
+  0%,
+  35% {
+    background-color: var(--pils);
+    box-shadow: 0 0 0 4px var(--pils);
+  }
+  100% {
+    background-color: transparent;
+    box-shadow: 0 0 0 4px transparent;
+  }
+}
+
+/* wide screens: rows in two columns, as the printed menu sets them, so a price is never
+   a long glance from its name */
+@container (min-width: 56rem) {
+  .mlist:not(.mlist--burgers) {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    column-gap: var(--s-9);
+  }
+  .mlist:not(.mlist--burgers) > .mrow:nth-child(2) {
+    border-top: 0;
+  }
+}
+
+/* ---------- Intro box (spec §4.5) ---------- */
+.intro-box {
+  margin-top: var(--s-5);
+  padding: var(--s-5);
+  border: var(--edge);
+  border-radius: var(--r-box);
+  text-align: center;
+}
+.intro-box__text {
+  max-width: var(--measure-prose);
+  margin: 0 auto;
+  font-size: var(--t-intro);
+  line-height: var(--lh-body);
+  text-wrap: pretty;
+}
+.intro-box__text strong {
+  font-weight: 600;
+}
+.intro-box__mods {
+  max-width: var(--measure-prose);
+  margin: var(--s-3) auto 0;
+  color: var(--fg-muted);
+  font-size: var(--t-small);
+  line-height: var(--lh-small);
+  text-wrap: pretty;
+}
+
+/* ---------- Burgers: three boxed columns from tablet width (spec §6.2) ---------- */
+.msec--burgers .mlist--burgers {
+  margin-top: var(--s-2);
+}
+@container (min-width: 36rem) {
+  .mlist--burgers {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    grid-template-rows: auto 1fr auto auto;
+    column-gap: var(--s-5);
+    padding-top: var(--s-4);
+  }
+  .mlist--burgers .mrow {
+    display: grid;
+    grid-row: span 4;
+    grid-template-rows: subgrid;
+    border-top: 0;
+  }
+  .mlist--burgers .mrow__box,
+  .mlist--burgers .mrow__sum {
+    display: grid;
+    grid-row: span 4;
+    grid-template-rows: subgrid;
+    grid-template-columns: minmax(0, 1fr);
+    justify-items: center;
+    row-gap: var(--s-3);
+    margin: 0;
+    padding: 0;
+    text-align: center;
+  }
+  .mlist--burgers .mrow__main {
+    display: contents;
+  }
+  .mlist--burgers .mrow__line {
+    grid-row: 1;
+    justify-content: center;
+  }
+  .mlist--burgers .mrow__name {
+    display: inline-block;
+    padding: 6px var(--s-4) 8px;
+    border-radius: var(--r-pill);
+    background: var(--fg);
+    color: var(--bg);
+  }
+  .mlist--burgers .mrow__desc {
+    grid-row: 2;
+    align-self: stretch;
+    display: grid;
+    align-items: center;
+    width: 100%;
+    padding: var(--s-4);
+    border: var(--edge);
+    border-radius: var(--r-box);
+    color: var(--fg);
+    font-size: var(--t-body);
+    line-height: var(--lh-body);
+  }
+  .mlist--burgers .mrow__tags {
+    grid-row: 3;
+    justify-content: center;
+    margin: 0;
+  }
+  .mlist--burgers .mrow__price {
+    grid-row: 4;
+    justify-self: center;
+    padding: 6px var(--s-4) 5px;
+    border: var(--edge);
+    border-radius: var(--r-pill);
+  }
+}
+
+/* ---------- Sauces (spec §6.2) ---------- */
+.sauces {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--s-4) var(--s-5);
+  margin: var(--s-5) 0 0;
+}
+@media (min-width: 64rem) {
+  .sauces {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+.sauces__item[data-dim] {
+  opacity: 0.3;
+}
+.sauces__name {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--s-1) var(--s-2);
+  font-weight: 600;
+  font-size: var(--t-small);
+  line-height: var(--lh-small);
+}
+.sauces__desc {
+  margin: 2px 0 0;
+  color: var(--fg-muted);
+  font-size: var(--t-small);
+  line-height: var(--lh-small);
+}
+
+/* ---------- Today's box (spec §6.2, plan Q5: ink outline, pils inner band) ---------- */
+.today {
+  display: none;
+  margin-bottom: var(--s-8);
+  padding: calc(var(--s-5) + 6px);
+  border: var(--edge);
+  border-radius: var(--r-box);
+  box-shadow: inset 0 0 0 6px var(--pils);
+}
+.menu[data-today="mon"] .today[data-days~="mon"],
+.menu[data-today="tue"] .today[data-days~="tue"],
+.menu[data-today="wed"] .today[data-days~="wed"],
+.menu[data-today="thu"] .today[data-days~="thu"],
+.menu[data-today="fri"] .today[data-days~="fri"],
+.menu[data-today="sat"] .today[data-days~="sat"],
+.menu[data-today="sun"] .today[data-days~="sun"] {
+  display: block;
+}
+.today__title {
+  margin: 0 0 var(--s-3);
+  font-family: var(--ff-display);
+  font-size: var(--t-h2);
+  line-height: var(--lh-h2);
+  text-wrap: balance;
+}
+.today__list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.today__list li + li {
+  border-top: var(--stroke-dash) dashed var(--fg-faint);
+}
+.today__item {
+  display: flex;
+  justify-content: space-between;
+  gap: var(--s-4);
+  min-height: 44px;
+  align-items: center;
+  color: var(--fg);
+  text-decoration: none;
+}
+.today__name {
+  font-weight: 600;
+  text-decoration: underline var(--stroke) var(--accent);
+  text-underline-offset: 4px;
+}
+.today__price {
+  font-weight: 600;
+  font-size: var(--t-price);
+  font-variant-numeric: tabular-nums lining-nums;
+}
+.today__item:focus-visible {
+  outline: 3px solid var(--focus);
+  outline-offset: 2px;
+  border-radius: var(--r-tag);
+}
+
+/* ---------- Notices ---------- */
+.menu-notices {
+  max-width: var(--measure-prose);
+  margin-top: var(--s-10);
+  padding-top: var(--s-5);
+  border-top: var(--stroke) solid var(--rule-strong);
+  color: var(--fg-muted);
+  font-size: var(--t-small);
+  line-height: var(--lh-small);
+}
+.menu-notices p {
+  margin: 0;
+}
+.menu-notices p + p {
+  margin-top: var(--s-2);
+}
+
+/* ---------- Order bar (phone) ---------- */
+.order-bar {
+  position: fixed;
+  inset: auto 0 0;
+  z-index: 45;
+  display: flex;
+  align-items: center;
+  gap: var(--s-3);
+  padding: 4px max(var(--gutter), env(safe-area-inset-right)) calc(4px + env(safe-area-inset-bottom))
+    max(var(--gutter), env(safe-area-inset-left));
+  background: var(--bg);
+  box-shadow: 0 calc(-1 * var(--stroke)) 0 var(--rule-strong);
+  translate: 0 calc(100% + var(--stroke));
+  transition: translate var(--d-3) var(--ease-out);
+}
+.order-bar[data-visible] {
+  translate: 0 0;
+}
+.order-bar__order {
+  flex: 1;
+}
+@media (min-width: 48rem) {
+  .order-bar {
+    display: none;
+  }
+}
+.icon-btn {
+  display: inline-grid;
+  place-items: center;
+  flex: none;
+  width: 48px;
+  height: 48px;
+  border: var(--stroke) solid var(--rule-strong);
+  border-radius: var(--r-pill);
+  background: transparent;
+  color: var(--fg);
+  cursor: pointer;
+}
+.icon-btn:active {
+  translate: 0 1px;
+  background: var(--paper-deep);
+}
+.icon-btn:focus-visible {
+  outline: 3px solid var(--focus);
+  outline-offset: 3px;
+}
+.icon-btn__icon {
+  width: 22px;
+  height: 22px;
+}
+.toast {
+  position: fixed;
+  left: 50%;
+  bottom: calc(64px + env(safe-area-inset-bottom) + var(--s-3));
+  z-index: 46;
+  margin: 0;
+  padding: 10px var(--s-5) 9px;
+  border-radius: var(--r-pill);
+  background: var(--ink);
+  color: var(--paper);
+  font-family: var(--ff-utility);
+  font-weight: 700;
+  font-size: var(--t-label);
+  line-height: 1;
+  letter-spacing: var(--track-label);
+  text-transform: uppercase;
+  white-space: nowrap;
+  pointer-events: none;
+  opacity: 0;
+  translate: -50% var(--s-2);
+  transition:
+    opacity var(--d-2) var(--ease-out),
+    translate var(--d-2) var(--ease-out);
+}
+.toast[data-visible] {
+  opacity: 1;
+  translate: -50% 0;
+}
+
+/* ---------- Pour line (desktop, spec §5.4) ---------- */
+.pour-line {
+  display: none;
+}
+@media (min-width: 64rem) and (scripting: enabled) {
+  .pour-line {
+    position: fixed;
+    top: calc(var(--header-h, 76px) + 9rem);
+    bottom: var(--s-9);
+    left: max(var(--s-4), calc((100% - var(--content-max)) / 2 - var(--s-2)));
+    z-index: 30;
+    display: block;
+    width: var(--stroke);
+    background: var(--rule);
+  }
+}
+.pour-line__fill {
+  position: absolute;
+  inset: 0;
+  background: var(--accent);
+  transform-origin: 50% 0;
+  scale: 1 var(--p, 0);
+}
+.pour-line__kernel {
+  --passed: clamp(0, (var(--p, 0) - var(--at)) * 1000, 1);
+  position: absolute;
+  top: calc(var(--at) * 100%);
+  left: 50%;
+  display: block;
+  width: 11px;
+  translate: -50% -50%;
+  cursor: pointer;
+}
+.pour-line__kernel svg {
+  display: block;
+  width: 100%;
+  overflow: visible;
+  fill: color-mix(in srgb, var(--accent) calc(var(--passed) * 100%), var(--bg));
+  stroke: var(--accent);
+  stroke-width: 3;
+  transition: fill var(--d-2) var(--ease-out);
+}
+@media (hover: hover) {
+  .pour-line__kernel:hover svg {
+    fill: var(--accent);
+  }
+}
+
+/* ---------- Without JavaScript: two stacked lists with anchor links (spec §2.5) ---------- */
+@media (scripting: none) {
+  .menu-bar {
+    position: static;
+  }
+  .menu-bar__nojs {
+    display: flex;
+    gap: var(--s-6);
+    margin: 0;
+    font-family: var(--ff-utility);
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+  .menu-bar__nojs a {
+    display: inline-flex;
+    align-items: center;
+    min-height: 44px;
+    color: var(--fg);
+  }
+  .seg,
+  .fpill,
+  .filters {
+    display: none;
+  }
+}

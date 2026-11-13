@@ -75,6 +75,9 @@ pairs.push(
   { name: "sticker: paper on currant", skin: "paper", fg: r("paper"), bg: r("currant"), role: "label" },
   { name: "sticker: paper on spruce", skin: "paper", fg: r("paper"), bg: r("spruce"), role: "label" },
   { name: "ledger: paper on spruce", skin: "paper", fg: r("paper"), bg: r("spruce"), role: "body" },
+  // menu (M3): the under-21 tag, the micro-chips, the muted text in a pressed row
+  { name: "under-21 tag: card on sky-deep", skin: "paper", fg: r("card"), bg: r("skyDeep"), role: "label" },
+  { name: "menu tag: ink on paper-deep", skin: "paper", fg: r("ink"), bg: r("paperDeep"), role: "label" },
   { name: "date block Music: ink on pils", skin: "overtime", fg: r("ink"), bg: r("pils"), role: "label" },
   {
     name: "date block Trivia: ink on sky (numerals)",

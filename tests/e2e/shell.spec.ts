@@ -87,11 +87,15 @@ test("reduced motion: navigations run no view-transition animation", async ({ pa
     const link = document.querySelector<HTMLAnchorElement>('nav[aria-label="Main"] a[href="/visit"]');
     link?.click();
     await new Promise((r) => setTimeout(r, 120));
-    return document
-      .getAnimations()
-      .filter((a) =>
-        String((a.effect as KeyframeEffect | null)?.pseudoElement ?? "").includes("view-transition"),
-      ).length;
+    return (
+      document
+        .getAnimations()
+        .filter((a) =>
+          String((a.effect as KeyframeEffect | null)?.pseudoElement ?? "").includes("view-transition"),
+        )
+        // React keeps a transition alive with zero-length animations of its own; they move nothing
+        .filter((a) => Number(a.effect?.getTiming().duration ?? 0) > 0).length
+    );
   });
   expect(animations).toBe(0);
 });

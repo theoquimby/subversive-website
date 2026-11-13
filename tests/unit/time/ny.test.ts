@@ -2,6 +2,7 @@ import { describe, expect, it } from "vitest";
 import {
   addDays,
   diffDays,
+  formatMonthDay,
   fromMinutes,
   type HHmm,
   type IsoDate,
@@ -111,5 +112,12 @@ describe("isoWithOffset", () => {
   });
   it("rolls past midnight onto the next date", () => {
     expect(isoWithOffset(d("2026-11-13"), 1470)).toBe("2026-11-14T00:30:00-05:00");
+  });
+});
+
+describe("formatMonthDay", () => {
+  it("prints the calendar date as the old site did", () => {
+    expect(formatMonthDay(d("2026-10-23"))).toBe("October 23");
+    expect(formatMonthDay(d("2027-01-01"))).toBe("January 1");
   });
 });

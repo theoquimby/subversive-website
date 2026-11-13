@@ -1,0 +1,99 @@
+/* Print (spec §6.2): the menu prints as a clean two-column black-on-white menu with the
+   checker rail, so staff can print it. No nav, no photos, no bars. Every row prints open
+   (MenuEnhancer opens them on beforeprint); both lists print. */
+@media print {
+  @page {
+    margin: 12mm;
+  }
+  :root,
+  [data-skin] {
+    --bg: white;
+    --surface: white;
+    --fg: black;
+    --fg-muted: black;
+    --rule-strong: black;
+    --accent: black;
+  }
+  body {
+    background: white;
+    color: black;
+  }
+  body::after,
+  .skip-link,
+  .site-header,
+  .site-footer,
+  .menu-bar,
+  .menu-bar-sentinel,
+  .order-bar,
+  .toast,
+  .pour-line,
+  .under21,
+  .today,
+  .photo,
+  .mrow__glass,
+  .mrow__toggle {
+    display: none !important;
+  }
+  .page {
+    max-width: none;
+    padding: 0;
+  }
+  .page--menu .page__title {
+    font-size: 28pt;
+  }
+  .menu[data-show] [data-list] {
+    display: block !important;
+    animation: none !important;
+  }
+  .menu-list {
+    columns: 2;
+    column-gap: 10mm;
+    padding-top: 4mm;
+  }
+  .menu-list + .menu-list {
+    break-before: page;
+  }
+  .msec {
+    break-inside: avoid-column;
+  }
+  .msec + .msec {
+    margin-top: 6mm;
+  }
+  .pill {
+    font-size: 15pt;
+    padding: 2pt 10pt 3pt;
+    background: black;
+    color: white;
+    print-color-adjust: exact;
+    -webkit-print-color-adjust: exact;
+  }
+  .mrow {
+    break-inside: avoid;
+    opacity: 1 !important;
+  }
+  .mrow__sum {
+    padding-block: 2mm;
+  }
+  .mrow__name {
+    font-size: 11pt;
+  }
+  .mrow__desc,
+  .mrow__more,
+  .mrow__meta {
+    font-size: 8.5pt;
+    -webkit-line-clamp: none !important;
+    line-clamp: none !important;
+    display: block !important;
+  }
+  .mlist--burgers {
+    display: block !important;
+  }
+  .intro-box {
+    padding: 2mm 3mm;
+    font-size: 9pt;
+  }
+  .checker {
+    print-color-adjust: exact;
+    -webkit-print-color-adjust: exact;
+  }
+}

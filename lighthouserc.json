@@ -3,7 +3,7 @@
     "collect": {
       "startServerCommand": "pnpm start -p 3300",
       "startServerReadyPattern": "Ready",
-      "url": ["http://localhost:3300/"],
+      "url": ["http://localhost:3300/", "http://localhost:3300/menu"],
       "numberOfRuns": 3,
       "settings": { "formFactor": "mobile", "throttlingMethod": "simulate" }
     },

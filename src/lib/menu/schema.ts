@@ -15,8 +15,8 @@ const price = z.number().nonnegative();
 // "" in the transcription means the printed menu has no description
 const text = z
   .string()
-  .optional()
-  .transform((s) => (s ? s : undefined));
+  .transform((s) => (s ? s : undefined))
+  .optional();
 
 const windowShape = {
   seasonal: z.boolean().optional(),
@@ -126,6 +126,4 @@ export function parseMenu(json: unknown): Menu {
   return menuSchema.parse(json);
 }
 
-export function isBeer(i: Item): i is BeerItem {
-  return "abv" in i && "prices" in i;
-}
+export { isBeer } from "./kinds";
