@@ -1,4 +1,50 @@
-# Handoff: where things stand (2026-11-13)
+# Handoff: where things stand
+
+## Update 2026-11-13 (Theo's PC): M0 done
+
+- Vercel project `subversive-website` is connected to this repo; pushes to `main` deploy to
+  https://subversive-website.vercel.app. `NEXT_PUBLIC_DEV_KIT=1` is set on all environments, so
+  `/dev/kit` and `?grid` are live until M9. Framework and Node 22 are pinned in the repo
+  (`vercel.json`, `engines`), not in the dashboard.
+- Theo accepted the plan's assumptions for Q1 and Q3–Q5. What M0 shipped for each is in the M0
+  commit messages; the token changes are listed in `src/styles/tokens.ts → adjustments` and on `/dev/kit`.
+- On this PC, Playwright runs through installed Edge: `PW_CHANNEL=msedge`. Node and pnpm are not on PATH;
+  use the Codex-bundled Node and `corepack pnpm@10`.
+
+### Direction from Theo for M1 onward (2026-11-13)
+
+1. **The bar.** The site should be the best piece of work in a seasoned designer's portfolio: bespoke,
+   graphic, with integrity. Nothing that reads as generated. Spec §3A is the working method.
+2. **A brewery, not a diner.** Cream stock, a checkerboard and fat black pills can tip into diner.
+   Keep the menu's vocabulary but weight it toward the brewery:
+   - The barley kernel and the 61° slash are the lead motifs. The checker stays an edge, never a field.
+   - Beer is the hero object: glasses that fill in each beer's colour, can and label art when Max sends it.
+   - Use spruce, the grain and the fire pit (Overtime) for depth.
+   - No diner tells: chrome, red and teal, script neon, pastel, "Eats" signage, booth-card layouts.
+   - Max's label art and typefaces (spec O5, §11.3 item 2) are the strongest lever. Ask for them before M1 is signed off.
+3. **The lager goblin** is Max's Oktoberfest PR character and he wants him in the site in fun ways.
+   The spec's appearances (§5.1, §5.2: gate, footer hatch, typing `lager`, 404, Oktoberfest event pages) stand.
+   He is drawn by Max, never invented by us. Until his art arrives, he is the marked placeholder.
+4. **References Theo pointed to:**
+   - [Fable 5.2 design and motion tests](https://productwithattitude.com/articles/claude-fable-5-2-design-motion-tests-prompts)
+   - [Five things with Fable 5.2](https://abhijayvuyyuru.substack.com/p/fable-52-five-insane-things-you-can)
+   - [designprompts.dev](https://designprompts.dev/)
+   - [Figma AI website examples](https://www.figma.com/resource-library/ai-website-examples/)
+   - [MindStudio design patterns](https://www.mindstudio.ai/blog/ai-website-design-patterns)
+   - A Facebook video of motion prompts (login-walled, not readable)
+
+   What we take from them:
+   - Numbers, not adjectives.
+   - A construction overlay and frame-strip motion sheets.
+   - A separate reviewer who sees only renders.
+   - One moving element per screen; words never wait.
+   - Real content only.
+   - An audit of what could not be verified without a person.
+
+   What we reject: bento grids, glassmorphism, neon or gradient heroes, soft shadows, parallax and
+   3D scroll gimmicks, kinetic type everywhere.
+
+---
 
 Written at the end of the cloud session that produced the spec, so a session on Theo's computer can continue.
 
