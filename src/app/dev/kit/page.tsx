@@ -93,8 +93,7 @@ export default function KitPage() {
       <Checker />
       <main id="main" className="kit-main">
         <header className="kit-head">
-          <p className="kit-label">Dev kit · M0 foundation</p>
-          <h1 className="kit-t-h1">Tokens</h1>
+          <h1 className="kit-label">Dev kit · M0 foundation · Tokens</h1>
         </header>
 
         <Section id="kit-colour" title="Colour">
@@ -147,48 +146,50 @@ export default function KitPage() {
           </ol>
         </Section>
 
-        <Section id="kit-space" title="Space">
-          <ol className="kit-space">
-            {SPACE.map((px, i) => (
-              <li key={px}>
-                <span className="kit-label">--s-{i + 1}</span>
-                <span className="kit-space__bar" style={{ width: `var(--s-${i + 1})` }} />
-                <span className="kit-code tabular">{px}</span>
-              </li>
-            ))}
-          </ol>
-        </Section>
+        <div className="kit-split">
+          <Section id="kit-space" title="Space">
+            <ol className="kit-space">
+              {SPACE.map((px, i) => (
+                <li key={px}>
+                  <span className="kit-label">--s-{i + 1}</span>
+                  <span className="kit-space__bar" style={{ width: `var(--s-${i + 1})` }} />
+                  <span className="kit-code tabular">{px}</span>
+                </li>
+              ))}
+            </ol>
+          </Section>
 
-        <Section id="kit-shape" title="Shape">
-          <div className="kit-shapes">
-            <figure>
-              <span className="kit-shape kit-shape--box" />
-              <figcaption className="kit-label">--r-box 22</figcaption>
-            </figure>
-            <figure>
-              <span className="kit-shape kit-shape--card" />
-              <figcaption className="kit-label">--r-card 16</figcaption>
-            </figure>
-            <figure>
-              <span className="kit-shape kit-shape--tag" />
-              <figcaption className="kit-label">--r-tag 8</figcaption>
-            </figure>
-            <figure>
-              <button type="button" className="kit-stamp">
-                Press
-              </button>
-              <figcaption className="kit-label">--shadow-press</figcaption>
-            </figure>
-          </div>
-          <div className="kit-angles">
-            {(["a", "b", "c"] as const).map((k) => (
-              <figure key={k}>
-                <span className="kit-angle" style={{ rotate: `var(--rot-${k})` }} />
-                <figcaption className="kit-label">--rot-{k}</figcaption>
+          <Section id="kit-shape" title="Shape">
+            <div className="kit-shapes">
+              <figure>
+                <span className="kit-shape kit-shape--box" />
+                <figcaption className="kit-label">--r-box 22</figcaption>
               </figure>
-            ))}
-          </div>
-        </Section>
+              <figure>
+                <span className="kit-shape kit-shape--card" />
+                <figcaption className="kit-label">--r-card 16</figcaption>
+              </figure>
+              <figure>
+                <span className="kit-shape kit-shape--tag" />
+                <figcaption className="kit-label">--r-tag 8</figcaption>
+              </figure>
+              <figure>
+                <button type="button" className="kit-stamp">
+                  Press
+                </button>
+                <figcaption className="kit-label">--shadow-press</figcaption>
+              </figure>
+            </div>
+            <div className="kit-angles">
+              {(["a", "b", "c"] as const).map((k) => (
+                <figure key={k}>
+                  <span className="kit-angle" style={{ rotate: `var(--rot-${k})` }} />
+                  <figcaption className="kit-label">--rot-{k}</figcaption>
+                </figure>
+              ))}
+            </div>
+          </Section>
+        </div>
 
         <Section id="kit-motion" title="Motion">
           <div className="kit-curves">

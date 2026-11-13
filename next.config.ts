@@ -15,7 +15,7 @@ const csp = [
   "style-src 'self' 'unsafe-inline'", // Motion writes inline styles
   "img-src 'self' data: blob:",
   "font-src 'self'",
-  "connect-src 'self'" + (isDev ? " ws:" : ""),
+  `connect-src 'self'${isDev ? " ws:" : ""}`,
   "object-src 'none'",
   "base-uri 'self'",
   "form-action 'self'",

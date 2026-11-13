@@ -8,7 +8,7 @@ interface Props {
 
 const W = 160;
 const H = 120;
-const PAD = 28; // room above and below for overshoot (ease-stamp reaches y = 1.6)
+const PAD = 76; // headroom for the largest overshoot (ease-stamp reaches y = 1.6 → 0.6 × H + 4)
 
 export function CurvePlot({ name, values, job }: Props) {
   const [x1, y1, x2, y2] = values;
@@ -18,7 +18,7 @@ export function CurvePlot({ name, values, job }: Props) {
 
   return (
     <figure className="kit-curve">
-      <svg viewBox={`-2 0 ${W + 4} ${H + PAD * 2}`} role="img" aria-labelledby={`curve-${name}`}>
+      <svg viewBox={`-2 0 ${W + 4} ${H + PAD + 8}`} role="img" aria-labelledby={`curve-${name}`}>
         <title id={`curve-${name}`}>{`${name}: cubic-bezier(${values.join(", ")})`}</title>
         <rect x={0} y={PAD} width={W} height={H} className="kit-curve__frame" />
         <line x1={0} y1={py(1)} x2={W} y2={py(1)} className="kit-curve__target" />

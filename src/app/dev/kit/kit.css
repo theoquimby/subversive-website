@@ -10,13 +10,13 @@
 .kit-main {
   max-width: var(--content-max);
   margin-inline: auto;
-  padding: var(--s-9) var(--gutter) var(--section);
+  padding: var(--s-9) var(--gutter) calc(var(--section) + var(--s-11));
 }
 
 .kit-head {
   display: grid;
   gap: var(--s-2);
-  margin-bottom: var(--s-10);
+  margin-bottom: var(--s-7);
 }
 .kit-head .kit-t-h1 {
   margin-left: var(--optical-left);
@@ -77,7 +77,7 @@
   display: grid;
   grid-template-columns: 1fr 1fr;
   padding: 4px;
-  border: var(--stroke) solid var(--fg);
+  border: var(--edge);
   border-radius: var(--r-pill);
   background: var(--bg);
   box-shadow: var(--shadow-press);
@@ -121,7 +121,7 @@
 /* ---- Colour ---- */
 .kit-swatches {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(min(100%, 15rem), 1fr));
+  grid-template-columns: repeat(var(--kit-cols, 2), minmax(0, 1fr));
   gap: var(--s-7) var(--s-6);
   margin: 0;
   padding: 0;
@@ -133,9 +133,9 @@
 }
 .kit-swatch__chip {
   display: block;
-  aspect-ratio: 3 / 2;
+  aspect-ratio: 4 / 3;
   margin-bottom: var(--s-2);
-  border: var(--stroke) solid var(--fg);
+  border: var(--edge);
   border-radius: var(--r-card);
 }
 .kit-semantic {
@@ -155,7 +155,7 @@
   flex: none;
   width: var(--s-7);
   height: var(--s-7);
-  border: var(--stroke) solid var(--fg);
+  border: var(--edge);
   border-radius: var(--r-pill);
 }
 .kit-ledger {
@@ -173,7 +173,7 @@
 @media (min-width: 48rem) {
   .kit-ledger li {
     grid-template-columns: 14rem 12rem 1fr;
-    align-items: baseline;
+    align-items: first baseline;
   }
 }
 
@@ -197,7 +197,7 @@
 @media (min-width: 64rem) {
   .kit-type li {
     grid-template-columns: 12rem 1fr;
-    align-items: baseline;
+    align-items: first baseline;
   }
   .kit-type__meta {
     display: grid;
@@ -262,13 +262,12 @@
 }
 .kit-space li {
   display: grid;
-  grid-template-columns: 4.5rem 1fr;
+  grid-template-columns: 4.5rem 1fr 2.5rem;
   align-items: center;
   gap: var(--s-4);
 }
 .kit-space li .kit-code {
-  grid-column: 2;
-  margin-top: calc(var(--s-1) * -2);
+  text-align: right;
 }
 .kit-space__bar {
   height: var(--s-3);
@@ -297,7 +296,7 @@
   display: block;
   width: 6.5rem;
   height: 5rem;
-  border: var(--stroke) solid var(--fg);
+  border: var(--edge);
   background: var(--surface);
 }
 .kit-shape--box {
@@ -313,9 +312,9 @@
   display: block;
   width: 5.5rem;
   height: 2.75rem;
-  border: var(--stroke) solid var(--fg);
+  border: var(--edge);
   border-radius: var(--r-tag);
-  background: var(--highlight);
+  background: transparent;
 }
 
 /* The stamp: pressable things carry a hard offset that collapses on press (spec §2.4) */
@@ -348,7 +347,7 @@
 /* ---- Motion ---- */
 .kit-curves {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(min(100%, 10.5rem), 1fr));
+  grid-template-columns: repeat(var(--kit-cols, 2), minmax(0, 1fr));
   gap: var(--s-7) var(--s-6);
 }
 .kit-curve {
@@ -424,4 +423,44 @@
 .kit-switch__option:has(:focus-visible) {
   outline: var(--stroke) solid var(--focus);
   outline-offset: 3px;
+}
+
+/* ---- Review-loop fixes (M0): explicit columns so every row shares the same edges ---- */
+.kit-root {
+  --kit-cols: 2;
+}
+@media (min-width: 48rem) {
+  .kit-root {
+    --kit-cols: 3;
+  }
+}
+@media (min-width: 64rem) {
+  .kit-root {
+    --kit-cols: 4;
+  }
+}
+.kit-head + .kit-section {
+  margin-top: 0;
+}
+.kit-split {
+  display: grid;
+  column-gap: var(--s-7);
+}
+@media (min-width: 64rem) {
+  .kit-split {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+.kit-curves {
+  --kit-cols: 2;
+}
+@media (min-width: 48rem) {
+  .kit-curves {
+    --kit-cols: 3;
+  }
+}
+@media (min-width: 64rem) {
+  .kit-curves {
+    --kit-cols: 5;
+  }
 }

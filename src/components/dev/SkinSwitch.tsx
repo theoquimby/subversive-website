@@ -16,23 +16,25 @@ export function SkinSwitch({ children }: { children: ReactNode }) {
 
   return (
     <div data-skin={skin} className="kit-root">
-      <fieldset className="kit-switch">
-        <legend className="sr-only">Skin</legend>
-        {OPTIONS.map((o) => (
-          <label key={o.value} className="kit-switch__option" data-checked={skin === o.value}>
-            <input
-              className="sr-only"
-              type="radio"
-              name={name}
-              value={o.value}
-              checked={skin === o.value}
-              onChange={() => setSkin(o.value)}
-            />
-            {o.label}
-          </label>
-        ))}
-        <span className="kit-switch__thumb" data-pos={skin} aria-hidden="true" />
-      </fieldset>
+      <aside aria-label="Kit controls">
+        <fieldset className="kit-switch">
+          <legend className="sr-only">Skin</legend>
+          {OPTIONS.map((o) => (
+            <label key={o.value} className="kit-switch__option" data-checked={skin === o.value}>
+              <input
+                className="sr-only"
+                type="radio"
+                name={name}
+                value={o.value}
+                checked={skin === o.value}
+                onChange={() => setSkin(o.value)}
+              />
+              {o.label}
+            </label>
+          ))}
+          <span className="kit-switch__thumb" data-pos={skin} aria-hidden="true" />
+        </fieldset>
+      </aside>
       {children}
     </div>
   );
