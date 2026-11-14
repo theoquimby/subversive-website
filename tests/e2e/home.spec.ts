@@ -32,11 +32,12 @@ test("the first phone screen holds the pill, the beer, the glass, the brewery li
   expect(overflow).toBeLessThanOrEqual(0);
 });
 
-test("the label page: spruce to the top edge, no checker rail, no photo to wait for", async ({ page }) => {
+test("the first screen is on the menu's paper, with its checker rail, and no photo to wait for", async ({
+  page,
+}) => {
   await page.goto("/");
-  await expect(page.locator("[data-hero]")).toHaveAttribute("data-page-skin", "label");
-  await expect(page.locator("[data-checker]").first()).toBeHidden();
-  await expect(page.locator('meta[name="theme-color"]')).toHaveAttribute("content", /#1e3a2f/i);
+  await expect(page.locator("[data-hero]")).toHaveAttribute("data-skin", "paper");
+  await expect(page.locator("[data-checker]").first()).toBeVisible();
   await expect(page.locator(".hero img")).toHaveCount(0);
 });
 

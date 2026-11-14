@@ -2,8 +2,9 @@
 
 /* ---------- Hero: the label, standing up ---------- */
 .hero {
-  /* one line weight for everything drawn here: the glass, the ridge, the horizon */
-  --line: 1.5px;
+  /* one line for everything drawn here (the glass, the ridge, the horizon): the printed
+     menu's ink rule. Cream paper is the ground; green is only the ridge. */
+  --line: var(--stroke);
   /* the horizon rule runs the full width of the screen; it never makes the page scroll */
   overflow-x: clip;
   background: var(--bg);
@@ -23,28 +24,6 @@
 .hero__open {
   justify-self: start;
 }
-/* the status line, in the label's terms: no box, a gold dot (filled when open) */
-.hero .open-now {
-  padding: 0;
-  border: 0;
-  border-radius: var(--s-1);
-}
-@media (hover: hover) {
-  .hero .open-now:hover {
-    background: none;
-    color: var(--gold);
-  }
-}
-.hero .open-now .open-now__dot {
-  border: var(--line) solid var(--gold);
-  background: transparent;
-}
-.hero .open-now[data-dot="go"] .open-now__dot {
-  background: var(--gold);
-}
-.hero .open-now .open-now__dot::after {
-  content: none;
-}
 .hero__scene {
   /* the glass's column: the grid uses it, and the name's size is the scene's width */
   --glass-col: clamp(7rem, 42%, 15rem);
@@ -59,7 +38,7 @@
   left: 50%;
   bottom: 0;
   width: 100vw;
-  border-top: var(--line) solid var(--gold);
+  border-top: var(--line) solid var(--fg);
   translate: -50% 0;
 }
 /* the Catskill ridge: one line along the horizon, passing behind the glass */
@@ -74,7 +53,7 @@
 }
 .hero__ridge path {
   fill: none;
-  stroke: var(--gold);
+  stroke: var(--spruce);
   stroke-width: var(--line);
   stroke-linecap: round;
   stroke-linejoin: round;
@@ -99,13 +78,14 @@
 .tap-hero__name {
   height: 2.16em;
   margin: 0;
-  color: var(--accent);
-  font-family: var(--ff-label);
+  /* the menu's own fat serif in ink (Theo, 2026-11-13: thin gold capitals on green read
+     too high-brow; this is for everyone) */
+  color: var(--fg);
+  font-family: var(--ff-display);
   font-size: var(--name-size);
-  font-weight: 300;
+  font-weight: 400;
   line-height: 1.08;
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
+  letter-spacing: -0.005em;
   text-wrap: wrap;
 }
 .tap-hero__name > span {
@@ -124,16 +104,16 @@
   justify-items: start;
   gap: var(--s-2);
 }
-/* the small voice: the label's own face, tracked, for everything that is not the name */
+/* the small voice: the menu's bold condensed capitals, as on the printed menu */
 .tap-hero__meta,
 .tap-hero__hint,
 .tap-hero__count,
 .tap-hero__more {
-  font-family: var(--ff-label);
-  font-size: 0.875rem;
-  font-weight: 400;
-  line-height: 1.4;
-  letter-spacing: 0.14em;
+  font-family: var(--ff-utility);
+  font-size: 0.9375rem;
+  font-weight: 700;
+  line-height: 1.35;
+  letter-spacing: var(--track-label);
   text-transform: uppercase;
 }
 .tap-hero__meta {
@@ -157,14 +137,14 @@
   display: inline-flex;
   align-items: center;
   min-height: 44px;
-  color: var(--accent);
+  color: var(--fg);
   text-decoration: underline;
   text-decoration-thickness: 1px;
   text-underline-offset: 5px;
 }
 @media (hover: hover) {
   .tap-hero__more:hover {
-    color: var(--fg);
+    color: var(--accent-text);
   }
 }
 /* the arrows and the count sit on the horizon */
@@ -185,7 +165,7 @@
   border: 0;
   border-radius: 50%;
   background: transparent;
-  color: var(--gold);
+  color: var(--fg);
   cursor: pointer;
   transition:
     background-color var(--d-1) var(--ease-out),
@@ -193,11 +173,11 @@
 }
 @media (hover: hover) {
   .tap-hero__arrow:hover {
-    background: color-mix(in srgb, var(--gold) 14%, transparent);
+    background: color-mix(in srgb, var(--fg) 8%, transparent);
   }
 }
 .tap-hero__arrow:active {
-  background: color-mix(in srgb, var(--gold) 24%, transparent);
+  background: color-mix(in srgb, var(--fg) 16%, transparent);
   scale: 0.9;
 }
 .tap-hero__arrow:focus-visible,
@@ -268,14 +248,14 @@
 }
 .lglass__line > * {
   fill: none;
-  stroke: var(--gold);
+  stroke: var(--fg);
   stroke-width: var(--line);
   stroke-linecap: round;
   stroke-linejoin: round;
   vector-effect: non-scaling-stroke;
 }
 .lglass__foam {
-  fill: var(--bone);
+  fill: var(--card);
 }
 .lglass__haze {
   fill: var(--bone);
@@ -287,7 +267,7 @@
 }
 .lglass__shine {
   fill: none;
-  stroke: var(--bone);
+  stroke: var(--card);
   stroke-width: var(--line);
   stroke-linecap: round;
   vector-effect: non-scaling-stroke;
@@ -454,13 +434,6 @@
 }
 .hero__actions .btn {
   white-space: nowrap;
-}
-.hero .btn--primary {
-  border-color: transparent;
-}
-.hero .btn--quiet {
-  border-width: var(--line);
-  border-color: var(--gold);
 }
 /* the narrowest and shortest phones: both actions still clear the fold */
 @media (max-width: 22.5rem) {

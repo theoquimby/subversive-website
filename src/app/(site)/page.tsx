@@ -4,7 +4,7 @@
 //   visit (split: hours + address) · gift cards (band)
 import { homeLabels, microcopy, visitLabels } from "@content/microcopy";
 import { type Photo, photos } from "@content/photos";
-import type { Metadata, Viewport } from "next";
+import type { Metadata } from "next";
 import { EventTicket } from "@/components/events/EventTicket";
 import { Chevrons } from "@/components/graphics/Chevrons";
 import { NyMap } from "@/components/graphics/NyMap";
@@ -28,11 +28,8 @@ import { buildMenuView, draftBeers, findItem, type ItemView } from "@/lib/menu/v
 import { getSite } from "@/lib/site/site";
 import { now } from "@/lib/time/now";
 import { nyParts } from "@/lib/time/ny";
-import { raw } from "@/styles/tokens";
 
 export const revalidate = 300;
-// the phone's status bar and toolbar take the label's green on Home
-export const viewport: Viewport = { themeColor: raw.spruce };
 export const metadata: Metadata = {
   title: "Subversive · Catskill NY",
   description:

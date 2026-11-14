@@ -1,5 +1,6 @@
-// Home's first screen (direction contract in .impeccable/surfaces: "The label, poured").
-// Spruce edge to edge, header included (data-page-skin="label"). The status pill; the
+// Home's first screen. On the menu's cream paper, in its ink and its fat serif (Theo,
+// 2026-11-13: the all-green label look read too high-brow; green is now only the ridge).
+// The status pill; the
 // tap list as one glass the visitor pours (TapHero); the glass standing on a full-width
 // gold rule with the Catskill ridge drawn beside it; under the rule the brewery's line
 // and the two actions. No photograph here, so the screen paints with the page; no
@@ -12,7 +13,7 @@ import { type TapBeer, TapHero } from "./TapHero";
 
 export function Hero({ site, beers }: { site: Site; beers: TapBeer[] }) {
   return (
-    <section className="hero" data-hero="" data-page-skin="label" aria-labelledby="hero-title">
+    <section className="hero" data-hero="" data-skin="paper" aria-labelledby="hero-title">
       <div className="hero__inner">
         <OpenNow className="hero__open" />
         <div className="hero__scene">
@@ -28,7 +29,7 @@ export function Hero({ site, beers }: { site: Site; beers: TapBeer[] }) {
           </h1>
           <div className="hero__actions">
             <Button href="/menu">{microcopy.seeTheMenu}</Button>
-            <Button href={site.links.map} external variant="quiet">
+            <Button href={site.links.map} external variant="secondary">
               {microcopy.directions}
             </Button>
           </div>

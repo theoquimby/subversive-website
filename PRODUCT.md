@@ -42,7 +42,7 @@ A true farmhouse brewery: every beer is brewed with 100% New York grain, and the
 
 - Name: "Subversive" ("Subversive Brewing" on the label and in metadata).
 - The barley mark (six geometric kernels) and the slash in the wordmark.
-- **The beer label leads the look** (Theo, 2026-11-13): thin gold line on spruce green, the New York State outline, light geometric capitals, the mountain line with "Crafted in Catskill NY". The cream printed-menu look (checker rail, black pills, heavy flared serif) stays only for utility surfaces: the menu and hours.
+- **The printed menu leads the look; the label is an accent** (Theo, 2026-11-13, after trying the all-green label look on Home: "too high brow", "don't lean into the green so hard"). Cream paper, ink, the fat serif, the checker rail and the yellow stamp button, for everyone. From the beer label keep the line drawing (the glass, the Catskill ridge) and a little spruce green.
 - The lager goblin is Max's Oktoberfest character; only his own art may be used (not yet supplied).
 - Voice: plain, factual, the menu's own words.
 - The bar: a top 1% web experience; "useful fun"; refined, never heavy-handed, never early-2000s, never diner.
