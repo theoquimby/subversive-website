@@ -141,8 +141,14 @@ test("a game night does not take over the first screen: the pill carries it in o
 test("with reduced motion the glass arrives full and still", async ({ page }) => {
   await page.emulateMedia({ reducedMotion: "reduce" });
   await page.goto("/");
+  // the scene's own keyframe animations (the pour, the line, the bubbles); a colour
+  // transition on the status pill when the browser corrects the time is not motion here
   const moving = await page.evaluate(
-    () => document.querySelector(".hero")?.getAnimations({ subtree: true }).length ?? -1,
+    () =>
+      document
+        .querySelector(".hero__scene")
+        ?.getAnimations({ subtree: true })
+        .filter((a) => a instanceof CSSAnimation).length ?? -1,
   );
   expect(moving).toBe(0);
 });
