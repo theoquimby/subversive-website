@@ -478,6 +478,20 @@ html:has(.page--menu) {
   justify-content: space-between;
   gap: var(--s-4);
 }
+/* The title never gives way to the legend beside it. As a shrinking flex item it wrapped
+   to two lines in the fallback face (a little wider) and snapped back to one when the
+   display face arrived, pulling the whole list up 23 px (CLS 0.042 in Lighthouse). The
+   row's shape now depends on the section's width alone: side by side, or the legend
+   underneath on a narrow section. */
+.msec__head .pill {
+  flex: none;
+}
+@container (max-width: 22rem) {
+  .msec__head {
+    flex-wrap: wrap;
+    gap: var(--s-2) var(--s-4);
+  }
+}
 .msec__legend {
   flex: none;
   margin: 0 0 var(--s-2);
