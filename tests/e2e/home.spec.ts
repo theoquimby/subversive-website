@@ -18,7 +18,7 @@ test("the first phone screen holds the pill, the beer, the glass, the brewery li
     page.locator(".hero .open-now"),
     name(page),
     page.locator(".tap-hero__meta"),
-    page.getByRole("button", { name: "Tap to pour the next beer" }),
+    page.getByRole("button", { name: "Tap the glass to pour the next beer" }),
     page.getByRole("heading", { level: 1 }),
     page.locator(".hero").getByRole("link", { name: "See the menu" }),
     page.locator(".hero").getByRole("link", { name: /Directions/ }),
@@ -46,7 +46,7 @@ test("tapping the glass pours the next beer and nothing on the page moves", asyn
   await page.goto("/");
   const before = await footTop(page);
   await expect(count(page)).toHaveText(/^01 \/ \d\d$/);
-  await page.getByRole("button", { name: "Tap to pour the next beer" }).click();
+  await page.getByRole("button", { name: "Tap the glass to pour the next beer" }).click();
   await expect(name(page)).not.toHaveText("New York Nectar");
   await expect(count(page)).toHaveText(/^02 \/ \d\d$/);
   // a screen reader hears the new beer; the link follows it to its row on the menu
@@ -62,7 +62,7 @@ test("the arrows do the same from a keyboard, and wrap", async ({ page }) => {
   await page.getByRole("button", { name: "Previous beer", exact: true }).focus();
   await page.keyboard.press("Enter");
   await expect(count(page)).toHaveText(new RegExp(`^${String(total).padStart(2, "0")} /`));
-  await page.getByRole("button", { name: "Next beer", exact: true }).focus();
+  await page.getByRole("button", { name: "Pour the next beer", exact: true }).focus();
   await page.keyboard.press("Enter");
   await expect(count(page)).toHaveText(/^01 \//);
   await expect(name(page)).toHaveText("New York Nectar");
@@ -111,7 +111,7 @@ test("every beer's name stays inside its two lines and clear of the glass on the
     // a scripted click: the real pointer path has its own tests above, and eleven
     // actionability waits time out on a loaded WebKit
     await page
-      .getByRole("button", { name: "Next beer", exact: true })
+      .getByRole("button", { name: "Pour the next beer", exact: true })
       .evaluate((b) => (b as HTMLButtonElement).click());
     await expect(count(page)).not.toHaveText(new RegExp(`^${String(i + 1).padStart(2, "0")} /`));
   }
@@ -164,7 +164,7 @@ test("axe: home", async ({ page }) => {
 test("axe: home, after a pour", async ({ page }) => {
   await page.emulateMedia({ reducedMotion: "reduce" });
   await page.goto("/", { waitUntil: "networkidle" });
-  await page.getByRole("button", { name: "Next beer", exact: true }).click();
+  await page.getByRole("button", { name: "Pour the next beer", exact: true }).click();
   const r = await new AxeBuilder({ page }).include(".hero").analyze();
   expect(r.violations.map((v) => `${v.id}: ${v.help} (${v.nodes.length})`)).toEqual([]);
 });

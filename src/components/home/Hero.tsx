@@ -17,10 +17,6 @@ export function Hero({ site, beers }: { site: Site; beers: TapBeer[] }) {
       <div className="hero__inner">
         <OpenNow className="hero__open" />
         <div className="hero__scene">
-          {/* the Catskill ridge, as on the label: one line along the horizon, drawn once */}
-          <svg viewBox="0 0 400 90" className="hero__ridge" aria-hidden="true" focusable="false">
-            <path d="M0 90L38 70L62 78L118 34L140 50L176 18L214 52L236 44L292 74L318 66L400 90" />
-          </svg>
           <TapHero beers={beers} />
         </div>
         <div className="hero__foot">

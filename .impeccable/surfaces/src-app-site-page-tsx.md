@@ -35,3 +35,7 @@ Left for the rollout: the header's Order pill competes with the primary action; 
 ## Direction change (Theo, 2026-11-13, after seeing the proof live)
 
 "Mix in a bit of the vibe of the initial design... this is a little too high brow" and "we also don't want to lean into the green so hard". The first screen moved back to the menu's cream paper, ink and fat serif, with the checker rail, the status pill and the stamped yellow button. Kept from the proof: the glass you pour, the horizon rule, the ridge (now the only green), the fixed two-line name. Josefin Sans removed (six font files again). OWN-WORLD and FIRST VIEWPORT above are superseded where they say spruce ground and gold line.
+
+## Round after Theo's notes (2026-11-13, evening)
+
+"The tap pour animation should be WAY better... simulated physics and foam and bubbles and if they need to pour half the head off it pours some out"; "no way someone knows to tap to pour"; "the idea of one line doing the mountain and the glass is cool but make it way more artistic". Built: one ink line that is the ground, a rounded Catskill ridge and the glass without lifting; a bar tap drawn from the right; a simulated pour (falling stream, spring surface, head that builds and settles, bubbles, and about one lively pour in three that runs over the rim, waits, and is topped up); the first beer pours itself on arrival; a plain "Pour the next beer" button. Still to do from the same notes: the checker rail top and bottom, the typefaces, the other pages, and several more polish rounds.

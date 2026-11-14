@@ -116,11 +116,10 @@ export const homeLabels = {
   weekdayTag: { wed: "Wing Wednesday", thu: "Rodeo Thursdays", other: "Dogs welcome in the tent" },
   // the tap-list glass on the first screen: interface labels
   tap: {
-    // the glass button's name; it begins with the words printed above the glass
-    pour: "Tap to pour the next beer",
-    hint: "Tap to pour",
+    // the glass itself is a button too; this is its name
+    pour: "Tap the glass to pour the next beer",
     previous: "Previous beer",
-    next: "Next beer",
+    next: "Pour the next beer",
     onTheMenu: "On the menu",
   },
   mapTitle:
