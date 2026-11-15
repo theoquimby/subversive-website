@@ -403,8 +403,7 @@
    hairlines; a single column of rows on a phone. */
 .facts {
   display: grid;
-  margin: var(--s-7) 0 0;
-  border-top: var(--stroke) solid var(--fg);
+  margin: 0;
   border-bottom: 1px solid var(--hair);
 }
 .facts__cell {
@@ -445,10 +444,10 @@
   color: var(--fg-muted);
   font-size: var(--t-small);
 }
+/* a 44 px target without pushing the number off the other facts' baseline */
 .facts__phone {
-  display: inline-flex;
-  align-items: center;
-  min-height: 44px;
+  margin-block: -10px;
+  padding-block: 10px;
 }
 @media (min-width: 64rem) {
   .facts {
@@ -494,8 +493,8 @@
     stroke-dashoffset: 1;
   }
   .pen[data-draw="in"] path {
-    animation: pen-draw 620ms cubic-bezier(0.45, 0, 0.25, 1) both;
-    animation-delay: calc(var(--i, 0) * 110ms);
+    animation: pen-draw 400ms cubic-bezier(0.45, 0, 0.25, 1) both;
+    animation-delay: calc(var(--i, 0) * 55ms);
   }
 }
 @keyframes pen-draw {
@@ -507,53 +506,57 @@
   }
 }
 
-/* the ways onward: four drawings, each a door to a page */
-.ways {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: var(--s-7) var(--s-5);
-  margin: var(--s-9) 0 0;
-  padding: 0;
-  list-style: none;
+/* A part of the page led by a drawing in the margin. On a phone the drawing sits beside
+   the heading; on a wide screen it has a margin column of its own and everything else
+   runs down the column beside it. The drawing is a link to that part's page. */
+.band {
+  grid-template-columns: 4.75rem minmax(0, 1fr);
+  column-gap: var(--s-4);
 }
-.ways__link {
-  display: grid;
-  justify-items: center;
-  gap: var(--s-3);
-  color: inherit;
-  text-decoration: none;
-  border-radius: var(--s-3);
+.band > * {
+  grid-column: 1 / -1;
 }
-.ways__link:focus-visible {
-  outline: 3px solid var(--focus);
-  outline-offset: 6px;
-}
-.ways__art {
-  width: min(100%, 9.5rem);
+.band > .band__art {
+  grid-column: 1;
+  grid-row: 1;
+  align-self: end;
+  display: block;
+  border-radius: var(--s-2);
   transition: rotate var(--d-2) var(--ease-out);
 }
-.ways__name {
-  font-family: var(--ff-display);
-  font-size: clamp(1.375rem, 1.25rem + 0.625vw, 1.75rem);
-  line-height: 1.1;
-  background: linear-gradient(var(--fg) 0 0) 50% 100% / 0 var(--stroke) no-repeat;
-  padding-bottom: 5px;
-  transition: background-size var(--d-2) var(--ease-out);
+.band > .band__art + .sec-head {
+  grid-column: 2;
+  grid-row: 1;
+  align-self: end;
 }
 @media (hover: hover) {
-  .ways__link:hover .ways__art {
+  .band__art:hover {
     rotate: -3deg;
   }
-  .ways__link:hover .ways__name {
-    background-size: 100% var(--stroke);
-  }
 }
-.ways__link:active .ways__art {
+.band__art:active {
   rotate: 2deg;
 }
-@media (min-width: 48rem) {
-  .ways {
-    grid-template-columns: repeat(4, minmax(0, 1fr));
+.band .facts {
+  margin-top: 0;
+}
+@media (min-width: 64rem) {
+  .band {
+    grid-template-columns: minmax(0, 2fr) minmax(0, 10fr);
+    column-gap: var(--s-9);
+  }
+  .band > * {
+    grid-column: 2;
+  }
+  .band > .band__art {
+    grid-column: 1;
+    grid-row: 1 / span 3;
+    align-self: start;
+    width: min(100%, 10rem);
+    margin-top: calc(-1 * var(--s-3));
+  }
+  .band > .band__art + .sec-head {
+    grid-column: 2;
   }
 }
 
@@ -575,9 +578,7 @@
   background: var(--card);
   color: inherit;
   text-decoration: none;
-  transition:
-    translate var(--d-1) var(--ease-out),
-    box-shadow var(--d-1) var(--ease-out);
+  transition: background-color var(--d-1) var(--ease-out);
 }
 .tix__t:focus-visible {
   outline: 3px solid var(--focus);
@@ -639,13 +640,11 @@
 }
 @media (hover: hover) {
   .tix__t:hover {
-    translate: -2px -2px;
-    box-shadow: 4px 4px 0 var(--fg);
+    background: color-mix(in srgb, var(--pils) 22%, var(--card));
   }
 }
 .tix__t:active {
-  translate: 0 0;
-  box-shadow: none;
+  translate: 0 1px;
 }
 @media (min-width: 48rem) {
   .tix {
@@ -664,6 +663,18 @@
 }
 .home-tap .mrow + .mrow {
   border-top: 1px solid var(--hair);
+}
+.home-tap .mrow__glass,
+.home-tap .mrow__desc {
+  display: none;
+}
+.home-tap .mrow__sum {
+  grid-template-columns: minmax(0, 1fr) auto;
+}
+.home-tap .badge {
+  padding: 0;
+  background: none;
+  color: var(--fg-muted);
 }
 @media (min-width: 64rem) {
   .home-tap {
@@ -774,7 +785,20 @@
   display: block;
   width: 100%;
   height: auto;
+  max-height: 36svh;
   overflow: visible;
+}
+@media (max-width: 63.99rem) {
+  .smap__map {
+    position: sticky;
+    top: var(--header-offset);
+    z-index: 1;
+    margin-inline: calc(-1 * var(--gutter));
+    padding: var(--s-3) var(--gutter);
+    border-bottom: 1px solid var(--hair);
+    background: var(--bg);
+    transition: top var(--d-2) var(--ease-out);
+  }
 }
 .smap__state {
   fill: transparent;
@@ -853,11 +877,8 @@
 }
 .smap__row {
   display: grid;
-  grid-template-columns: 3rem minmax(0, 1fr);
-  align-items: center;
-  column-gap: var(--s-4);
   width: 100%;
-  min-height: 4.5rem;
+  min-height: 4.25rem;
   padding: var(--s-2) var(--s-3);
   border: 0;
   background: transparent;
@@ -874,29 +895,14 @@
   outline: 3px solid var(--focus);
   outline-offset: -3px;
 }
-.smap__pin {
-  display: grid;
-  place-items: center;
-}
-/* a source's drawing is line only until it is the one chosen */
-.smap__row .run__doodle path,
-.smap__row .run__doodle circle {
-  fill: transparent;
-  transition: fill var(--d-1) var(--ease-out);
-}
-.smap__row[aria-pressed="true"] .run__doodle path,
-.smap__row[aria-pressed="true"] .run__doodle circle {
-  fill: var(--pils);
-}
-.smap__row .run__doodle--mark path,
-.smap__row[aria-pressed="true"] .run__doodle--mark path {
-  fill: var(--fg);
-}
 @media (min-width: 64rem) {
   .smap {
     grid-template-columns: minmax(0, 7fr) minmax(0, 5fr);
     column-gap: var(--s-10);
     align-items: center;
+  }
+  .smap__svg {
+    max-height: none;
   }
   .smap__label {
     font-size: 30px;

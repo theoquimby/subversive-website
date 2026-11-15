@@ -891,6 +891,20 @@ body::after {
   border-top: var(--stroke) solid var(--fg);
   translate: 0 0.3em;
 }
+@media (max-width: 47.99rem) {
+  .sec-head {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    align-items: center;
+    gap: var(--s-2) var(--s-3);
+  }
+  .sec-head__title {
+    grid-column: 1 / -1;
+  }
+  .sec-head__rule {
+    translate: none;
+  }
+}
 .sec-head__note {
   color: var(--fg-muted);
   font-family: var(--ff-utility);

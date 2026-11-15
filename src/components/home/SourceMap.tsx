@@ -12,7 +12,6 @@ import { useState } from "react";
 import type { Site } from "@/lib/site/schema";
 import { BARLEY_VIEWBOX, KERNELS } from "../graphics/BarleyMark";
 import { NY_PATH, NY_PLACES, NY_VIEWBOX } from "../graphics/ny-map.generated";
-import { Doodle } from "./DeliveryRun";
 
 type Place = (typeof NY_PLACES)[number];
 
@@ -41,7 +40,6 @@ function arc(p: Place): string {
 export function SourceMap({ sourcing }: { sourcing: Site["sourcing"] }) {
   const items = sourcing.map((s) => ({
     ...s,
-    kind: s.what.toLowerCase(),
     // "Hudson Falls, NY" → the town on the map; "New York State" → the whole state
     place: NY_PLACES.find((p) => p.kind === "source" && s.where.startsWith(p.label)) ?? null,
   }));
@@ -124,9 +122,6 @@ export function SourceMap({ sourcing }: { sourcing: Site["sourcing"] }) {
               }}
               onFocus={() => setAt(i)}
             >
-              <span className="smap__pin">
-                <Doodle kind={it.kind} />
-              </span>
               <span className="run__text">
                 <span className="run__what">{it.what}</span>
                 <span className="run__who">{it.who}</span>

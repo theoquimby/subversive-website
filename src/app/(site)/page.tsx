@@ -1,9 +1,11 @@
 // Home (redesign 2026-11-14; Theo's brief that day: "give someone the basic info they are
 // looking for and then give them ways to get to the other stuff", announcements and the
 // things Max wants to feature, never overloaded).
-//   first screen (the glass, the tap, the status) · the facts (today, where, phone) ·
-//   the ways onward (four pen drawings) · coming up (tickets) · on tap (a few featured
-//   beers) · from the kitchen (one photo) · where it comes from (the map you can ask)
+// Composed, not listed: each part of the page is led by a pen drawing in the margin, and
+// the drawing is the way to that part's own page.
+//   first screen (the glass, the tap, the status) · visit (the taproom: today, where, the
+//   phone) · coming up (a ticket: three tickets) · on tap (the featured beers) · from the
+//   kitchen (a burger: one photo) · where it comes from (barley: the map you can ask)
 // Hours in full, the whole menu and every event live on their own pages.
 import { homeLabels, microcopy, visitLabels } from "@content/microcopy";
 import { type Photo, photos } from "@content/photos";
@@ -11,7 +13,7 @@ import type { Metadata } from "next";
 import { PhotoFrame } from "@/components/graphics/PhotoFrame";
 import { Hero } from "@/components/home/Hero";
 import { SourceMap } from "@/components/home/SourceMap";
-import { type WayKey, Ways } from "@/components/home/Ways";
+import { Drawing } from "@/components/home/Ways";
 import { PageWipe } from "@/components/layout/PageWipe";
 import { SectionHead } from "@/components/layout/SectionHead";
 import { IntroBox } from "@/components/menu/IntroBox";
@@ -26,7 +28,7 @@ import { isBeer } from "@/lib/menu/kinds";
 import { applySeasonal } from "@/lib/menu/seasonal";
 import { getMenu } from "@/lib/menu/source";
 import { buildMenuView, draftBeers, findItem } from "@/lib/menu/view";
-import { getSite, NAV } from "@/lib/site/site";
+import { getSite } from "@/lib/site/site";
 import { now } from "@/lib/time/now";
 import { nyParts, weekdayOf } from "@/lib/time/ny";
 
@@ -82,54 +84,60 @@ export default async function Home() {
       <Hero site={site} beers={tapBeers} />
 
       <div className="page home" data-skin="paper">
-        {/* the facts a visitor came for, in one glance */}
-        <dl className="facts">
-          <div className="facts__cell">
-            <dt>{homeLabels.facts.today}</dt>
-            <dd>
-              {tonight.open !== null && tonight.close !== null ? (
-                <>
-                  <span className="facts__big tabular">{formatRange(tonight.open, tonight.close)}</span>
-                  {tonight.kitchenClose !== null && tonight.kitchenClose !== tonight.close ? (
-                    <span className="facts__small">
-                      {visitLabels.kitchenTil(formatTime(tonight.kitchenClose))}
-                    </span>
-                  ) : null}
-                </>
-              ) : (
-                <span className="facts__big">{visitLabels.closed}</span>
-              )}
-              <TextLink href="/visit#hours">{homeLabels.facts.allHours}</TextLink>
-            </dd>
-          </div>
-          <div className="facts__cell">
-            <dt>{homeLabels.facts.findUs}</dt>
-            <dd>
-              <span className="facts__big">{site.address.street}</span>
-              <span className="facts__small">
-                {site.address.city}, {site.address.state} {site.address.zip}
-              </span>
-              <ExternalLink href={site.links.map}>{microcopy.directions}</ExternalLink>
-            </dd>
-          </div>
-          <div className="facts__cell">
-            <dt>{homeLabels.facts.call}</dt>
-            <dd>
-              <a className="facts__big facts__phone tabular" href={`tel:${site.phone.tel}`}>
-                {site.phone.display}
-              </a>
-              <span className="facts__small">{site.phone.note}</span>
-            </dd>
-          </div>
-        </dl>
-
-        {/* the ways onward */}
-        <nav aria-label={homeLabels.waysLabel}>
-          <Ways items={NAV.map((n) => ({ key: n.href.slice(1) as WayKey, href: n.href, label: n.label }))} />
-        </nav>
+        {/* Each part of the page is led by a pen drawing in the margin, and the drawing is
+            the way to that part's own page. First, what a visitor came for: when, where,
+            the phone. (Not a named landmark: the footer has a region called "Visit".) */}
+        <section className="home-section band">
+          <Link href="/visit" className="band__art" aria-hidden="true" tabIndex={-1}>
+            <Drawing name="visit" />
+          </Link>
+          <SectionHead>{homeLabels.visit}</SectionHead>
+          <dl className="facts">
+            <div className="facts__cell">
+              <dt>{homeLabels.facts.today}</dt>
+              <dd>
+                {tonight.open !== null && tonight.close !== null ? (
+                  <>
+                    <span className="facts__big tabular">{formatRange(tonight.open, tonight.close)}</span>
+                    {tonight.kitchenClose !== null && tonight.kitchenClose !== tonight.close ? (
+                      <span className="facts__small">
+                        {visitLabels.kitchenTil(formatTime(tonight.kitchenClose))}
+                      </span>
+                    ) : null}
+                  </>
+                ) : (
+                  <span className="facts__big">{visitLabels.closed}</span>
+                )}
+                <TextLink href="/visit#hours">{homeLabels.facts.allHours}</TextLink>
+              </dd>
+            </div>
+            <div className="facts__cell">
+              <dt>{homeLabels.facts.findUs}</dt>
+              <dd>
+                <span className="facts__big">{site.address.street}</span>
+                <span className="facts__small">
+                  {site.address.city}, {site.address.state} {site.address.zip}
+                </span>
+                <ExternalLink href={site.links.map}>{microcopy.directions}</ExternalLink>
+              </dd>
+            </div>
+            <div className="facts__cell">
+              <dt>{homeLabels.facts.call}</dt>
+              <dd>
+                <a className="facts__big facts__phone tabular" href={`tel:${site.phone.tel}`}>
+                  {site.phone.display}
+                </a>
+                <span className="facts__small">{site.phone.note}</span>
+              </dd>
+            </div>
+          </dl>
+        </section>
 
         {coming.length > 0 ? (
-          <section className="home-section" aria-labelledby="coming-title">
+          <section className="home-section band" aria-labelledby="coming-title">
+            <Link href="/events" className="band__art" aria-hidden="true" tabIndex={-1}>
+              <Drawing name="events" />
+            </Link>
             <SectionHead id="coming-title">{homeLabels.comingUp}</SectionHead>
             <ul className="tix">
               {coming.map((e) => {
@@ -162,7 +170,7 @@ export default async function Home() {
           </section>
         ) : null}
 
-        <section className="home-section" aria-labelledby="tap-title">
+        <section className="home-section band band--plain" aria-labelledby="tap-title">
           <SectionHead id="tap-title" note={`${view.pourSizes.half} / ${view.pourSizes.full}`}>
             {homeLabels.onTap}
           </SectionHead>
@@ -174,7 +182,10 @@ export default async function Home() {
           <TextLink href="/menu">{homeLabels.fullMenu}</TextLink>
         </section>
 
-        <section className="home-section" aria-labelledby="kitchen-title">
+        <section className="home-section band" aria-labelledby="kitchen-title">
+          <Link href="/menu?show=food" className="band__art" aria-hidden="true" tabIndex={-1}>
+            <Drawing name="menu" />
+          </Link>
           <SectionHead id="kitchen-title">{homeLabels.kitchen}</SectionHead>
           <div className="home-kitchen">
             <figure className="home-kitchen__photo">
@@ -199,10 +210,14 @@ export default async function Home() {
           </div>
         </section>
 
-        <section className="home-section" aria-labelledby="where-title">
+        <section className="home-section band" aria-labelledby="where-title">
+          <Link href="/beer" className="band__art" aria-hidden="true" tabIndex={-1}>
+            <Drawing name="beer" />
+          </Link>
           <SectionHead id="where-title">{homeLabels.whereFrom}</SectionHead>
           <p className="home-lede">{site.sourcingLine}</p>
           <SourceMap sourcing={site.sourcing} />
+          <TextLink href="/beer">{homeLabels.ourBeer}</TextLink>
         </section>
       </div>
     </PageWipe>
