@@ -33,6 +33,14 @@ const DRAWINGS = {
     "M77 79C77 72 76 64 77 58C81 57 85 58 88 57C89 64 88 72 89 79",
     "M73 23C68 17 78 14 73 8C70 4 76 2 77 0",
   ],
+  // the house glass, empty, with one last drop (the 404 page)
+  empty: [
+    "M4 86C30 84 90 87 116 85",
+    "M38 12C40 46 44 66 60 66C76 66 80 46 82 12C68 7 52 7 38 12C52 17 68 17 82 12",
+    "M60 66V79",
+    "M44 85C52 79 68 79 76 85C68 89 52 89 44 85",
+    "M60 36C56 42 56 46 60 47C64 46 64 42 60 36Z",
+  ],
   // an ear of barley: paired kernels like the brand's mark, long awns
   beer: [
     "M60 88C60 70 59 52 61 30",

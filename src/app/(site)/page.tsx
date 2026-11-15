@@ -8,12 +8,12 @@
 //   kitchen (a burger: one photo) · where it comes from (barley: the map you can ask)
 // Hours in full, the whole menu and every event live on their own pages.
 import { homeLabels, microcopy, visitLabels } from "@content/microcopy";
-import { type Photo, type PhotoId, photos } from "@content/photos";
+import { type Photo, photos } from "@content/photos";
 import type { Metadata } from "next";
 import { PhotoFrame } from "@/components/graphics/PhotoFrame";
 import { Hero } from "@/components/home/Hero";
-import { SourceMap } from "@/components/home/SourceMap";
 import { Drawing } from "@/components/home/Ways";
+import { WhereFrom } from "@/components/home/WhereFrom";
 import { PageWipe } from "@/components/layout/PageWipe";
 import { SectionHead } from "@/components/layout/SectionHead";
 import { IntroBox } from "@/components/menu/IntroBox";
@@ -24,8 +24,6 @@ import { hoursEvents } from "@/components/visit/OpenNow";
 import { getEvents, tickets, upcoming } from "@/lib/events/source";
 import { formatClock, formatRange, formatTime, weekdayLabel } from "@/lib/hours/format";
 import { scheduleFor } from "@/lib/hours/schedule";
-import { mapFeatures } from "@/lib/map/features";
-import { projectNY } from "@/lib/map/project";
 import { isBeer } from "@/lib/menu/kinds";
 import { applySeasonal } from "@/lib/menu/seasonal";
 import { getMenu } from "@/lib/menu/source";
@@ -59,40 +57,6 @@ export default async function Home() {
   const kitchenPhoto = photos[KITCHEN] as Photo;
   const dish = kitchenPhoto.menuItemId ? findItem(view, kitchenPhoto.menuItemId) : undefined;
   const tonight = scheduleFor(today, { hours: site.hours }, await hoursEvents());
-
-  // where each source sits on the drawn map: placed from its latitude and longitude, so
-  // a supplier added as data (later, from Ops) appears with no drawing work. A source with
-  // no location, or one outside the drawing, counts as statewide.
-  // Each source may also carry a detail view: a photograph, a few sentences, a link. It
-  // opens under the source when it is chosen. TODO(Max): the sentences and photographs for
-  // each supplier; only the grain photograph is on hand, so only Grain opens today.
-  const stops = site.sourcing.map(({ what, who, where, geo, photo, about, url }) => {
-    const at = geo ? projectNY(geo.lat, geo.lng) : null;
-    const hasPhoto = photo !== undefined && photo in photos;
-    return {
-      what,
-      who,
-      where,
-      place: at?.onMap ? { label: where.split(",")[0]?.trim() ?? where, x: at.x, y: at.y } : null,
-      detail:
-        hasPhoto || about || url ? (
-          <>
-            {hasPhoto ? (
-              <PhotoFrame
-                id={photo as PhotoId}
-                ratio="16/10"
-                sizes="(min-width: 1024px) 420px, 100vw"
-                // no scroll reveal: this photo is added on a click, after the page's
-                // reveal observer has run, and would stay hidden waiting for it
-                reveal={false}
-              />
-            ) : null}
-            {about ? <p className="smap__about">{about}</p> : null}
-            {url ? <ExternalLink href={url}>{homeLabels.supplierSite}</ExternalLink> : null}
-          </>
-        ) : null,
-    };
-  });
 
   // the first screen's glass: the flagship first, then the taps in menu order
   const flagship = Math.max(
@@ -252,7 +216,7 @@ export default async function Home() {
           </Link>
           <SectionHead id="where-title">{homeLabels.whereFrom}</SectionHead>
           <p className="home-lede">{site.sourcingLine}</p>
-          <SourceMap stops={stops} features={mapFeatures()} />
+          <WhereFrom sourcing={site.sourcing} />
           <TextLink href="/beer">{homeLabels.ourBeer}</TextLink>
         </section>
       </div>

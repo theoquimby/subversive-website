@@ -96,6 +96,9 @@ export const eventLabels = {
 } as const;
 
 // Home (spec §6.1). Every line is the spec's own.
+// About page: interface labels
+export const aboutLabels = { title: "About", founders: "Founders" } as const;
+
 export const homeLabels = {
   headline: ["Beer.", "Burgers.", "Catskill."] as const,
   subline: (street: string) => `Farmhouse brewery, taproom & kitchen at ${street}.`,

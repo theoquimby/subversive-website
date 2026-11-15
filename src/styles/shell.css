@@ -809,3 +809,85 @@ body {
 .site-nav__link[aria-current="page"] {
   background: linear-gradient(var(--fg) 0 0) 0 calc(50% + 0.95em) / 100% var(--stroke) no-repeat;
 }
+
+/* ---------- Our beer, About, and the 404 (redesign 2026-11-15) ----------
+   A title beside a pen drawing; the brewery's own words in a readable column with one
+   photograph beside them. */
+.prose-page {
+  padding-bottom: 0;
+}
+.prose-head {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: end;
+  gap: var(--s-4);
+}
+.prose-head .prose-head__art {
+  width: clamp(5.25rem, 20vw, 12rem);
+}
+.prose-split {
+  display: grid;
+  gap: var(--s-8);
+  margin-top: var(--s-7);
+}
+.prose {
+  display: grid;
+  justify-items: start;
+  align-content: start;
+  gap: var(--s-5);
+  max-width: 34rem;
+}
+.prose p {
+  margin: 0;
+  font-size: clamp(1.0625rem, 1.0417rem + 0.1042vw, 1.125rem);
+  line-height: var(--lh-body);
+  text-wrap: pretty;
+}
+.prose .prose__lede {
+  font-size: clamp(1.25rem, 1.125rem + 0.625vw, 1.625rem);
+  line-height: 1.35;
+}
+.prose-facts {
+  display: grid;
+  gap: 2px;
+  margin: var(--s-2) 0 0;
+  padding-top: var(--s-4);
+  border-top: var(--stroke) solid var(--fg);
+  justify-self: stretch;
+}
+.prose-facts dt {
+  color: var(--fg-muted);
+  font-family: var(--ff-utility);
+  font-size: var(--t-label);
+  font-weight: 700;
+  letter-spacing: var(--track-label);
+  text-transform: uppercase;
+}
+.prose-facts dd {
+  margin: 0;
+  font-family: var(--ff-utility);
+  font-size: 1.5rem;
+  font-weight: 700;
+  letter-spacing: 0.01em;
+}
+.prose-links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--s-5);
+}
+.prose-section {
+  display: grid;
+  gap: var(--s-6);
+  margin-top: var(--section);
+}
+@media (min-width: 64rem) {
+  .prose-split {
+    grid-template-columns: minmax(0, 7fr) minmax(0, 5fr);
+    column-gap: var(--s-10);
+    align-items: start;
+  }
+}
+.not-found .not-found__art {
+  width: clamp(9rem, 34vw, 18rem);
+  justify-self: end;
+}

@@ -1,16 +1,11 @@
-import menu from "@content/menu.json";
 import type { Metadata } from "next";
-import { GlassGlyph } from "@/components/graphics/GlassGlyph";
+import { Drawing } from "@/components/home/Ways";
 import { PageWipe } from "@/components/layout/PageWipe";
 import { Button } from "@/components/ui/Button";
 import { TextLink } from "@/components/ui/TextLink";
 
-// 404 (spec §5.7): Paper, a mega headline, one line, three buttons, and their glass draining
-// from 78% to empty on load (the fall curve: it empties under gravity). The goblin peeks in
-// from the bottom right in M7.
-// The house pils, from the tap list.
-const PILS_COLOR = (menu.drinks[0]?.groups[0]?.items[0] as { color?: string } | undefined)?.color ?? "";
-
+// 404 (redesign 2026-11-15): the headline, one line, the ways back, and the house glass
+// drawn empty in pen with one last drop, in the same hand as the rest of the site.
 export const metadata: Metadata = {
   title: "Not found · Subversive, Catskill NY",
   robots: { index: false },
@@ -29,7 +24,7 @@ export default function NotFound() {
             <TextLink href="/">Home</TextLink>
           </div>
         </div>
-        <GlassGlyph color={PILS_COLOR} fill={0.78} size="hero" mark={false} className="glass--drain" />
+        <Drawing name="empty" className="not-found__art" />
       </div>
     </PageWipe>
   );
