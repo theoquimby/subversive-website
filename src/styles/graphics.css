@@ -848,12 +848,13 @@ body::after {
   box-decoration-break: clone;
   -webkit-box-decoration-break: clone;
 }
+/* one link style on the site: an ink underline; hover fills it with the menu's yellow */
 .text-link {
-  background-image: linear-gradient(var(--accent) 0 0);
+  background-image: linear-gradient(var(--fg) 0 0);
 }
 @media (hover: hover) {
   .text-link:hover {
-    background-image: linear-gradient(color-mix(in srgb, var(--accent) 30%, transparent) 0 0);
+    background-image: linear-gradient(var(--highlight) 0 0);
     background-size: 100% 100%;
   }
 }
@@ -866,4 +867,36 @@ body::after {
 /* icons inside buttons keep a true 2 px stroke at 18 px (2 × 24 / 18) */
 .btn__icon {
   stroke-width: 2.67;
+}
+
+/* ---------- Section head on the ink line (redesign 2026-11-14) ----------
+   The title in the display serif, then the line running on to the right edge; an
+   optional small note sits at the line's end. */
+.sec-head {
+  display: flex;
+  align-items: baseline;
+  gap: var(--s-4);
+}
+.sec-head__title {
+  margin: 0 0 0 var(--optical-left);
+  font-family: var(--ff-display);
+  font-size: clamp(1.75rem, 1.3333rem + 2.0833vw, 3rem);
+  font-weight: 400;
+  line-height: 1.05;
+}
+.sec-head__rule {
+  flex: 1;
+  align-self: center;
+  min-width: var(--s-6);
+  border-top: var(--stroke) solid var(--fg);
+  translate: 0 0.3em;
+}
+.sec-head__note {
+  color: var(--fg-muted);
+  font-family: var(--ff-utility);
+  font-size: var(--t-label);
+  font-weight: 700;
+  letter-spacing: var(--track-label);
+  text-transform: uppercase;
+  white-space: nowrap;
 }

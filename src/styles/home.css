@@ -373,301 +373,334 @@
   }
 }
 
-/* below the first screen Home is still the first build, until the rollout */
-.home-paper {
-  background: var(--bg);
-  color: var(--fg);
-}
-
-/* ---------- Sections ---------- */
+/* ---------- Sections (redesign 2026-11-14) ----------
+   One column on the page grid. Every section is headed by a title on the ink line
+   (.sec-head, graphics.css). Rows and hairlines; no cards, chips or coloured slabs. */
 .home {
+  --hair: color-mix(in srgb, var(--fg) 26%, transparent);
   padding-top: 0;
   padding-bottom: 0;
 }
 .home-section {
   display: grid;
-  justify-items: start;
+  grid-template-columns: minmax(0, 1fr);
   gap: var(--s-6);
   margin-top: var(--section);
 }
-/* the first section follows the hero closely; a full section gap left a void */
-.home-paper > .home:first-child > .home-section:first-child {
+.home-section:first-child {
   margin-top: var(--s-8);
 }
-.home-section > .pill {
-  padding: 6px 18px 8px;
-  font-size: clamp(1.375rem, 1.2083rem + 0.8333vw, 1.875rem);
+.home-section > .text-link {
+  justify-self: start;
 }
-.home-section > :not(.pill, a, .btn) {
-  justify-self: stretch;
+.home-lede {
+  max-width: 46ch;
+  margin: 0;
+  font-size: clamp(1.1875rem, 1.125rem + 0.3125vw, 1.375rem);
+  line-height: 1.4;
+  text-wrap: pretty;
 }
+
+/* on tap: two columns of whole groups; both start at the top, so their heads line up */
 .home-tap {
   display: grid;
-  gap: 0 var(--s-9);
+  gap: var(--s-7) var(--s-10);
 }
-.home-tap .mgroup:first-child {
+.home-tap__col {
+  display: grid;
+  align-content: start;
+  gap: var(--s-7);
+}
+.home-tap .mgroup {
   margin-top: 0;
 }
 @media (min-width: 64rem) {
   .home-tap {
     grid-template-columns: repeat(2, minmax(0, 1fr));
-    align-items: start;
   }
 }
 
-/* kitchen: a snapping strip on a phone (the next photo peeks), three across on desktop */
-.kitchen-strip {
+/* from the kitchen: one photograph on the grid and the menu's own line beside it */
+.home-kitchen {
   display: grid;
-  grid-auto-flow: column;
-  grid-auto-columns: 78%;
-  gap: var(--s-4);
-  margin: 0 calc(-1 * var(--gutter));
-  padding: 0 var(--gutter);
-  overflow-x: auto;
-  scroll-snap-type: x mandatory;
-  scroll-padding-inline: var(--gutter);
-  scrollbar-width: none;
-  list-style: none;
-}
-.kitchen-strip::-webkit-scrollbar {
-  display: none;
-}
-.kitchen-strip > li {
-  scroll-snap-align: start;
-}
-@media (min-width: 64rem) {
-  .kitchen-strip {
-    grid-auto-flow: row;
-    grid-template-columns: repeat(3, minmax(0, 1fr));
-    margin: 0;
-    padding: 0;
-    overflow: visible;
-  }
-}
-.kitchen-strip__caption {
-  display: flex;
-  justify-content: space-between;
-  margin: var(--s-3) 0 0;
-  font-family: var(--ff-utility);
-  font-weight: 700;
-  letter-spacing: 0.01em;
-  font-size: clamp(1.4375rem, 1.375rem + 0.3125vw, 1.625rem);
-}
-.home .intro-box {
-  margin-top: 0;
-}
-.home-coming {
-  justify-self: stretch;
-}
-
-/* ---------- Where it comes from (spruce, the label's register) ---------- */
-.where-from {
-  --bg: var(--spruce);
-  --surface: var(--spruce);
-  --rule: color-mix(in srgb, var(--bone) 24%, transparent);
-  margin-top: var(--section);
-  background: var(--spruce);
-  color: var(--bone);
-}
-.where-from__band {
-  display: block;
-}
-.where-from__inner {
-  display: grid;
-  gap: var(--s-9);
-  padding-top: var(--s-10);
-  padding-bottom: var(--section);
-}
-@media (min-width: 64rem) {
-  .where-from__inner {
-    grid-template-columns: minmax(0, 5fr) minmax(0, 7fr);
-    align-items: center;
-    column-gap: var(--s-10);
-  }
-}
-.where-from__text {
-  display: grid;
-  justify-items: start;
   gap: var(--s-6);
 }
-.where-from__text > .pill {
-  padding: 6px 18px 8px;
-  font-size: clamp(1.375rem, 1.2083rem + 0.8333vw, 1.875rem);
-}
-.where-from__line {
-  max-width: var(--measure-subline);
+.home-kitchen__photo {
   margin: 0;
-  font-size: var(--t-subline);
-  text-wrap: pretty;
 }
-.where-from .text-link {
-  color: var(--bone);
+.home-kitchen__caption {
+  display: flex;
+  justify-content: space-between;
+  gap: var(--s-4);
+  margin-top: var(--s-3);
+  font-family: var(--ff-utility);
+  font-size: 1.25rem;
+  font-weight: 700;
+  letter-spacing: 0.01em;
+}
+.home-kitchen__text {
+  display: grid;
+  align-content: center;
+  justify-items: start;
+  gap: var(--s-5);
+}
+.home .intro-box {
+  margin: 0;
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  text-align: left;
+}
+.home .intro-box__text {
+  margin: 0;
+  font-size: clamp(1.1875rem, 1.125rem + 0.3125vw, 1.375rem);
+  line-height: 1.4;
+}
+@media (min-width: 64rem) {
+  .home-kitchen {
+    grid-template-columns: minmax(0, 7fr) minmax(0, 5fr);
+    column-gap: var(--s-10);
+    align-items: center;
+  }
 }
 
-.sourcing {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  width: 100%;
+/* rows: a date, a title, a time, between hairlines (Home's coming up; Events' list) */
+.rows {
   margin: 0;
-  border: var(--stroke) solid color-mix(in srgb, var(--bone) 60%, transparent);
+  padding: 0;
+  border-top: 1px solid var(--hair);
+  list-style: none;
 }
-.sourcing__cell {
-  padding: var(--s-4);
-  border-right: var(--stroke-dash) solid var(--rule);
-  border-bottom: var(--stroke-dash) solid var(--rule);
+.rows > li {
+  border-bottom: 1px solid var(--hair);
 }
-.sourcing__cell:nth-child(2n) {
-  border-right: 0;
+.rows__row {
+  display: grid;
+  grid-template-columns: 5.25rem minmax(0, 1fr) auto;
+  align-items: center;
+  column-gap: var(--s-4);
+  min-height: 4.75rem;
+  padding: var(--s-3) 0;
+  color: inherit;
+  text-decoration: none;
 }
-.sourcing__cell:nth-last-child(-n + 2) {
-  border-bottom: 0;
+.rows__row:focus-visible {
+  outline: 3px solid var(--focus);
+  outline-offset: 2px;
 }
-.sourcing__what {
+.rows__date {
+  display: grid;
+  gap: 3px;
+}
+.rows__day {
+  font-family: var(--ff-display);
+  font-size: 2rem;
+  line-height: 1;
+}
+.rows__when {
+  color: var(--fg-muted);
   font-family: var(--ff-utility);
-  font-weight: 700;
   font-size: var(--t-label);
+  font-weight: 700;
   letter-spacing: var(--track-label);
   text-transform: uppercase;
-  color: var(--pils);
+  white-space: nowrap;
 }
-.sourcing__who {
-  margin: var(--s-2) 0 0;
+.rows__title {
+  font-family: var(--ff-utility);
+  font-size: clamp(1.375rem, 1.3125rem + 0.3125vw, 1.5625rem);
+  font-weight: 700;
+  line-height: 1.15;
+  letter-spacing: 0.01em;
+  text-wrap: balance;
+}
+.rows__time {
   font-weight: 600;
+  white-space: nowrap;
 }
-.sourcing__where {
-  margin: 0;
-  color: var(--fg-muted);
-  font-size: var(--t-small);
+@media (hover: hover) {
+  .rows__row:hover .rows__title {
+    text-decoration: underline;
+    text-decoration-thickness: 2px;
+    text-underline-offset: 4px;
+  }
 }
 
-/* the map: one monoline in the label's gold */
-.ny-map {
-  display: block;
-  width: 100%;
-  height: auto;
+/* where it comes from: the delivery run. The ink line is the route; each stop sits on it
+   as a small drawing on a patch of paper. Down the left on a phone, across on a wide
+   screen. */
+.run {
+  --pin: 3.5rem;
+  position: relative;
+  display: grid;
+  gap: var(--s-6);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.run::before {
+  content: "";
+  position: absolute;
+  top: calc(var(--pin) / 2);
+  bottom: calc(var(--pin) / 2);
+  left: calc(var(--pin) / 2 - var(--stroke) / 2);
+  border-left: var(--stroke) solid var(--fg);
+  transform-origin: 50% 0;
+}
+.run__stop {
+  position: relative;
+  display: grid;
+  grid-template-columns: var(--pin) minmax(0, 1fr);
+  align-items: center;
+  column-gap: var(--s-4);
+}
+.run__pin {
+  display: grid;
+  place-items: center;
+  width: var(--pin);
+  height: var(--pin);
+  background: var(--bg);
+}
+.run__doodle {
+  width: 2.75rem;
+  height: 2.75rem;
   overflow: visible;
 }
-.ny-map__state {
-  fill: none;
-  stroke: var(--pils);
-  stroke-width: 2;
+.run__doodle path,
+.run__doodle circle {
+  fill: var(--pils);
+  stroke: var(--fg);
+  stroke-width: var(--stroke);
+  stroke-linecap: round;
   stroke-linejoin: round;
   vector-effect: non-scaling-stroke;
 }
-.ny-map__line {
-  fill: none;
-  stroke: var(--pils);
-  stroke-width: 1.5;
-  stroke-dasharray: 1;
-  vector-effect: non-scaling-stroke;
-  opacity: 0.7;
+.run__doodle--mark {
+  width: auto;
 }
-@media (scripting: enabled) and (prefers-reduced-motion: no-preference) {
-  .ny-map:not([data-draw="in"]) .ny-map__line {
-    stroke-dashoffset: 1;
-  }
-  .ny-map[data-draw="in"] .ny-map__line {
-    animation: map-draw 900ms var(--ease-in-out) both;
-    animation-delay: calc(200ms + var(--i, 0) * 120ms);
-  }
+.run__doodle--mark path {
+  fill: var(--fg);
+  stroke: none;
 }
-@keyframes map-draw {
-  from {
-    stroke-dashoffset: 1;
-  }
-  to {
-    stroke-dashoffset: 0;
-  }
+.run__text {
+  display: grid;
+  gap: 2px;
 }
-.ny-map__dot {
-  fill: var(--spruce);
-  stroke: var(--pils);
-  stroke-width: 3;
-}
-.ny-map__place[data-kind="origin"] .ny-map__dot {
-  stroke-dasharray: 4 3;
-}
-.ny-map__mark path {
-  fill: var(--pils);
-  stroke: var(--pils);
-  stroke-width: 3;
-}
-.ny-map__label {
-  fill: var(--bone);
+.run__what {
+  color: var(--fg-muted);
   font-family: var(--ff-utility);
+  font-size: var(--t-label);
   font-weight: 700;
-  font-size: 24px;
-  letter-spacing: 0.12em;
+  letter-spacing: var(--track-label);
   text-transform: uppercase;
 }
-.ny-map__place[data-kind="taproom"] .ny-map__label {
-  fill: var(--pils);
-  font-size: 30px;
+.run__who {
+  font-family: var(--ff-utility);
+  font-size: clamp(1.3125rem, 1.25rem + 0.3125vw, 1.5rem);
+  font-weight: 700;
+  line-height: 1.15;
+  letter-spacing: 0.01em;
+  text-wrap: balance;
 }
-.ny-map__year {
-  fill: var(--fg-muted);
+.run__where {
+  color: var(--fg-muted);
+  font-size: var(--t-small);
+}
+@media (min-width: 64rem) {
+  .run {
+    grid-template-columns: repeat(var(--stops), minmax(0, 1fr));
+    gap: var(--s-5);
+  }
+  /* from the first stop's drawing to the last one's */
+  .run::before {
+    top: calc(var(--pin) / 2 - var(--stroke) / 2);
+    bottom: auto;
+    left: calc(var(--pin) / 2);
+    right: calc((100% - (var(--stops) - 1) * var(--s-5)) / var(--stops) - var(--pin) / 2);
+    border-left: 0;
+    border-top: var(--stroke) solid var(--fg);
+    transform-origin: 0 50%;
+  }
+  .run__stop {
+    grid-template-columns: minmax(0, 1fr);
+    align-content: start;
+    align-items: start;
+    row-gap: var(--s-3);
+  }
+}
+/* the route draws as the section scrolls into view, and each stop arrives as the line
+   reaches it. Scroll-linked, so it follows the reader's thumb; where the browser has no
+   scroll timelines, or with reduced motion, everything is simply there. */
+@supports (animation-timeline: view()) {
+  @media (prefers-reduced-motion: no-preference) {
+    .run::before {
+      animation: run-draw linear both;
+      animation-timeline: view();
+      animation-range: entry 15% cover 55%;
+    }
+    .run__pin {
+      animation: run-arrive linear both;
+      animation-timeline: view();
+      animation-range: entry 30% entry 110%;
+    }
+    @media (min-width: 64rem) {
+      .run::before {
+        animation-name: run-draw-across;
+        animation-range: entry 30% cover 45%;
+      }
+    }
+  }
+}
+@keyframes run-draw {
+  from {
+    scale: 1 0;
+  }
+}
+@keyframes run-draw-across {
+  from {
+    scale: 0 1;
+  }
+}
+@keyframes run-arrive {
+  from {
+    opacity: 0;
+    scale: 0.6;
+  }
 }
 
-/* ---------- Visit band, gift cards ---------- */
+/* visit: this week's hours and where to find it, on the same two columns */
 .home-visit__grid {
   display: grid;
-  gap: var(--s-9);
+  gap: var(--s-8);
+}
+.home-visit .hours {
+  margin-top: 0;
+}
+.home-visit__side {
+  display: grid;
+  align-content: start;
+  gap: var(--s-6);
+}
+.home-visit .address-block {
+  padding-top: 0;
+}
+.home-visit .address-block__addr {
+  margin-left: 0;
+  font-family: var(--ff-utility);
+  font-size: 1.75rem;
+  font-weight: 700;
+  line-height: 1.15;
+  letter-spacing: 0.01em;
+}
+.home-visit__note {
+  max-width: 42ch;
+  margin: 0;
+  color: var(--fg-muted);
 }
 @media (min-width: 64rem) {
   .home-visit__grid {
     grid-template-columns: minmax(0, 7fr) minmax(0, 5fr);
     column-gap: var(--s-10);
-  }
-}
-.home-visit .hours {
-  margin-top: 0;
-}
-.fact-chips {
-  display: flex;
-  flex-wrap: wrap;
-  gap: var(--s-2);
-  margin: var(--s-7) 0 0;
-  padding: 0;
-  list-style: none;
-}
-.fact-chips li {
-  padding: 6px 12px 5px;
-  border-radius: var(--r-pill);
-  background: var(--paper-deep);
-  font-family: var(--ff-utility);
-  font-weight: 700;
-  font-size: var(--t-label);
-  letter-spacing: var(--track-label);
-  text-transform: uppercase;
-}
-.home-visit > .photo {
-  justify-self: stretch;
-}
-.gift-band {
-  margin-bottom: var(--section);
-  padding-top: var(--s-7);
-  border-top: var(--stroke) solid var(--rule-strong);
-}
-.gift-band__title {
-  margin: 0;
-  font-family: var(--ff-display);
-  font-size: var(--t-h3);
-  font-weight: 400;
-}
-.gift-band p {
-  max-width: var(--measure-prose);
-  margin: 0;
-}
-/* on a phone the map is ~350 px wide: its labels (in map units) step up to stay legible */
-@media (max-width: 47.99rem) {
-  .ny-map__label {
-    font-size: 40px;
-    letter-spacing: 0.06em;
-  }
-  .ny-map__place[data-kind="taproom"] .ny-map__label {
-    font-size: 46px;
-  }
-  .ny-map__place:not([data-kind="taproom"]):not([data-kind="origin"]) .ny-map__label {
-    display: none;
+    align-items: start;
   }
 }
