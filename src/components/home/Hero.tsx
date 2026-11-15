@@ -8,6 +8,7 @@
 import { homeLabels, microcopy } from "@content/microcopy";
 import type { Site } from "@/lib/site/schema";
 import { Button } from "../ui/Button";
+import { ExternalLink } from "../ui/TextLink";
 import { OpenNow } from "../visit/OpenNow";
 import { type TapBeer, TapHero } from "./TapHero";
 
@@ -25,9 +26,8 @@ export function Hero({ site, beers }: { site: Site; beers: TapBeer[] }) {
           </h1>
           <div className="hero__actions">
             <Button href="/menu">{microcopy.seeTheMenu}</Button>
-            <Button href={site.links.map} external variant="secondary">
-              {microcopy.directions}
-            </Button>
+            {/* a link, not a second button: one filled action per screen */}
+            <ExternalLink href={site.links.map}>{microcopy.directions}</ExternalLink>
           </div>
         </div>
       </div>

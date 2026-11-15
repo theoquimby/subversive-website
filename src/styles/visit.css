@@ -369,7 +369,8 @@
   grid-row: 1;
   align-self: end;
 }
-.visit-head__art {
+/* (two classes: .pen's own width:100% comes later in the bundle) */
+.visit-head .visit-head__art {
   grid-column: 2;
   grid-row: 1;
   width: clamp(5.75rem, 22vw, 14rem);

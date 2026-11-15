@@ -914,3 +914,60 @@ body::after {
   text-transform: uppercase;
   white-space: nowrap;
 }
+
+/* ---------- Buttons and status, redesign 2026-11-15 (these override the rules above) ----------
+   Theo: the round buttons "look very AI and there are too many"; give them "the slightest
+   bit of variance" and a better shape. They are now cut by hand: a lopsided rounded
+   shape with an ink edge, each kind cut a little differently and set a hair off level,
+   straightening under a pointer. No offset shadow. The open-now line loses its pill. */
+.btn {
+  border: var(--stroke) solid var(--ink);
+  border-radius: 255px 22px 225px 20px / 20px 225px 22px 255px;
+  box-shadow: none;
+  transition:
+    rotate var(--d-2) var(--ease-out),
+    translate var(--d-1) var(--ease-out),
+    background-color var(--d-1) var(--ease-out);
+}
+.btn--primary {
+  rotate: -0.7deg;
+  box-shadow: none;
+}
+.btn--secondary {
+  border-radius: 22px 235px 20px 255px / 245px 20px 225px 22px;
+  rotate: 0.6deg;
+}
+.btn--quiet {
+  border-radius: 235px 20px 255px 22px / 22px 255px 20px 225px;
+}
+[data-skin="overtime"] .btn,
+:root:has([data-page-skin="overtime"]) .btn {
+  border-color: var(--fg);
+}
+@media (hover: hover) {
+  .btn:hover,
+  .btn--primary:hover {
+    rotate: 0deg;
+    translate: 0 -1px;
+    box-shadow: none;
+  }
+}
+.btn:active,
+.btn--primary:active {
+  rotate: 0deg;
+  translate: 0 1px;
+  box-shadow: none;
+}
+.open-now.open-now {
+  padding-inline: 0;
+  border: 0;
+  border-radius: var(--s-1);
+}
+@media (hover: hover) {
+  .open-now:hover {
+    background: none;
+    text-decoration: underline;
+    text-decoration-thickness: 2px;
+    text-underline-offset: 4px;
+  }
+}

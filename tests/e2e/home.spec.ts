@@ -201,6 +201,7 @@ test("where it comes from: choosing a source moves the map; a click opens its de
   await expect(page.locator(".smap__state")).toHaveAttribute("data-all", "");
   await expect(grain).toHaveAttribute("aria-expanded", "true");
   // the photograph really loads (it once stayed hidden waiting for a scroll reveal)
+  await page.locator(".smap__detail img").scrollIntoViewIfNeeded();
   await expect
     .poll(() => page.locator(".smap__detail img").evaluate((i) => (i as HTMLImageElement).naturalWidth))
     .toBeGreaterThan(0);

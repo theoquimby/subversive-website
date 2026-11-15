@@ -562,7 +562,7 @@
   align-items: end;
   gap: var(--s-4);
 }
-.events-head__art {
+.events-head .events-head__art {
   width: clamp(4.75rem, 18vw, 13rem);
 }
 .events-page .tix--tonight {

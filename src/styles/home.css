@@ -302,6 +302,7 @@
 .hero__actions {
   display: grid;
   grid-auto-flow: column;
+  align-items: center;
   justify-content: start;
   gap: var(--s-3);
 }
