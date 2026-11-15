@@ -96,6 +96,31 @@ export const eventLabels = {
 } as const;
 
 // Home (spec §6.1). Every line is the spec's own.
+// Private-event inquiry form: interface labels and its own messages (Ops words the
+// errors it sends back; these are the ones the form raises itself)
+export const inquiryLabels = {
+  title: "Private events",
+  link: "Book a private event",
+  name: "Name",
+  email: "Email",
+  phone: "Phone",
+  date: "Date",
+  datePlaceholder: "MM/DD/YYYY",
+  guests: "Guests",
+  kind: "Kind of event",
+  kinds: ["Birthday", "Rehearsal dinner", "Corporate", "Buyout", "Other"],
+  message: "Anything else",
+  optional: "(optional)",
+  send: "Send inquiry",
+  sending: "Sending",
+  sent: "Thanks. We have your inquiry and will be in touch.",
+  needName: "Please add your name.",
+  needContact: "Please add an email or a phone number.",
+  badDate: "Please write the date as MM/DD/YYYY.",
+  badGuests: "Please give the number of guests as a number.",
+  failed: "Something went wrong. Please email or call us instead.",
+} as const;
+
 // About page: interface labels
 export const aboutLabels = { title: "About", founders: "Founders" } as const;
 

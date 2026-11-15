@@ -891,3 +891,152 @@ body {
   width: clamp(9rem, 34vw, 18rem);
   justify-self: end;
 }
+
+/* ---------- Forms (the private-event inquiry) ----------
+   Fields are a label over a line to write on, like a paper form; no boxes. The kind of
+   event is a row of plain choices; the chosen one is inked in. */
+.inquiry-wrap {
+  display: grid;
+  gap: var(--s-8);
+  max-width: 38rem;
+  margin-top: var(--s-7);
+}
+.inquiry {
+  display: grid;
+  gap: var(--s-6);
+}
+.inquiry__pair {
+  display: grid;
+  gap: var(--s-6);
+}
+@media (min-width: 36rem) {
+  .inquiry__pair {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+.field {
+  display: grid;
+  gap: var(--s-1);
+}
+.field__label {
+  padding: 0;
+  font-family: var(--ff-utility);
+  font-size: var(--t-label);
+  font-weight: 700;
+  letter-spacing: var(--track-label);
+  text-transform: uppercase;
+}
+.field__hint {
+  color: var(--fg-muted);
+  font-weight: 600;
+  text-transform: none;
+  letter-spacing: 0.02em;
+}
+.field__input {
+  width: 100%;
+  min-height: 48px;
+  padding: var(--s-2) 0;
+  border: 0;
+  border-bottom: var(--stroke) solid var(--fg);
+  border-radius: 0;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  font-size: 1.125rem;
+}
+textarea.field__input {
+  min-height: 7rem;
+  padding: var(--s-2) var(--s-3);
+  border: var(--stroke) solid var(--fg);
+  resize: vertical;
+}
+.field__input::placeholder {
+  color: color-mix(in srgb, var(--fg) 55%, transparent);
+}
+.field__input:focus-visible {
+  outline: 3px solid var(--focus);
+  outline-offset: 3px;
+  background: color-mix(in srgb, var(--pils) 22%, transparent);
+}
+.field[data-invalid] .field__input {
+  border-color: var(--accent-text);
+}
+.field__error {
+  margin: 0;
+  color: var(--accent-text);
+  font-weight: 600;
+}
+.choices {
+  display: grid;
+  gap: var(--s-2);
+  min-width: 0;
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+.choices__row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--s-2);
+}
+.choices__item > span {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  padding: 0 var(--s-4);
+  border: var(--stroke) solid var(--fg);
+  border-radius: 14px 18px 12px 20px / 18px 12px 20px 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color var(--d-1) var(--ease-out);
+}
+.choices__item > input:checked + span {
+  background: var(--fg);
+  color: var(--bg);
+}
+.choices__item > input:focus-visible + span {
+  outline: 3px solid var(--focus);
+  outline-offset: 3px;
+}
+.inquiry__trap {
+  position: absolute;
+  left: -9999px;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+}
+.inquiry__send {
+  justify-self: start;
+  cursor: pointer;
+}
+.inquiry__send:disabled {
+  opacity: 0.6;
+  cursor: progress;
+}
+.inquiry__done {
+  margin: 0;
+  padding: var(--s-4);
+  background: var(--pils);
+  font-size: 1.25rem;
+  font-weight: 600;
+}
+.inquiry__other {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: var(--s-3) var(--s-5);
+  margin: 0;
+  padding-top: var(--s-5);
+  border-top: 1px solid color-mix(in srgb, var(--fg) 26%, transparent);
+}
+.inquiry__note {
+  flex-basis: 100%;
+  color: var(--fg-muted);
+  font-size: var(--t-small);
+}
+.events-private {
+  margin: var(--s-9) 0 0;
+}
+.events-private + .events-bands {
+  margin-top: var(--s-4);
+}

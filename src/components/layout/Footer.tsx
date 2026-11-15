@@ -4,7 +4,7 @@
 // printed menu's checker closes the page. About half its old height on a phone.
 // the global "Pause motion" control (§9.2). The open-now pill and hours summary arrive with
 // lib/hours in M4; the goblin hatch with M7; the mailing list stays hidden until O6.
-import { microcopy } from "@content/microcopy";
+import { inquiryLabels, microcopy } from "@content/microcopy";
 import { getSite } from "@/lib/site/site";
 import { Checker } from "../graphics/Checker";
 import { Seal } from "../graphics/Seal";
@@ -61,6 +61,7 @@ export function Footer() {
             <a href={site.links.eGiftCard} {...ext}>
               eGift cards
             </a>
+            <Link href="/private-events">{inquiryLabels.title}</Link>
             <a href={site.links.bandBookingForm} {...ext}>
               Book your band
             </a>

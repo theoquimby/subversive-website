@@ -2,13 +2,13 @@
 // Calm: "What's on" beside a ticket drawn in pen, tonight's ticket large if there is one,
 // then the months, each a short run of tickets under its name on the line. No photograph,
 // ticker, scoreboard, starburst or filters. Events come read-only from the Ops feed.
-import { eventLabels, visitLabels } from "@content/microcopy";
+import { eventLabels, inquiryLabels, visitLabels } from "@content/microcopy";
 import type { Metadata, Viewport } from "next";
 import { TicketLink } from "@/components/events/TicketLink";
 import { Drawing } from "@/components/home/Ways";
 import { PageWipe } from "@/components/layout/PageWipe";
 import { SectionHead } from "@/components/layout/SectionHead";
-import { ExternalLink } from "@/components/ui/TextLink";
+import { ExternalLink, TextLink } from "@/components/ui/TextLink";
 import type { SiteEvent } from "@/lib/events/enrich";
 import { getEvents, tickets, upcoming } from "@/lib/events/source";
 import { getSite } from "@/lib/site/site";
@@ -99,6 +99,10 @@ export default async function EventsPage() {
               </a>
             </p>
           ) : null}
+
+          <p className="events-private">
+            <TextLink href="/private-events">{inquiryLabels.link}</TextLink>
+          </p>
 
           <p className="events-bands">
             {site.bands}{" "}

@@ -2,7 +2,7 @@ import AxeBuilder from "@axe-core/playwright";
 import { expect, test } from "@playwright/test";
 
 // Plan M2: axe on each stub and the 404, and with the mobile menu open.
-const ROUTES = ["/", "/menu", "/events", "/visit", "/beer", "/about", "/no-such-page"];
+const ROUTES = ["/", "/menu", "/events", "/visit", "/beer", "/about", "/private-events", "/no-such-page"];
 
 for (const route of ROUTES) {
   test(`axe: ${route}`, async ({ page }) => {
