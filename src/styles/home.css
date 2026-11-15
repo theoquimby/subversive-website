@@ -21,6 +21,16 @@
   margin-inline: auto;
   padding: var(--s-3) var(--gutter) var(--s-6);
 }
+/* a notice from Max: one plain line on the menu's yellow, above everything */
+.hero__notice {
+  justify-self: start;
+  max-width: 60ch;
+  margin: 0;
+  padding: var(--s-2) var(--s-3);
+  background: var(--pils);
+  font-weight: 600;
+  line-height: 1.35;
+}
 .hero__open {
   justify-self: start;
 }

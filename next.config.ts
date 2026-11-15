@@ -1,6 +1,7 @@
 import type { NextConfig } from "next";
 
 const isDev = process.env.NODE_ENV === "development";
+const OPS_ORIGIN = process.env.NEXT_PUBLIC_OPS_ORIGIN ?? "";
 
 // Spec §8.8 with plan Q4. Pages stay static, so there is no nonce. Tried first (M0):
 // script-src 'self' with experimental.sri. The e2e CSP check showed Next 16.4's inline
@@ -17,7 +18,8 @@ const csp = [
   "style-src 'self' 'unsafe-inline'", // Motion writes inline styles
   "img-src 'self' data: blob:",
   "font-src 'self'",
-  `connect-src 'self'${isDev ? " ws:" : ""}`,
+  // the analytics beacon posts to Ops; allowed only when that origin is configured
+  `connect-src 'self'${OPS_ORIGIN ? ` ${OPS_ORIGIN}` : ""}${isDev ? " ws:" : ""}`,
   "object-src 'none'",
   "base-uri 'self'",
   "form-action 'self'",

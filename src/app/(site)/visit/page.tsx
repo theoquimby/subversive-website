@@ -14,7 +14,7 @@ import { AddressBlock } from "@/components/visit/AddressBlock";
 import { GoodToKnow } from "@/components/visit/GoodToKnow";
 import { HoursCard } from "@/components/visit/HoursCard";
 import { hoursEvents, OpenNow } from "@/components/visit/OpenNow";
-import { getSite } from "@/lib/site/site";
+import { getLiveSite } from "@/lib/site/ops";
 import { now } from "@/lib/time/now";
 import { nyParts } from "@/lib/time/ny";
 
@@ -25,8 +25,8 @@ export const metadata: Metadata = {
 };
 
 export default async function VisitPage() {
-  const site = getSite();
   const today = nyParts(now()).date;
+  const site = await getLiveSite(today);
   return (
     <PageWipe>
       <div className="page page--visit">

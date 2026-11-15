@@ -10,7 +10,7 @@ const hhmm = z
 
 const dayHours = z.object({ open: hhmm, close: hhmm, kitchenClose: hhmm }).nullable();
 
-const weekly = z.object({
+export const weekly = z.object({
   mon: dayHours,
   tue: dayHours,
   wed: dayHours,

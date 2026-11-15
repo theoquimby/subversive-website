@@ -12,10 +12,12 @@ import { ExternalLink } from "../ui/TextLink";
 import { OpenNow } from "../visit/OpenNow";
 import { type TapBeer, TapHero } from "./TapHero";
 
-export function Hero({ site, beers }: { site: Site; beers: TapBeer[] }) {
+export function Hero({ site, beers, notice }: { site: Site; beers: TapBeer[]; notice?: string }) {
   return (
     <section className="hero" data-hero="" data-skin="paper" aria-labelledby="hero-title">
       <div className="hero__inner">
+        {/* a line from Max (Ops → Website → Hours & notice), when there is one */}
+        {notice ? <p className="hero__notice">{notice}</p> : null}
         <OpenNow className="hero__open" />
         <div className="hero__scene">
           <TapHero beers={beers} />

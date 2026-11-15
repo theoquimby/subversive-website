@@ -1,6 +1,7 @@
 import { Analytics } from "@vercel/analytics/next";
 import { SpeedInsights } from "@vercel/speed-insights/next";
 import type { ReactNode } from "react";
+import { Beacon } from "@/components/layout/Beacon";
 import { Curtain } from "@/components/layout/Curtain";
 import { Footer } from "@/components/layout/Footer";
 import { Header } from "@/components/layout/Header";
@@ -23,6 +24,7 @@ export default function SiteLayout({ children }: { children: ReactNode }) {
       <Footer />
       <StampIn />
       <Curtain />
+      <Beacon orderHost={new URL(getSite().links.order).hostname} />
       <script
         type="application/ld+json"
         // biome-ignore lint/security/noDangerouslySetInnerHtml: JSON built from site.json, with < escaped

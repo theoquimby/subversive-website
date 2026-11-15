@@ -30,7 +30,7 @@ import { isBeer } from "@/lib/menu/kinds";
 import { applySeasonal } from "@/lib/menu/seasonal";
 import { getMenu } from "@/lib/menu/source";
 import { buildMenuView, draftBeers, findItem } from "@/lib/menu/view";
-import { getSite } from "@/lib/site/site";
+import { getLiveSite } from "@/lib/site/ops";
 import { now } from "@/lib/time/now";
 import { nyParts, weekdayOf } from "@/lib/time/ny";
 
@@ -46,8 +46,8 @@ const MONTHS = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "
 const FEATURED = 4;
 
 export default async function Home() {
-  const site = getSite();
   const today = nyParts(now()).date;
+  const site = await getLiveSite(today);
   const view = buildMenuView(applySeasonal(await getMenu(), today));
   const { events } = await getEvents();
   const coming = tickets(upcoming(events, today)).slice(0, 3);
@@ -117,7 +117,7 @@ export default async function Home() {
 
   return (
     <PageWipe>
-      <Hero site={site} beers={tapBeers} />
+      <Hero site={site} beers={tapBeers} notice={site.notice?.text} />
 
       <div className="page home" data-skin="paper">
         {/* Each part of the page is led by a pen drawing in the margin, and the drawing is

@@ -6,7 +6,7 @@ import { getEvents } from "@/lib/events/source";
 import { formatStatus } from "@/lib/hours/format";
 import type { HoursEvent } from "@/lib/hours/schedule";
 import { statusAt } from "@/lib/hours/status";
-import { getSite } from "@/lib/site/site";
+import { getLiveSite } from "@/lib/site/ops";
 import { now } from "@/lib/time/now";
 import { addDays, nyParts } from "@/lib/time/ny";
 import { OpenNowLive } from "./OpenNowLive";
@@ -32,7 +32,7 @@ export async function hoursEvents(): Promise<HoursEvent[]> {
 }
 
 export async function OpenNow({ className }: { className?: string }) {
-  const { hours } = getSite();
+  const { hours } = await getLiveSite(nyParts(now()).date);
   const events = await hoursEvents();
   const initial = formatStatus(statusAt(now(), { hours }, events));
   return <OpenNowLive initial={initial} hours={hours} events={events} className={className} />;
