@@ -1,7 +1,6 @@
 import { Analytics } from "@vercel/analytics/next";
 import { SpeedInsights } from "@vercel/speed-insights/next";
 import type { ReactNode } from "react";
-import { Checker } from "@/components/graphics/Checker";
 import { Curtain } from "@/components/layout/Curtain";
 import { Footer } from "@/components/layout/Footer";
 import { Header } from "@/components/layout/Header";
@@ -11,12 +10,12 @@ import { getSite } from "@/lib/site/site";
 
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? "https://subversive-website.vercel.app";
 
-// Site shell (spec §8.3, plan M2 item 7): rail, header, main, footer. The gate bootstrap
+// Site shell: header, main, footer (the checker band at the top went on 2026-11-15; the
+// footer keeps it as the page's closing band). The gate bootstrap
 // joins in M7. Analytics are Vercel's cookieless ones, served from this origin.
 export default function SiteLayout({ children }: { children: ReactNode }) {
   return (
     <>
-      <Checker rows={1} />
       <Header />
       <main id="main" className="site-main">
         {children}

@@ -99,3 +99,32 @@ The website already has the seam for this: `MenuSource` in `src/lib/menu/source.
 2. Ops: the revalidate ping on save (a few lines).
 3. Ops: `/api/public/site` (hours). Website: read it, `site.json` as fallback.
 4. Ops: the tap list and `/api/public/menu`. Website: `opsMenuSource`, `menu.json` as fallback.
+
+## Suppliers for "Where it comes from" (asked 2026-11-15)
+
+Theo: when Max adds a supplier he wants to feature in Ops, it should appear in Home's
+"Where it comes from" section on its own.
+
+The website side is ready for this. The section is drawn entirely from a list, and each
+entry is placed on the New York map from its latitude and longitude
+(`src/lib/map/project.ts`); nothing in the map knows a town by name. Today the list is
+`sourcing` in `content/site.json`.
+
+What Ops would need to serve, read-only, e.g. `GET /api/public/suppliers`:
+
+```json
+[
+  { "what": "Beef", "who": "Kilcoyne Farms", "where": "Hudson Falls, NY", "lat": 43.301, "lng": -73.586 },
+  { "what": "Grain", "who": "100% New York", "where": "grown in New York State" }
+]
+```
+
+- `what`, `who`, `where`: the three lines shown, in Max's words.
+- `lat`, `lng`: optional. With them the supplier gets a town on the map and a road to the
+  taproom. Without them (or outside New York) it counts as statewide. Ops could fill these
+  from the town with a geocoder when Max saves, so he never types a coordinate.
+- Only suppliers Max has marked "feature on the website"; order as he sets it.
+- The same revalidate ping on save as events.
+
+Website work once that exists: a small `getSourcing()` that reads the feed (Zod-validated,
+cached, `site.json` as the fallback), used in place of `site.sourcing` on Home.

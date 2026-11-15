@@ -122,6 +122,18 @@ export async function buildNyMap(): Promise<void> {
     `export const NY_VIEWBOX = "0 0 ${W} ${H}";`,
     `export const NY_PATH = ${JSON.stringify(path)};`,
     `export const NY_PLACES = ${JSON.stringify(places)} as const;`,
+    "// the projection's numbers (Albers equal-area conic, fitted to the viewBox), so a",
+    "// place known only by latitude and longitude can be put on this map: src/lib/map/project.ts",
+    `export const NY_PROJECTION = ${JSON.stringify({
+      n: Number(n.toFixed(8)),
+      C: Number(C.toFixed(8)),
+      rho0: Number(rho0.toFixed(8)),
+      lam0: Number(lam0.toFixed(8)),
+      minX: Number(minX.toFixed(8)),
+      minY: Number(minY.toFixed(8)),
+      k: Number(k.toFixed(6)),
+      pad: PAD,
+    })} as const;`,
     "",
   ].join("\n");
   writeFileSync(join(root, "src/components/graphics/ny-map.generated.ts"), out);

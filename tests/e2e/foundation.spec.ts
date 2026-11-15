@@ -27,14 +27,13 @@ test("home is served with no console errors and no CSP violations", async ({ pag
   expect(problems).toEqual([]);
 });
 
-// on a paper page; Home is a label page and carries no rail (tests/e2e/home.spec.ts)
-test("the checker rail is the first thing on the page", async ({ page }) => {
+// the checker band left the top of the page on 2026-11-15; it closes the page instead
+test("the page opens on the header and closes on the checker", async ({ page }) => {
   await page.goto("/visit");
-  const rail = page.locator("[data-checker]").first();
-  await expect(rail).toBeVisible();
-  const box = await rail.boundingBox();
-  expect(box?.y).toBe(0);
-  expect(box?.height).toBeGreaterThanOrEqual(22); // one row at the top since M2 (refinement)
+  const header = await page.locator("#site-header").boundingBox();
+  expect(header?.y).toBe(0);
+  await expect(page.locator("footer [data-checker]")).toHaveCount(1);
+  await expect(page.locator("[data-checker]")).toHaveCount(1);
 });
 
 test("no horizontal scroll at 320 px", async ({ page }) => {

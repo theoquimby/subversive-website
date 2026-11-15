@@ -8,7 +8,7 @@ test.beforeEach(async ({ page }) => {
 test("list → ticket → event page", async ({ page }) => {
   await page.goto("/events");
   await expect(page.getByRole("heading", { level: 1 })).toHaveText("What's on");
-  const ticket = page.locator('.events-month a[data-ticket]').first();
+  const ticket = page.locator(".events-month a[data-ticket]").first();
   const href = await ticket.getAttribute("href");
   await ticket.click();
   await expect(page).toHaveURL(href ?? "");

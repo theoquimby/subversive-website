@@ -83,22 +83,38 @@
     {
       "what": "Beef",
       "who": "Kilcoyne Farms",
-      "where": "Hudson Falls, NY"
+      "where": "Hudson Falls, NY",
+      "geo": {
+        "lat": 43.301,
+        "lng": -73.586
+      }
     },
     {
       "what": "Buns",
       "who": "See & Be Bakery",
-      "where": "Cairo, NY"
+      "where": "Cairo, NY",
+      "geo": {
+        "lat": 42.299,
+        "lng": -73.998
+      }
     },
     {
       "what": "Cider",
       "who": "Indian Ladder",
-      "where": "Altamont, NY"
+      "where": "Altamont, NY",
+      "geo": {
+        "lat": 42.7,
+        "lng": -74.034
+      }
     },
     {
       "what": "Wine",
       "who": "Salmon Run · Dr. Konstantin Frank",
-      "where": "Hammondsport, NY"
+      "where": "Hammondsport, NY",
+      "geo": {
+        "lat": 42.408,
+        "lng": -77.224
+      }
     },
     {
       "what": "Spirits",

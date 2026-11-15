@@ -3,11 +3,12 @@
 // The page change (redesign 2026-11-14). A fixed, screen-sized sheet: cheap in every
 // browser, unlike the whole-page snapshot it replaces (see PageWipe.tsx).
 //
-// Between paper pages a sheet of paper comes over with one ink line drawn across it, and
-// lifts on the new page. Going to the events pages the lights dim: the sheet is the
-// night's black and comes over more slowly; coming back, they come up again.
+// The screen is scribbled over with one broad pen stroke, side to side from the top down,
+// as if coloured in by hand: in paper between paper pages, and in the night's black on
+// the way to the events pages, so the lights are painted out rather than faded. Coming
+// back from the events pages it is painted paper again.
 //
-// The order matters: the sheet covers the old page first (200 ms; 340 ms for the dim),
+// The order matters: the scribble covers the old page first (420 ms; 560 ms to paint it dark),
 // then the route changes underneath it, then it lifts on the new page. So the visitor
 // never sees the new page arrive half-scrolled or half-loaded. The click is taken in the
 // capture phase and the route is pushed when the cover is done. With reduced motion, a
@@ -15,8 +16,8 @@
 import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useRef } from "react";
 
-const COVER = 200; // ms the paper takes to come over
-const DIM = 340; // ms the lights take to go down
+const COVER = 420; // ms the scribble takes to cover the screen in paper
+const DIM = 560; // ms it takes to paint the screen dark
 const NIGHT = /^\/events(\/|$)/;
 
 export function Curtain() {
@@ -77,7 +78,12 @@ export function Curtain() {
 
   return (
     <div className="curtain" aria-hidden="true">
-      <span className="curtain__line" />
+      <svg viewBox="0 0 100 100" preserveAspectRatio="none" className="curtain__ink" focusable="false">
+        <path
+          pathLength={1}
+          d="M-12 6L112 2L-12 20L112 18L-12 36L112 34L-12 52L112 50L-12 68L112 66L-12 84L112 82L-12 100L112 98"
+        />
+      </svg>
     </div>
   );
 }

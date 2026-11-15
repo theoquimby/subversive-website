@@ -24,6 +24,7 @@ import { hoursEvents } from "@/components/visit/OpenNow";
 import { getEvents, tickets, upcoming } from "@/lib/events/source";
 import { formatClock, formatRange, formatTime, weekdayLabel } from "@/lib/hours/format";
 import { scheduleFor } from "@/lib/hours/schedule";
+import { projectNY } from "@/lib/map/project";
 import { isBeer } from "@/lib/menu/kinds";
 import { applySeasonal } from "@/lib/menu/seasonal";
 import { getMenu } from "@/lib/menu/source";
@@ -57,6 +58,19 @@ export default async function Home() {
   const kitchenPhoto = photos[KITCHEN] as Photo;
   const dish = kitchenPhoto.menuItemId ? findItem(view, kitchenPhoto.menuItemId) : undefined;
   const tonight = scheduleFor(today, { hours: site.hours }, await hoursEvents());
+
+  // where each source sits on the drawn map: placed from its latitude and longitude, so
+  // a supplier added as data (later, from Ops) appears with no drawing work. A source with
+  // no location, or one outside the drawing, counts as statewide.
+  const stops = site.sourcing.map(({ what, who, where, geo }) => {
+    const at = geo ? projectNY(geo.lat, geo.lng) : null;
+    return {
+      what,
+      who,
+      where,
+      place: at?.onMap ? { label: where.split(",")[0]?.trim() ?? where, x: at.x, y: at.y } : null,
+    };
+  });
 
   // the first screen's glass: the flagship first, then the taps in menu order
   const flagship = Math.max(
@@ -216,7 +230,7 @@ export default async function Home() {
           </Link>
           <SectionHead id="where-title">{homeLabels.whereFrom}</SectionHead>
           <p className="home-lede">{site.sourcingLine}</p>
-          <SourceMap sourcing={site.sourcing} />
+          <SourceMap stops={stops} />
           <TextLink href="/beer">{homeLabels.ourBeer}</TextLink>
         </section>
       </div>

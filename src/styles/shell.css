@@ -681,49 +681,51 @@ body {
 }
 
 /* ---------- The page change (Curtain.tsx) ----------
-   A fixed sheet the size of the screen. Paper with one ink line drawn across it between
-   paper pages; the night's black, coming over more slowly, on the way to the events
-   pages ("the lights dim"). Opacity and one transform; nothing is snapshotted. */
+   A fixed drawing the size of the screen: one broad stroke scribbled side to side from
+   the top down until the page is covered, in paper or (on the way to the events pages)
+   the night's black. Then it lifts. A dash offset and one opacity; nothing is
+   snapshotted. */
 .curtain {
   position: fixed;
   inset: 0;
   z-index: 200;
-  display: grid;
-  align-items: center;
-  background: var(--paper);
   opacity: 0;
   pointer-events: none;
 }
-.curtain__line {
-  height: var(--stroke);
-  background: var(--ink);
-  scale: 0 1;
-  transform-origin: 0 50%;
+.curtain__ink {
+  display: block;
+  width: 100%;
+  height: 100%;
 }
-:root[data-curtain-to="night"] .curtain {
-  background: var(--night);
+.curtain__ink path {
+  fill: none;
+  stroke: var(--paper);
+  stroke-width: 21;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-dasharray: 1;
+  stroke-dashoffset: 1;
 }
-:root[data-curtain-to="night"] .curtain__line {
-  background: var(--bone);
-  opacity: 0.5;
+:root[data-curtain-to="night"] .curtain__ink path {
+  stroke: var(--night);
 }
-:root[data-curtain="cover"] .curtain {
+:root[data-curtain="cover"] .curtain,
+:root[data-curtain="reveal"] .curtain {
   opacity: 1;
-  transition: opacity 200ms cubic-bezier(0.4, 0, 1, 1);
 }
-:root[data-curtain="cover"][data-curtain-to="night"] .curtain {
-  transition-duration: 340ms;
+:root[data-curtain="cover"] .curtain__ink path {
+  stroke-dashoffset: 0;
+  transition: stroke-dashoffset 420ms cubic-bezier(0.35, 0, 0.25, 1);
 }
-:root[data-curtain="cover"] .curtain__line {
-  scale: 1 1;
-  transition: scale 260ms cubic-bezier(0.3, 0, 0.2, 1);
+:root[data-curtain="cover"][data-curtain-to="night"] .curtain__ink path {
+  transition-duration: 560ms;
 }
 :root[data-curtain="reveal"] .curtain {
   opacity: 0;
-  transition: opacity 420ms cubic-bezier(0, 0, 0.2, 1) 60ms;
+  transition: opacity 380ms cubic-bezier(0, 0, 0.2, 1) 60ms;
 }
-:root[data-curtain="reveal"] .curtain__line {
-  scale: 1 1;
+:root[data-curtain="reveal"] .curtain__ink path {
+  stroke-dashoffset: 0;
 }
 @media print {
   .curtain {

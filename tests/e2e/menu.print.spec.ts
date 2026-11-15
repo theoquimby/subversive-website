@@ -9,7 +9,7 @@ test("print shows a clean two-column menu", async ({ page }) => {
   }
   await expect(page.locator('[data-list="drinks"]')).toBeVisible();
   await expect(page.locator('[data-list="food"]')).toBeVisible();
-  await expect(page.locator("[data-checker]").first()).toBeVisible();
+  // (the checker band at the top of the page went on 2026-11-15; print has none now)
   const columns = await page
     .locator('[data-list="drinks"]')
     .evaluate((el) => getComputedStyle(el).columnCount);

@@ -786,7 +786,16 @@
   width: 100%;
   height: auto;
   max-height: 36svh;
-  overflow: visible;
+  overflow: hidden;
+}
+/* the camera: one group that glides to frame the chosen town and the taproom */
+.smap__cam {
+  transform-origin: 0 0;
+}
+@media (prefers-reduced-motion: no-preference) {
+  .smap__cam {
+    transition: transform 900ms cubic-bezier(0.3, 0, 0.15, 1);
+  }
 }
 @media (max-width: 63.99rem) {
   .smap__map {
@@ -812,11 +821,14 @@
 .smap__state[data-all] {
   fill: var(--pils);
 }
+/* Everything below is drawn in map units and scaled back by --k (one over the zoom), so
+   it keeps its size on screen however far in the camera is. */
 .smap__route {
   fill: none;
   stroke: var(--fg);
-  stroke-width: 5;
+  stroke-width: calc(5px * var(--k, 1));
   stroke-linecap: round;
+  stroke-linejoin: round;
   stroke-dasharray: 1;
 }
 .smap__dot {
@@ -825,13 +837,14 @@
   stroke-width: 5;
   transform-box: fill-box;
   transform-origin: 50% 50%;
+  scale: var(--k, 1);
   transition:
     scale var(--d-2) var(--ease-out),
     fill var(--d-1) var(--ease-out);
 }
 .smap__town[data-on] .smap__dot {
   fill: var(--pils);
-  scale: 1.7;
+  scale: calc(1.5 * var(--k, 1));
 }
 .smap__hit {
   fill: transparent;
@@ -843,27 +856,33 @@
 .smap__label {
   fill: var(--fg);
   font-family: var(--ff-utility);
-  font-size: 44px;
+  font-size: calc(var(--label, 44px) * var(--k, 1));
   font-weight: 700;
   letter-spacing: 0.08em;
   text-transform: uppercase;
   /* a paper halo, so the name reads where it crosses the state's outline */
   paint-order: stroke;
   stroke: var(--bg);
-  stroke-width: 14px;
+  stroke-width: calc(var(--label, 44px) * 0.32 * var(--k, 1));
   stroke-linejoin: round;
 }
 @media (prefers-reduced-motion: no-preference) {
+  /* the camera arrives, then the road is drawn, then the town is named */
   .smap__route {
-    animation: smap-draw 520ms var(--ease-out) both;
+    animation: smap-draw 900ms cubic-bezier(0.45, 0, 0.3, 1) 420ms both;
   }
   .smap__label:not(.smap__label--home) {
-    animation: tap-in var(--d-3) var(--ease-out) 160ms both;
+    animation: smap-name var(--d-3) var(--ease-out) 700ms both;
   }
 }
 @keyframes smap-draw {
   from {
     stroke-dashoffset: 1;
+  }
+}
+@keyframes smap-name {
+  from {
+    opacity: 0;
   }
 }
 .smap__list {
@@ -904,8 +923,7 @@
   .smap__svg {
     max-height: none;
   }
-  .smap__label {
-    font-size: 30px;
-    stroke-width: 10px;
+  .smap__svg {
+    --label: 30px;
   }
 }

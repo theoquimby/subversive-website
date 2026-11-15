@@ -32,7 +32,7 @@ test("the first phone screen holds the pill, the beer, the glass, the brewery li
   expect(overflow).toBeLessThanOrEqual(0);
 });
 
-test("the first screen is on the menu's paper, with its checker rail, and no photo to wait for", async ({
+test("the first screen is on the menu's paper, with no photo to wait for; the checker closes the page", async ({
   page,
 }) => {
   await page.goto("/");

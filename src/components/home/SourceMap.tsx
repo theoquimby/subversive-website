@@ -2,48 +2,69 @@
 
 // "Where it comes from": New York State in one ink line, and the things on the menu that
 // come from it. Pick a source (tap it in the list, tap its town on the map, or hover) and
-// the map answers: the town lights up, a line runs from it to the taproom in Catskill, and
-// its name is set beside it. The two statewide sources (grain, spirits) light the whole
-// state. Only one town is ever labelled at a time, so the map never becomes a tangle.
+// the map goes there: it zooms in on the town and the taproom, and a wandering pen line
+// draws the road between them. The two statewide sources (grain, spirits) pull back to
+// the whole state and light it. Only one town is ever labelled at a time.
+//
+// The zoom is a transform on one group (the "camera"); everything drawn in map units is
+// scaled back down by the same factor, so dots, names and the road keep their size on
+// screen however far in the map is.
 //
 // Every word comes from site.json. The list alone carries all the information; the map
 // is hidden from assistive tech.
-import { useState } from "react";
-import type { Site } from "@/lib/site/schema";
+import { type CSSProperties, useState } from "react";
 import { BARLEY_VIEWBOX, KERNELS } from "../graphics/BarleyMark";
 import { NY_PATH, NY_PLACES, NY_VIEWBOX } from "../graphics/ny-map.generated";
 
-type Place = (typeof NY_PLACES)[number];
+/** A source as the page hands it over: already placed on the map, or statewide (null). */
+export interface Stop {
+  what: string;
+  who: string;
+  where: string;
+  place: { label: string; x: number; y: number } | null;
+}
+type Place = { x: number; y: number };
 
-// where each town's name sits, by hand (anchor, dx, dy in map units)
-const LABEL: Record<string, { anchor: "start" | "end"; dx: number; dy: number }> = {
-  "hudson-falls": { anchor: "end", dx: -28, dy: 12 },
-  cairo: { anchor: "end", dx: -28, dy: 12 },
-  altamont: { anchor: "end", dx: -28, dy: 12 },
-  hammondsport: { anchor: "start", dx: 28, dy: 12 },
-};
+const W = 1000;
+const H = 774;
+// far enough in to separate the Hudson Valley towns, not so far that the state is lost
+const MAX_ZOOM = 2.7;
 
-const catskill = NY_PLACES.find((p) => p.id === "catskill") as Place;
+const catskill = NY_PLACES.find((p) => p.id === "catskill") as (typeof NY_PLACES)[number];
 
-/** A gentle arc from a town to Catskill, bowing to one side. */
-function arc(p: Place): string {
-  const mx = (p.x + catskill.x) / 2;
-  const my = (p.y + catskill.y) / 2;
-  const dx = catskill.x - p.x;
-  const dy = catskill.y - p.y;
-  return `M${p.x} ${p.y}Q${Math.round(mx - dy * 0.2)} ${Math.round(my + dx * 0.2)} ${catskill.x} ${catskill.y}`;
+/** The camera for a town: frame it and the taproom with room around them. */
+function camera(p: Place | null) {
+  if (!p) return { s: 1, x: 0, y: 0 };
+  const w = Math.abs(p.x - catskill.x);
+  const h = Math.abs(p.y - catskill.y);
+  const pad = Math.max(70, Math.max(w, h) * 0.55);
+  const s = Math.min(MAX_ZOOM, W / (w + pad * 2), H / (h + pad * 2));
+  const cx = (p.x + catskill.x) / 2;
+  const cy = (p.y + catskill.y) / 2;
+  return { s, x: W / 2 - s * cx, y: H / 2 - s * cy };
 }
 
-// Only the sourcing list crosses to the browser. Passing the whole site object put every
-// field of site.json into the page's data, including unpublished text (the no-malting
-// test caught it).
-export function SourceMap({ sourcing }: { sourcing: Site["sourcing"] }) {
-  const items = sourcing.map((s) => ({
-    ...s,
-    // "Hudson Falls, NY" → the town on the map; "New York State" → the whole state
-    place: NY_PLACES.find((p) => p.kind === "source" && s.where.startsWith(p.label)) ?? null,
-  }));
-  // start on the first source that has a town, so the map opens with a line on it
+/** The road from a town to the taproom, drawn by hand: it wanders a little either side
+    of the straight line and stops just short of the mark. `k` is the on-screen unit. */
+function road(p: Place, k: number): string {
+  const dx = catskill.x - p.x;
+  const dy = catskill.y - p.y;
+  const len = Math.hypot(dx, dy) || 1;
+  const nx = -dy / len;
+  const ny = dx / len;
+  const stop = 1 - Math.min(0.4, (26 * k) / len);
+  const at = (t: number, off: number) =>
+    `${(p.x + dx * t * stop + nx * off * len).toFixed(1)} ${(p.y + dy * t * stop + ny * off * len).toFixed(1)}`;
+  return `M${at(0, 0)}Q${at(0.12, 0.1)} ${at(0.28, 0.07)}T${at(0.55, -0.05)}T${at(0.8, 0.045)}T${at(1, 0)}`;
+}
+
+// Data-driven: the page gives a list of stops, each placed from its latitude and longitude
+// (src/lib/map/project.ts) or marked statewide. Nothing here knows any town by name, so a
+// new supplier needs no change to this file. Only this short list crosses to the browser,
+// never the whole site object (the no-malting test once caught that).
+export function SourceMap({ stops }: { stops: Stop[] }) {
+  const items = stops;
+  // start on the first source that has a town, so the map opens with a road on it
   const [at, setAt] = useState(() =>
     Math.max(
       0,
@@ -52,60 +73,73 @@ export function SourceMap({ sourcing }: { sourcing: Site["sourcing"] }) {
   );
   const sel = items[at];
   if (!sel) return null;
-  const label = sel.place ? LABEL[sel.place.id] : undefined;
+  const cam = camera(sel.place);
+  const k = 1 / cam.s;
+  // the town's name sits on the side away from the taproom
+  const left = sel.place ? sel.place.x <= catskill.x : false;
 
   return (
     <div className="smap">
       <div className="smap__map">
         <svg viewBox={NY_VIEWBOX} className="smap__svg" aria-hidden="true" focusable="false">
-          <path d={NY_PATH} className="smap__state" data-all={sel.place ? undefined : ""} />
-          {sel.place ? (
-            <path key={sel.what} d={arc(sel.place)} className="smap__route" pathLength={1} />
-          ) : null}
-          {items.map((it, i) =>
-            it.place ? (
-              <g key={it.what} className="smap__town" data-on={i === at ? "" : undefined}>
-                <circle cx={it.place.x} cy={it.place.y} r="11" className="smap__dot" />
-                {/* a generous target for a thumb */}
-                {/* biome-ignore lint/a11y/noStaticElementInteractions: a pointer shortcut; the list's buttons do the same for everyone */}
-                <circle
-                  cx={it.place.x}
-                  cy={it.place.y}
-                  r="44"
-                  className="smap__hit"
-                  onClick={() => setAt(i)}
-                  onPointerEnter={() => setAt(i)}
-                />
-              </g>
-            ) : null,
-          )}
-          {sel.place && label ? (
-            <text
-              key={`l-${sel.what}`}
-              x={sel.place.x + label.dx}
-              y={sel.place.y + label.dy}
-              textAnchor={label.anchor}
-              className="smap__label"
-            >
-              {sel.place.label}
-            </text>
-          ) : null}
-          {/* the taproom: the barley mark, always named */}
-          <svg
-            x={catskill.x - 13}
-            y={catskill.y - 38}
-            width="26"
-            height="74"
-            viewBox={BARLEY_VIEWBOX}
-            className="smap__mark"
+          <g
+            className="smap__cam"
+            style={
+              {
+                transform: `translate(${cam.x.toFixed(1)}px, ${cam.y.toFixed(1)}px) scale(${cam.s.toFixed(3)})`,
+                "--k": k.toFixed(4),
+              } as CSSProperties
+            }
           >
-            {KERNELS.map((d) => (
-              <path key={d} d={d} />
-            ))}
-          </svg>
-          <text x={catskill.x + 30} y={catskill.y + 12} className="smap__label smap__label--home">
-            {catskill.label}
-          </text>
+            <path d={NY_PATH} className="smap__state" data-all={sel.place ? undefined : ""} />
+            {sel.place ? (
+              <path key={sel.what} d={road(sel.place, k)} className="smap__route" pathLength={1} />
+            ) : null}
+            {items.map((it, i) =>
+              it.place ? (
+                <g key={it.what} className="smap__town" data-on={i === at ? "" : undefined}>
+                  <circle cx={it.place.x} cy={it.place.y} r="11" className="smap__dot" />
+                  {/* a generous target for a thumb */}
+                  {/* biome-ignore lint/a11y/noStaticElementInteractions: a pointer shortcut; the list's buttons do the same for everyone */}
+                  <circle
+                    cx={it.place.x}
+                    cy={it.place.y}
+                    r={44 * k}
+                    className="smap__hit"
+                    onClick={() => setAt(i)}
+                    onPointerEnter={() => setAt(i)}
+                  />
+                </g>
+              ) : null,
+            )}
+            {sel.place ? (
+              <text
+                key={`l-${sel.what}`}
+                x={sel.place.x + (left ? -26 : 26) * k}
+                y={sel.place.y + 12 * k}
+                textAnchor={left ? "end" : "start"}
+                className="smap__label"
+              >
+                {sel.place.label}
+              </text>
+            ) : null}
+            {/* the taproom: the barley mark, small, always named */}
+            <svg
+              x={catskill.x - 8 * k}
+              y={catskill.y - 23 * k}
+              width={16 * k}
+              height={46 * k}
+              viewBox={BARLEY_VIEWBOX}
+              className="smap__mark"
+            >
+              {KERNELS.map((d) => (
+                <path key={d} d={d} />
+              ))}
+            </svg>
+            <text x={catskill.x + 20 * k} y={catskill.y + 12 * k} className="smap__label smap__label--home">
+              {catskill.label}
+            </text>
+          </g>
         </svg>
       </div>
 

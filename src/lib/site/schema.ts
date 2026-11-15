@@ -53,7 +53,16 @@ export const siteSchema = z.object({
     giftCards: z.string(),
   }),
   sourcingLine: z.string(),
-  sourcing: z.array(z.object({ what: z.string(), who: z.string(), where: z.string() })),
+  // geo: where the supplier is. With it the map puts a town there and draws the road to
+  // the taproom; without it the source counts as statewide and lights the whole state.
+  sourcing: z.array(
+    z.object({
+      what: z.string(),
+      who: z.string(),
+      where: z.string(),
+      geo: z.object({ lat: z.number().min(-90).max(90), lng: z.number().min(-180).max(180) }).optional(),
+    }),
+  ),
   about: z.object({ founders: z.array(z.string()), paragraphs: z.array(z.string()) }),
   brewery: z.object({ paragraphs: z.array(z.string()) }),
   bands: z.string(),
