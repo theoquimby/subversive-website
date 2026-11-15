@@ -680,74 +680,81 @@ body {
   margin-top: var(--s-8);
 }
 
-/* ---------- The page change (Curtain.tsx) ----------
-   A fixed drawing the size of the screen. Seven sweeps of a broad marker go back and
-   forth down the screen, each starting as the one before is finishing, until the page is
-   covered: in paper, or (on the way to the events pages) the night's black. On the
-   covered sheet one quick pen line is drawn across, and then the sheet lifts. Dash
-   offsets and one opacity; nothing is snapshotted. */
+/* ---------- The page change (Curtain.tsx; rules in docs/motion-rules.md) ----------
+   The cover: six marker bands, each a filled shape with its rough edges and dry tail
+   drawn into its outline, slide in from alternate sides at a slight tilt until the screen
+   is painted out; a plain sheet snaps in under the last one. Transform only. Then the
+   cover lifts and the new page's content wipes in along its reading order. */
 .curtain {
-  --step: 45ms;
+  /* less tilt on a wide screen, where the same angle would open gaps at the edges */
+  --tilt-k: 1;
   position: fixed;
   inset: 0;
   z-index: 200;
-  opacity: 0;
+  overflow: hidden;
+  color: var(--paper);
+  visibility: hidden;
   pointer-events: none;
 }
+@media (min-width: 48rem) {
+  .curtain {
+    --tilt-k: 0.45;
+  }
+}
 :root[data-curtain-to="night"] .curtain {
-  --step: 65ms;
+  color: var(--night);
 }
-.curtain__ink {
-  display: block;
-  width: 100%;
-  height: 100%;
+:root[data-curtain] .curtain {
+  visibility: visible;
 }
-.curtain__ink path {
-  fill: none;
-  stroke-linecap: round;
-  stroke-linejoin: round;
-  stroke-dasharray: 1;
-  stroke-dashoffset: 1;
+.curtain__back {
+  position: absolute;
+  inset: 0;
+  background: currentColor;
+  opacity: 0;
 }
-.curtain__sweep {
-  stroke: var(--paper);
-  stroke-width: 24;
+.curtain__band {
+  position: absolute;
+  left: -25%;
+  width: 150%;
+  fill: currentColor;
+  transform: translateX(calc(var(--from) * 115%)) rotate(calc(var(--tilt) * var(--tilt-k)));
 }
-:root[data-curtain-to="night"] .curtain__sweep {
-  stroke: var(--night);
+/* each band is set down fast and slows as it runs out; the next starts before it lands */
+:root[data-curtain="cover"] .curtain__band,
+:root[data-curtain="reveal"] .curtain__band {
+  transform: translateX(0) rotate(calc(var(--tilt) * var(--tilt-k)));
 }
-/* the pen line is wiped in from the left (a dash offset cannot be trusted on a stroke
-   that keeps its width while the drawing is stretched to the screen) */
-.curtain__ink .curtain__pen {
-  stroke: var(--ink);
-  stroke-width: 3px;
-  stroke-dasharray: none;
-  vector-effect: non-scaling-stroke;
-  clip-path: inset(-8px 100% -8px -8px);
+:root[data-curtain="cover"] .curtain__band {
+  transition: transform var(--ms) cubic-bezier(0.3, 0, 0.15, 1);
+  transition-delay: calc(var(--i) * 70ms);
 }
-:root[data-curtain-to="night"] .curtain__pen {
-  stroke: var(--bone);
-}
-:root[data-curtain="cover"] .curtain,
-:root[data-curtain="reveal"] .curtain {
+:root[data-curtain="cover"] .curtain__back,
+:root[data-curtain="reveal"] .curtain__back {
   opacity: 1;
 }
-/* each sweep is fast and eases out, like an arm; the next one starts before it lands */
-:root[data-curtain="cover"] .curtain__sweep {
-  stroke-dashoffset: 0;
-  transition: stroke-dashoffset 150ms cubic-bezier(0.3, 0.6, 0.3, 1);
-  transition-delay: calc(var(--i) * var(--step));
-}
-:root[data-curtain="reveal"] .curtain__sweep {
-  stroke-dashoffset: 0;
-}
-:root[data-curtain="reveal"] .curtain__ink .curtain__pen {
-  clip-path: inset(-8px);
-  transition: clip-path 300ms cubic-bezier(0.4, 0, 0.2, 1);
+:root[data-curtain="cover"] .curtain__back {
+  transition: opacity 1ms linear 535ms;
 }
 :root[data-curtain="reveal"] .curtain {
   opacity: 0;
-  transition: opacity 300ms cubic-bezier(0, 0, 0.2, 1) 280ms;
+  transition: opacity 240ms cubic-bezier(0, 0, 0.2, 1);
+}
+/* the arrival: what is on the new page's first screen is drawn on, left to right, one
+   thing after another (Curtain marks them and numbers them in reading order) */
+@media (prefers-reduced-motion: no-preference) {
+  [data-arrive] {
+    animation: arrive 280ms cubic-bezier(0.3, 0, 0.15, 1) both;
+    animation-delay: calc(100ms + var(--arrive-i, 0) * 32ms);
+  }
+}
+@keyframes arrive {
+  from {
+    clip-path: inset(-6px 100% -6px -6px);
+  }
+  to {
+    clip-path: inset(-6px);
+  }
 }
 @media print {
   .curtain {

@@ -1,39 +1,79 @@
 "use client";
 
-// The page change (redesign 2026-11-14). A fixed, screen-sized sheet: cheap in every
-// browser, unlike the whole-page snapshot it replaces (see PageWipe.tsx).
+// The page change. Rebuilt 2026-11-15 from research into how this is done well (the rules
+// are in docs/motion-rules.md). Two parts:
 //
-// The screen is scribbled over with one broad pen stroke, side to side from the top down,
-// as if coloured in by hand: in paper between paper pages, and in the night's black on
-// the way to the events pages, so the lights are painted out rather than faded. Coming
-// back from the events pages it is painted paper again.
+// 1. The cover. Six marker bands paint the screen out: each is a filled shape with its
+//    rough edges, blunt start and dry, fingered tail baked into its outline, unequal in
+//    width, tilted a few degrees, overlapping its neighbours, sliding in from alternate
+//    sides with a fast attack. Transform only, so it runs on the compositor. A plain
+//    sheet snaps in under the last band, so the cover is certain to be whole before the
+//    page is swapped. Paper between paper pages; the night's black into the events pages.
 //
-// The order matters: the scribble covers the old page first (420 ms; 560 ms to paint it dark),
-// then the route changes underneath it, then it lifts on the new page. So the visitor
-// never sees the new page arrive half-scrolled or half-loaded. The click is taken in the
-// capture phase and the route is pushed when the cover is done. With reduced motion, a
-// modified click, a new tab or an outside link, nothing is intercepted.
+// 2. The arrival. The cover lifts and the new page's own content is drawn on in reading
+//    order: its headings, rules, tickets and rows wipe in from the left, one after
+//    another, inside about three quarters of a second. Only what is on the first screen,
+//    at most fourteen things. On a first visit nothing is animated; the page just paints.
+//
+// The click is taken first: the next page is prefetched at once and pushed when the cover
+// is whole. With reduced motion, a modified click, a new tab or an outside link, nothing
+// is intercepted. Back and forward have no cover.
 import { usePathname, useRouter } from "next/navigation";
 import { type CSSProperties, useEffect, useRef } from "react";
 
-const COVER = 420; // ms the scribble takes to cover the screen in paper
-const DIM = 560; // ms it takes to paint the screen dark
+const COVER = 560; // ms until the cover is whole (last band lands at about 540)
 const NIGHT = /^\/events(\/|$)/;
-// the marker's sweeps, alternating direction, each bowed a little differently
-const SWEEPS = [
-  "M-15 5C20 0 70 9 115 3",
-  "M115 19C75 24 30 14 -15 21",
-  "M-15 36C25 31 65 41 115 34",
-  "M115 51C70 56 35 46 -15 53",
-  "M-15 68C30 63 70 73 115 66",
-  "M115 84C75 89 30 79 -15 86",
-  "M-15 99C25 95 70 103 115 97",
-];
+const DRAWN =
+  "h1, h2, h3, .sec-head__rule, .open-now, .tix__t, .facts__cell, .mrow, .hours__row, .smap__row, .ledger__row, .btn, .field, .prose p";
+const MOST = 14;
+
+// A small seeded generator, so the same rough edges are drawn on the server and in the browser.
+function seeded(seed: number) {
+  let s = seed;
+  return () => {
+    s = (s * 1664525 + 1013904223) % 4294967296;
+    return s / 4294967296;
+  };
+}
+
+/** One marker band on a 1000 × 100 sheet: wobbling long edges, a blunt start, a dry tail. */
+function band(seed: number): string {
+  const r = seeded(seed);
+  const top: string[] = [];
+  const bottom: string[] = [];
+  for (let x = 30; x <= 930; x += 22) {
+    top.push(`${x} ${(7 + r() * 7).toFixed(1)}`);
+    bottom.push(`${x} ${(93 - r() * 7).toFixed(1)}`);
+  }
+  // the tail: the marker running dry, in uneven fingers
+  const tail: string[] = [];
+  const fingers = 5;
+  for (let i = 0; i < fingers; i++) {
+    const y0 = 9 + (i * 82) / fingers;
+    const y1 = 9 + ((i + 1) * 82) / fingers;
+    const reach = 945 + r() * 55;
+    tail.push(`${reach.toFixed(0)} ${(y0 + 2).toFixed(1)}`, `${reach.toFixed(0)} ${(y1 - 3).toFixed(1)}`);
+    if (i < fingers - 1) tail.push(`${(925 + r() * 12).toFixed(0)} ${y1.toFixed(1)}`);
+  }
+  // the start: blunt, a little rounded, set down hard
+  const start = `C2 78 0 60 3 44C1 30 6 16 30 ${(8 + r() * 5).toFixed(1)}`;
+  return `M${top.join("L")}L${tail.join("L")}L${bottom.reverse().join("L")}${start}Z`;
+}
+
+// Six bands: where each sits, how tall, its tilt, how long its stroke takes. Unequal on
+// purpose; together they overlap by about a quarter and overshoot every edge.
+const BANDS = [
+  { top: -6, height: 26, tilt: -5, ms: 190 },
+  { top: 12, height: 23, tilt: 4, ms: 170 },
+  { top: 28, height: 27, tilt: -6, ms: 200 },
+  { top: 46, height: 24, tilt: 5, ms: 175 },
+  { top: 62, height: 26, tilt: -4, ms: 195 },
+  { top: 79, height: 28, tilt: 6, ms: 185 },
+].map((b, i) => ({ ...b, d: band(11 + i * 7), from: i % 2 === 0 ? -1 : 1 }));
 
 export function Curtain() {
   const path = usePathname();
   const router = useRouter();
-  const cover = useRef(0);
   const timers = useRef<number[]>([]);
 
   // start the cover on a click that will change the page
@@ -49,38 +89,59 @@ export function Curtain() {
       e.preventDefault();
       e.stopPropagation();
       for (const t of timers.current) window.clearTimeout(t);
-      const night = NIGHT.test(to.pathname);
-      cover.current = night ? DIM : COVER;
-      root.dataset.curtainTo = night ? "night" : "paper";
+      const href = to.pathname + to.search + to.hash;
+      router.prefetch(href); // the fetch never waits for the animation
+      root.dataset.curtainTo = NIGHT.test(to.pathname) ? "night" : "paper";
+      delete root.dataset.curtain;
+      // restart cleanly if a transition was already running
+      void root.offsetWidth;
       root.dataset.curtain = "cover";
       timers.current = [
-        window.setTimeout(() => router.push(to.pathname + to.search + to.hash), cover.current),
-        // never leave the sheet down if the navigation does not happen
+        window.setTimeout(() => router.push(href), COVER),
+        // never leave the cover down if the navigation does not happen
         window.setTimeout(() => {
           delete root.dataset.curtain;
           delete root.dataset.curtainTo;
-        }, 4000),
+        }, COVER + 3000),
       ];
     };
     document.addEventListener("click", onClick, true);
     return () => document.removeEventListener("click", onClick, true);
   }, [router]);
 
-  // lift it once the new page is in and the cover has finished
+  // the new page is in: mark what is on its first screen, lift the cover, let it draw on
   // biome-ignore lint/correctness/useExhaustiveDependencies: the path is the trigger
   useEffect(() => {
     const root = document.documentElement;
     if (root.dataset.curtain !== "cover") return;
     for (const t of timers.current) window.clearTimeout(t);
-    // a beat for the new page to paint under the sheet
     timers.current = [
+      // a beat for the new page to paint under the cover
       window.setTimeout(() => {
+        const marked: HTMLElement[] = [];
+        for (const el of document.querySelectorAll<HTMLElement>(`main :is(${DRAWN})`)) {
+          if (marked.length >= MOST) break;
+          const box = el.getBoundingClientRect();
+          if (box.height === 0 || box.top > window.innerHeight || box.bottom < 0) continue;
+          // not a thing inside a thing already marked (a heading inside a ticket)
+          if (marked.some((m) => m.contains(el))) continue;
+          el.style.setProperty("--arrive-i", String(marked.length));
+          el.setAttribute("data-arrive", "");
+          marked.push(el);
+        }
         root.dataset.curtain = "reveal";
         timers.current.push(
-          window.setTimeout(() => {
-            delete root.dataset.curtain;
-            delete root.dataset.curtainTo;
-          }, 700),
+          window.setTimeout(
+            () => {
+              delete root.dataset.curtain;
+              delete root.dataset.curtainTo;
+              for (const el of marked) {
+                el.removeAttribute("data-arrive");
+                el.style.removeProperty("--arrive-i");
+              }
+            },
+            260 + marked.length * 40 + 360,
+          ),
         );
       }, 90),
     ];
@@ -88,24 +149,28 @@ export function Curtain() {
 
   return (
     <div className="curtain" aria-hidden="true">
-      {/* seven sweeps of a broad marker, back and forth down the screen, each a little
-          bowed; then, on the covered sheet, one quick continuous pen line before it lifts */}
-      <svg viewBox="0 0 100 100" preserveAspectRatio="none" className="curtain__ink" focusable="false">
-        {SWEEPS.map((d, i) => (
-          <path
-            key={d}
-            d={d}
-            pathLength={1}
-            className="curtain__sweep"
-            style={{ "--i": i } as CSSProperties}
-          />
-        ))}
-        <path
-          pathLength={1}
-          className="curtain__pen"
-          d="M-5 52C15 40 25 60 35 50C42 43 30 38 34 48C40 62 55 40 65 50C72 57 62 62 66 52C72 38 90 56 105 48"
-        />
-      </svg>
+      <div className="curtain__back" />
+      {BANDS.map((b, i) => (
+        <svg
+          key={b.d}
+          viewBox="0 0 1000 100"
+          preserveAspectRatio="none"
+          className="curtain__band"
+          focusable="false"
+          style={
+            {
+              top: `${b.top}%`,
+              height: `${b.height}%`,
+              "--tilt": `${b.tilt}deg`,
+              "--from": b.from,
+              "--ms": `${b.ms}ms`,
+              "--i": i,
+            } as CSSProperties
+          }
+        >
+          <path d={b.d} />
+        </svg>
+      ))}
     </div>
   );
 }
