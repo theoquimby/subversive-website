@@ -14,11 +14,21 @@
 // capture phase and the route is pushed when the cover is done. With reduced motion, a
 // modified click, a new tab or an outside link, nothing is intercepted.
 import { usePathname, useRouter } from "next/navigation";
-import { useEffect, useRef } from "react";
+import { type CSSProperties, useEffect, useRef } from "react";
 
 const COVER = 420; // ms the scribble takes to cover the screen in paper
 const DIM = 560; // ms it takes to paint the screen dark
 const NIGHT = /^\/events(\/|$)/;
+// the marker's sweeps, alternating direction, each bowed a little differently
+const SWEEPS = [
+  "M-15 5C20 0 70 9 115 3",
+  "M115 19C75 24 30 14 -15 21",
+  "M-15 36C25 31 65 41 115 34",
+  "M115 51C70 56 35 46 -15 53",
+  "M-15 68C30 63 70 73 115 66",
+  "M115 84C75 89 30 79 -15 86",
+  "M-15 99C25 95 70 103 115 97",
+];
 
 export function Curtain() {
   const path = usePathname();
@@ -70,7 +80,7 @@ export function Curtain() {
           window.setTimeout(() => {
             delete root.dataset.curtain;
             delete root.dataset.curtainTo;
-          }, 520),
+          }, 700),
         );
       }, 90),
     ];
@@ -78,10 +88,22 @@ export function Curtain() {
 
   return (
     <div className="curtain" aria-hidden="true">
+      {/* seven sweeps of a broad marker, back and forth down the screen, each a little
+          bowed; then, on the covered sheet, one quick continuous pen line before it lifts */}
       <svg viewBox="0 0 100 100" preserveAspectRatio="none" className="curtain__ink" focusable="false">
+        {SWEEPS.map((d, i) => (
+          <path
+            key={d}
+            d={d}
+            pathLength={1}
+            className="curtain__sweep"
+            style={{ "--i": i } as CSSProperties}
+          />
+        ))}
         <path
           pathLength={1}
-          d="M-12 6L112 2L-12 20L112 18L-12 36L112 34L-12 52L112 50L-12 68L112 66L-12 84L112 82L-12 100L112 98"
+          className="curtain__pen"
+          d="M-5 52C15 40 25 60 35 50C42 43 30 38 34 48C40 62 55 40 65 50C72 57 62 62 66 52C72 38 90 56 105 48"
         />
       </svg>
     </div>
