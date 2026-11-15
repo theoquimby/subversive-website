@@ -817,6 +817,19 @@
   vector-effect: non-scaling-stroke;
   transition: fill var(--d-2) var(--ease-out);
 }
+/* the geography is put through a small wobble, so an accurate outline reads as drawn by
+   hand; the little drawings (mountains, water, a boat) sit where the real ones are */
+.smap__land {
+  filter: url(#smap-wobble);
+}
+.smap__decor path {
+  fill: none;
+  stroke: var(--fg);
+  stroke-width: 1.5px;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  vector-effect: non-scaling-stroke;
+}
 /* landmarks, quieter than the outline: the main roads as fine dashes, the Hudson as a
    pen line in the one blue the page has */
 .smap__road {

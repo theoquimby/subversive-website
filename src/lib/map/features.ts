@@ -91,11 +91,35 @@ function line(points: LatLng[]): string {
   return `${d}L${last.x} ${last.y}`;
 }
 
+// Small pen drawings that sit where the real things are: the two mountain ranges, open
+// water, a boat on the river. Each is a kind and a place; SourceMap owns the drawings.
+const DECOR: { kind: "peaks" | "waves" | "boat" | "trees"; at: LatLng }[] = [
+  { kind: "peaks", at: [42.12, -74.35] }, // the Catskills
+  { kind: "peaks", at: [44.05, -74.25] }, // the Adirondacks
+  { kind: "peaks", at: [43.75, -74.75] },
+  { kind: "trees", at: [43.35, -75.3] }, // the Tug Hill and Mohawk country
+  { kind: "trees", at: [42.45, -76.5] }, // the Finger Lakes hills
+  { kind: "waves", at: [43.62, -77.6] }, // Lake Ontario
+  { kind: "waves", at: [43.72, -76.75] },
+  { kind: "waves", at: [40.62, -72.95] }, // the Atlantic, off Long Island
+  { kind: "waves", at: [42.72, -79.35] }, // Lake Erie
+  { kind: "boat", at: [41.62, -73.96] }, // on the Hudson, by Poughkeepsie
+];
+
 export interface MapFeatures {
   river: string;
   roads: string[];
+  decor: { kind: "peaks" | "waves" | "boat" | "trees"; x: number; y: number }[];
 }
 
 export function mapFeatures(): MapFeatures {
-  return { river: line(HUDSON), roads: ROADS.map((r) => line(r.points)) };
+  return {
+    river: line(HUDSON),
+    roads: ROADS.map((r) => line(r.points)),
+    decor: DECOR.map(({ kind, at }) => ({ kind, ...projectNY(at[0], at[1]) })).map(({ kind, x, y }) => ({
+      kind,
+      x,
+      y,
+    })),
+  };
 }

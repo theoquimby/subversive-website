@@ -28,6 +28,18 @@ export interface Stop {
 }
 type Place = { x: number; y: number };
 
+// The little drawings, each on its own small sheet centred on 0,0 (map units).
+const DECOR: Record<string, string[]> = {
+  peaks: ["M-34 14L-18 -10L-10 2L4 -20L18 4L24 -6L36 14", "M-2 -12L4 -6L9 -12", "M-22 -3L-18 2L-14 -3"],
+  waves: ["M-26 -4C-20 -11 -14 -11 -8 -4S4 3 10 -4S22 -11 28 -4", "M-16 8C-10 1 -4 1 2 8S14 15 20 8"],
+  boat: ["M-11 4H11L7 10H-7Z", "M0 4V-13L10 2Z", "M-16 15C-11 11 -6 11 -1 15S9 19 14 15"],
+  trees: [
+    "M-14 12V2M-14 2L-21 4L-14 -12L-7 4Z",
+    "M8 12V4M8 4L0 6L8 -10L16 6Z",
+    "M-3 12V7M-3 7L-8 8L-3 -3L2 8Z",
+  ],
+};
+
 const W = 1000;
 const H = 774;
 // far enough in to separate the Hudson Valley towns, not so far that the state is lost
@@ -97,17 +109,37 @@ export function SourceMap({ stops, features }: { stops: Stop[]; features: MapFea
               } as CSSProperties
             }
           >
-            <path d={NY_PATH} className="smap__state" data-all={sel.place ? undefined : ""} />
-            {/* landmarks, kept inside the state's outline: the main roads, thin and dashed,
+            {/* the pen's wobble: one small displacement over everything drawn as geography,
+                so the accurate outline reads as drawn by hand */}
+            <filter id="smap-wobble" x="-5%" y="-5%" width="110%" height="110%">
+              <feTurbulence type="fractalNoise" baseFrequency="0.022" numOctaves="2" seed="7" />
+              <feDisplacementMap in="SourceGraphic" scale="9" />
+            </filter>
+            <g className="smap__land">
+              <path d={NY_PATH} className="smap__state" data-all={sel.place ? undefined : ""} />
+              {/* landmarks, kept inside the state's outline: the main roads, thin and dashed,
                 and the Hudson */}
-            <clipPath id="smap-ny">
-              <path d={NY_PATH} />
-            </clipPath>
-            <g clipPath="url(#smap-ny)">
-              {features.roads.map((d) => (
-                <path key={d} d={d} className="smap__road" />
+              <clipPath id="smap-ny">
+                <path d={NY_PATH} />
+              </clipPath>
+              <g clipPath="url(#smap-ny)">
+                {features.roads.map((d) => (
+                  <path key={d} d={d} className="smap__road" />
+                ))}
+                <path d={features.river} className="smap__river" />
+              </g>
+              {/* mountains, water, a boat: drawn where the real ones are */}
+              {features.decor.map((d) => (
+                <g
+                  key={`${d.kind}-${d.x}-${d.y}`}
+                  className="smap__decor"
+                  transform={`translate(${d.x} ${d.y})`}
+                >
+                  {(DECOR[d.kind] ?? []).map((path) => (
+                    <path key={path} d={path} />
+                  ))}
+                </g>
               ))}
-              <path d={features.river} className="smap__river" />
             </g>
             {sel.place ? (
               <path key={sel.what} d={road(sel.place, k)} className="smap__route" pathLength={1} />
