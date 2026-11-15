@@ -61,6 +61,11 @@ export const siteSchema = z.object({
       who: z.string(),
       where: z.string(),
       geo: z.object({ lat: z.number().min(-90).max(90), lng: z.number().min(-180).max(180) }).optional(),
+      // the detail view, all optional: a photo (an id in content/photos.ts), a few
+      // sentences in the brewery's words, the supplier's own site
+      photo: z.string().optional(),
+      about: z.string().optional(),
+      url: z.url().optional(),
     }),
   ),
   about: z.object({ founders: z.array(z.string()), paragraphs: z.array(z.string()) }),

@@ -12,7 +12,7 @@
 //
 // Every word comes from site.json. The list alone carries all the information; the map
 // is hidden from assistive tech.
-import { type CSSProperties, useState } from "react";
+import { type CSSProperties, type ReactNode, useState } from "react";
 import { BARLEY_VIEWBOX, KERNELS } from "../graphics/BarleyMark";
 import { NY_PATH, NY_PLACES, NY_VIEWBOX } from "../graphics/ny-map.generated";
 
@@ -22,6 +22,8 @@ export interface Stop {
   who: string;
   where: string;
   place: { label: string; x: number; y: number } | null;
+  /** the detail view (a photograph, a few sentences, a link), rendered by the page */
+  detail?: ReactNode;
 }
 type Place = { x: number; y: number };
 
@@ -71,6 +73,9 @@ export function SourceMap({ stops }: { stops: Stop[] }) {
       items.findIndex((i) => i.place),
     ),
   );
+  // Which source's detail view is open. Hovering or tabbing through the list only moves
+  // the map; a detail opens on a click or tap, so the list never jumps under a pointer.
+  const [open, setOpen] = useState<number | null>(null);
   const sel = items[at];
   if (!sel) return null;
   const cam = camera(sel.place);
@@ -150,7 +155,11 @@ export function SourceMap({ stops }: { stops: Stop[] }) {
               type="button"
               className="smap__row"
               aria-pressed={i === at}
-              onClick={() => setAt(i)}
+              aria-expanded={it.detail ? i === open : undefined}
+              onClick={() => {
+                setAt(i);
+                setOpen(open === i ? null : i);
+              }}
               onPointerEnter={(e) => {
                 if (e.pointerType === "mouse") setAt(i);
               }}
@@ -162,6 +171,8 @@ export function SourceMap({ stops }: { stops: Stop[] }) {
                 <span className="run__where">{it.where}</span>
               </span>
             </button>
+            {/* the detail view: opens under the chosen source, when it has one */}
+            {it.detail && i === open ? <div className="smap__detail">{it.detail}</div> : null}
           </li>
         ))}
       </ul>

@@ -128,3 +128,12 @@ What Ops would need to serve, read-only, e.g. `GET /api/public/suppliers`:
 
 Website work once that exists: a small `getSourcing()` that reads the feed (Zod-validated,
 cached, `site.json` as the fallback), used in place of `site.sourcing` on Home.
+
+### Detail view (added 2026-11-15)
+
+Each supplier can open a detail view on the site: a photograph, a few sentences, a link.
+Three more optional fields per supplier: `about` (a few sentences, Max's words), `url`
+(the supplier's own site) and `photo`. Today `photo` is the id of a photograph already in
+the website's repo. For photographs uploaded in Ops, the website needs to know where they
+are served from (one image host to allow in its content-security policy and image
+settings); that is a decision for Theo before any code.

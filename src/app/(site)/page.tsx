@@ -8,7 +8,7 @@
 //   kitchen (a burger: one photo) · where it comes from (barley: the map you can ask)
 // Hours in full, the whole menu and every event live on their own pages.
 import { homeLabels, microcopy, visitLabels } from "@content/microcopy";
-import { type Photo, photos } from "@content/photos";
+import { type Photo, type PhotoId, photos } from "@content/photos";
 import type { Metadata } from "next";
 import { PhotoFrame } from "@/components/graphics/PhotoFrame";
 import { Hero } from "@/components/home/Hero";
@@ -62,13 +62,34 @@ export default async function Home() {
   // where each source sits on the drawn map: placed from its latitude and longitude, so
   // a supplier added as data (later, from Ops) appears with no drawing work. A source with
   // no location, or one outside the drawing, counts as statewide.
-  const stops = site.sourcing.map(({ what, who, where, geo }) => {
+  // Each source may also carry a detail view: a photograph, a few sentences, a link. It
+  // opens under the source when it is chosen. TODO(Max): the sentences and photographs for
+  // each supplier; only the grain photograph is on hand, so only Grain opens today.
+  const stops = site.sourcing.map(({ what, who, where, geo, photo, about, url }) => {
     const at = geo ? projectNY(geo.lat, geo.lng) : null;
+    const hasPhoto = photo !== undefined && photo in photos;
     return {
       what,
       who,
       where,
       place: at?.onMap ? { label: where.split(",")[0]?.trim() ?? where, x: at.x, y: at.y } : null,
+      detail:
+        hasPhoto || about || url ? (
+          <>
+            {hasPhoto ? (
+              <PhotoFrame
+                id={photo as PhotoId}
+                ratio="16/10"
+                sizes="(min-width: 1024px) 420px, 100vw"
+                // no scroll reveal: this photo is added on a click, after the page's
+                // reveal observer has run, and would stay hidden waiting for it
+                reveal={false}
+              />
+            ) : null}
+            {about ? <p className="smap__about">{about}</p> : null}
+            {url ? <ExternalLink href={url}>{homeLabels.supplierSite}</ExternalLink> : null}
+          </>
+        ) : null,
     };
   });
 

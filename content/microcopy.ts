@@ -110,6 +110,8 @@ export const homeLabels = {
   // the facts strip under the first screen: interface labels
   facts: { today: "Today", allHours: "All hours", findUs: "Find us", call: "Call" },
   waysLabel: "Pages",
+  // the link in a supplier's detail view: an interface label
+  supplierSite: "Their website",
   weekdayTag: { wed: "Wing Wednesday", thu: "Rodeo Thursdays", other: "Dogs welcome in the tent" },
   // the tap-list glass on the first screen: interface labels
   tap: {
