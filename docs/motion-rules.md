@@ -9,7 +9,7 @@ sources. Code: `src/components/layout/Curtain.tsx`, styles in `src/styles/shell.
 
 ## Rules
 
-1. The cover takes 550 ms or less. The arrival takes 900 ms or less. Never more than about
+1. The cover takes 350 ms or less. The arrival takes 900 ms or less. Never more than about
    1.4 s from click to a settled page.
 2. The next page is prefetched on the click. The animation never delays the fetch.
 3. If the page is not ready when the cover is whole, the cover holds; after 3 s it gives up
@@ -40,3 +40,9 @@ sources. Code: `src/components/layout/Curtain.tsx`, styles in `src/styles/shell.
 - A wobble filter on moving shapes: too costly on phones.
 - A decorative squiggle drawn on the cover before it lifted: Theo's note was that the
   page's own content should be what draws on.
+- Six shaped marker bands (filled shapes with rough edges and dry tails, tilted, sliding
+  in from alternate sides): better drawn than the lines, but Theo's verdict was still
+  "so bad", and the marker cover was scrapped on 2026-11-15. The cover is now a plain
+  sheet fading up in the next page's colour; the character is in the arrival, where the
+  page's own content draws on. Rules 7 and 13 below applied to the bands and are kept
+  only as a record.

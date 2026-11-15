@@ -681,64 +681,34 @@ body {
 }
 
 /* ---------- The page change (Curtain.tsx; rules in docs/motion-rules.md) ----------
-   The cover: six marker bands, each a filled shape with its rough edges and dry tail
-   drawn into its outline, slide in from alternate sides at a slight tilt until the screen
-   is painted out; a plain sheet snaps in under the last one. Transform only. Then the
-   cover lifts and the new page's content wipes in along its reading order. */
+   A plain sheet in the next page's colour fades up over the old page (the night's black,
+   a little slower, into the events pages: the lights dim), the page is swapped under it,
+   and it lifts while the new page's content is drawn on. One opacity. */
 .curtain {
-  /* less tilt on a wide screen, where the same angle would open gaps at the edges */
-  --tilt-k: 1;
   position: fixed;
   inset: 0;
   z-index: 200;
-  overflow: hidden;
-  color: var(--paper);
+  background: var(--paper);
+  opacity: 0;
   visibility: hidden;
   pointer-events: none;
 }
-@media (min-width: 48rem) {
-  .curtain {
-    --tilt-k: 0.45;
-  }
-}
 :root[data-curtain-to="night"] .curtain {
-  color: var(--night);
+  background: var(--night);
 }
 :root[data-curtain] .curtain {
   visibility: visible;
 }
-.curtain__back {
-  position: absolute;
-  inset: 0;
-  background: currentColor;
-  opacity: 0;
-}
-.curtain__band {
-  position: absolute;
-  left: -25%;
-  width: 150%;
-  fill: currentColor;
-  transform: translateX(calc(var(--from) * 115%)) rotate(calc(var(--tilt) * var(--tilt-k)));
-}
-/* each band is set down fast and slows as it runs out; the next starts before it lands */
-:root[data-curtain="cover"] .curtain__band,
-:root[data-curtain="reveal"] .curtain__band {
-  transform: translateX(0) rotate(calc(var(--tilt) * var(--tilt-k)));
-}
-:root[data-curtain="cover"] .curtain__band {
-  transition: transform var(--ms) cubic-bezier(0.3, 0, 0.15, 1);
-  transition-delay: calc(var(--i) * 70ms);
-}
-:root[data-curtain="cover"] .curtain__back,
-:root[data-curtain="reveal"] .curtain__back {
+:root[data-curtain="cover"] .curtain {
   opacity: 1;
+  transition: opacity 220ms cubic-bezier(0.4, 0, 0.6, 1);
 }
-:root[data-curtain="cover"] .curtain__back {
-  transition: opacity 1ms linear 535ms;
+:root[data-curtain="cover"][data-curtain-to="night"] .curtain {
+  transition-duration: 340ms;
 }
 :root[data-curtain="reveal"] .curtain {
   opacity: 0;
-  transition: opacity 240ms cubic-bezier(0, 0, 0.2, 1);
+  transition: opacity 200ms cubic-bezier(0, 0, 0.2, 1);
 }
 /* the arrival: what is on the new page's first screen is drawn on, left to right, one
    thing after another (Curtain marks them and numbers them in reading order) */
