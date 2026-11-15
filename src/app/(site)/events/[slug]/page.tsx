@@ -1,18 +1,16 @@
-// /events/[slug] (spec §6.3, plan Q14–Q15): the torn hero ticket; the matchup for games or
-// the kind's colour as a band with the seal; the description; good to know; add to
-// calendar, share, directions; previous and next. A renamed event redirects (308) to its
+// /events/[slug] (redesign 2026-11-15): a night page like the list. The date and time, the
+// title on the ink line (a game night's line carries the Knicks' two colours), the
+// description, good to know, one primary action (add to calendar) with directions and
+// share beside it, and the tickets before and after. No torn stub, scoreboard or band. A renamed event redirects (308) to its
 // canonical slug; a past one that is gone says "This one's over".
 import { eventLabels, microcopy } from "@content/microcopy";
 import type { Metadata, Viewport } from "next";
 import { notFound, permanentRedirect } from "next/navigation";
 import { AddToCalendar } from "@/components/events/AddToCalendar";
-import { Countdown } from "@/components/events/Countdown";
 import { EventDescription } from "@/components/events/EventDescription";
-import { DateStub, dateParts, detailLine, EventTicket, TICKET_KIND } from "@/components/events/EventTicket";
-import { Matchup } from "@/components/events/Matchup";
-import { Seal } from "@/components/graphics/Seal";
+import { dateParts, detailLine } from "@/components/events/EventTicket";
+import { TicketLink } from "@/components/events/TicketLink";
 import { Sticker } from "@/components/graphics/Sticker";
-import { Ticket } from "@/components/graphics/Ticket";
 import { PageWipe } from "@/components/layout/PageWipe";
 import { ShareButton } from "@/components/menu/ShareButton";
 import { Button } from "@/components/ui/Button";
@@ -105,40 +103,15 @@ export default async function EventPage({ params }: Params) {
       <div className="events-page" data-page-skin="overtime">
         <div className="page event-page">
           <TextLink href="/events">{microcopy.allEvents}</TextLink>
-          <div className="event-hero">
-            <Ticket kind={TICKET_KIND[e.category]} stub={<DateStub date={e.date} />} torn>
-              <span className="event-hero__date">
-                {p.weekdayLong}, {p.monthLong} {p.day}
-                {detailLine(e) ? <span className="tabular"> · {detailLine(e)}</span> : null}
-              </span>
-              <h1 className="event-hero__title">{e.displayTitle}</h1>
-            </Ticket>
-            {past ? (
-              <Sticker
-                shape="round"
-                color="ember"
-                rotate="b"
-                label={eventLabels.over}
-                className="event-hero__over"
-              >
-                {eventLabels.over}
-              </Sticker>
-            ) : null}
-          </div>
-        </div>
-
-        {e.matchup ? (
-          <div className="page event-game">
-            <Matchup event={e} />
-            {!past ? <Countdown event={e} /> : null}
-          </div>
-        ) : (
-          <div className="event-band" data-kind={TICKET_KIND[e.category]}>
-            <Seal className="event-band__seal" />
-          </div>
-        )}
-
-        <div className="page event-page event-page--body">
+          <header className="event-head" data-game={e.kind === "GAME" ? "" : undefined}>
+            <p className="event-head__date">
+              {p.weekdayLong}, {p.monthLong} {p.day}
+              {detailLine(e) ? <span className="tabular"> · {detailLine(e)}</span> : null}
+              {past ? <span> · {eventLabels.over}</span> : null}
+            </p>
+            <h1 className="event-hero__title">{e.displayTitle}</h1>
+            <span className="event-head__rule" aria-hidden="true" />
+          </header>
           <EventDescription text={e.description} />
           {facts.length > 0 ? (
             <section className="event-facts" aria-labelledby="facts-title">
@@ -169,7 +142,7 @@ export default async function EventPage({ params }: Params) {
               {prev ? (
                 <div>
                   <p className="event-prevnext__label">{eventLabels.previous}</p>
-                  <EventTicket event={prev} />
+                  <TicketLink event={prev} />
                 </div>
               ) : (
                 <span />
@@ -177,7 +150,7 @@ export default async function EventPage({ params }: Params) {
               {next ? (
                 <div>
                   <p className="event-prevnext__label">{eventLabels.next}</p>
-                  <EventTicket event={next} />
+                  <TicketLink event={next} />
                 </div>
               ) : null}
             </nav>

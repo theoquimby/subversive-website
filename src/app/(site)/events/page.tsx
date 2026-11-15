@@ -1,20 +1,16 @@
-// /events (spec §6.3): the night skin. The firepit photo at 40svh with "What's on" over
-// its scrim, the ticker, filters, today pinned large with its countdown, the month
-// timeline, and the band booking band. Seed until O1 is fixed; no code change after.
+// /events (redesign 2026-11-15): the night page; the lights dim on the way in (Curtain).
+// Calm: "What's on" beside a ticket drawn in pen, tonight's ticket large if there is one,
+// then the months, each a short run of tickets under its name on the line. No photograph,
+// ticker, scoreboard, starburst or filters. Events come read-only from the Ops feed.
 import { eventLabels, visitLabels } from "@content/microcopy";
 import type { Metadata, Viewport } from "next";
-import { Countdown } from "@/components/events/Countdown";
-import { EventFilters, type FilterKey } from "@/components/events/EventFilters";
-import { EventList } from "@/components/events/EventList";
-import { EventTicket } from "@/components/events/EventTicket";
-import { Matchup } from "@/components/events/Matchup";
-import { Ticker } from "@/components/events/Ticker";
-import { PhotoFrame } from "@/components/graphics/PhotoFrame";
-import { Ticket } from "@/components/graphics/Ticket";
+import { TicketLink } from "@/components/events/TicketLink";
+import { Drawing } from "@/components/home/Ways";
 import { PageWipe } from "@/components/layout/PageWipe";
-import { Button } from "@/components/ui/Button";
+import { SectionHead } from "@/components/layout/SectionHead";
+import { ExternalLink } from "@/components/ui/TextLink";
+import type { SiteEvent } from "@/lib/events/enrich";
 import { getEvents, tickets, upcoming } from "@/lib/events/source";
-import { formatDateShort } from "@/lib/hours/format";
 import { getSite } from "@/lib/site/site";
 import { now } from "@/lib/time/now";
 import { nyParts } from "@/lib/time/ny";
@@ -29,67 +25,85 @@ export const metadata: Metadata = {
     "Knicks nights, trivia, music and what's next at Subversive, 96 West Bridge Street, Catskill NY.",
 };
 
+const MONTHS = [
+  "January",
+  "February",
+  "March",
+  "April",
+  "May",
+  "June",
+  "July",
+  "August",
+  "September",
+  "October",
+  "November",
+  "December",
+];
+
+function byMonth(events: SiteEvent[]) {
+  const groups: { key: string; name: string; events: SiteEvent[] }[] = [];
+  for (const e of events) {
+    const key = e.date.slice(0, 7);
+    const g = groups.at(-1);
+    if (g && g.key === key) g.events.push(e);
+    else groups.push({ key, name: MONTHS[Number(key.slice(5)) - 1] ?? key, events: [e] });
+  }
+  return groups;
+}
+
 export default async function EventsPage() {
   const site = getSite();
   const today = nyParts(now()).date;
   const { events } = await getEvents();
-  const coming = upcoming(events, today);
-  const pinned = tickets(coming).filter((e) => e.date === today);
-  const list = coming.filter((e) => !pinned.includes(e));
-  const present = [...new Set(tickets(list).map((e) => e.category))].filter(
-    (c) => c !== "other" && c !== "notice",
-  ) as FilterKey[];
-  const ticker = tickets(coming)
-    .slice(0, 3)
-    .map((e) => ({ href: `/events/${e.slug}`, label: `${formatDateShort(e.date)} · ${e.displayTitle}` }));
+  const coming = tickets(upcoming(events, today));
+  const tonight = coming.filter((e) => e.date === today);
+  const later = coming.filter((e) => e.date !== today);
 
   return (
     <PageWipe>
       <div className="events-page" data-page-skin="overtime">
-        <header className="events-hero">
-          <PhotoFrame id="firepit-beers" bleed priority sizes="100vw" className="events-hero__photo" />
-          <h1 className="page__title events-hero__title">{eventLabels.title}</h1>
-        </header>
-        <Ticker items={ticker} label={eventLabels.ticker} />
-
         <div className="page events-body">
-          {pinned.length > 0 ? (
-            <div className="events-today">
-              {pinned.map((e) => (
-                <div key={e.id} className="events-today__item">
-                  <EventTicket event={e} tonight size="pinned" />
-                  {e.matchup ? (
-                    <div className="events-today__game">
-                      <Matchup event={e} size="pinned" />
-                      <Countdown event={e} />
-                    </div>
-                  ) : null}
-                </div>
+          <header className="events-head">
+            <h1 className="page__title">{eventLabels.title}</h1>
+            <Drawing name="events" className="events-head__art" />
+          </header>
+
+          {tonight.length > 0 ? (
+            <ul className="tix tix--tonight" data-tonight="">
+              {tonight.map((e) => (
+                <li key={e.id}>
+                  <TicketLink event={e} tonight />
+                </li>
               ))}
-            </div>
+            </ul>
           ) : null}
 
-          {tickets(list).length > 0 ? (
-            <>
-              <EventFilters present={present} />
-              <EventList events={list} today={today} />
-            </>
-          ) : pinned.length === 0 ? (
-            <Ticket kind="other" stub={<span className="ticket-date__day">–</span>} className="empty-ticket">
-              <span className="event-ticket__title">{eventLabels.empty}</span>
-              <a href={site.links.instagram} target="_blank" rel="noopener" className="event-ticket__detail">
+          {byMonth(later).map((g) => (
+            <section key={g.key} className="events-month" aria-labelledby={`m-${g.key}`}>
+              <SectionHead id={`m-${g.key}`}>{g.name}</SectionHead>
+              <ul className="tix">
+                {g.events.map((e) => (
+                  <li key={e.id}>
+                    <TicketLink event={e} />
+                  </li>
+                ))}
+              </ul>
+            </section>
+          ))}
+
+          {coming.length === 0 ? (
+            <p className="events-empty">
+              {eventLabels.empty}{" "}
+              <a className="text-link" href={site.links.instagram} target="_blank" rel="noopener">
                 Instagram
               </a>
-            </Ticket>
+            </p>
           ) : null}
 
-          <section className="band-band">
-            <p>{site.bands}</p>
-            {/* /bands arrives in M8; until then the button opens the booking form itself */}
-            <Button href={site.links.bandBookingForm} external variant="secondary">
-              {visitLabels.bookYourBand}
-            </Button>
-          </section>
+          <p className="events-bands">
+            {site.bands}{" "}
+            <ExternalLink href={site.links.bandBookingForm}>{visitLabels.bookYourBand}</ExternalLink>
+          </p>
         </div>
       </div>
     </PageWipe>

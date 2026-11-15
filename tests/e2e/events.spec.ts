@@ -8,22 +8,20 @@ test.beforeEach(async ({ page }) => {
 test("list → ticket → event page", async ({ page }) => {
   await page.goto("/events");
   await expect(page.getByRole("heading", { level: 1 })).toHaveText("What's on");
-  const ticket = page.locator('[data-event-list] a[href^="/events/"]').first();
+  const ticket = page.locator('.events-month a[data-ticket]').first();
   const href = await ticket.getAttribute("href");
   await ticket.click();
   await expect(page).toHaveURL(href ?? "");
   await expect(page.locator(".event-hero__title")).toBeVisible();
 });
 
-test("filter chips hide non-matching tickets", async ({ page }) => {
+// (the filter chips went with the 2026-11-15 redesign: a short list needs none)
+test("the list is tickets under month names; a game night carries the two-colour band", async ({ page }) => {
   await page.goto("/events");
-  const trivia = page.locator('[data-category="trivia-movies"]');
-  const games = page.locator('[data-category="games"]');
-  await page.getByRole("button", { name: "Trivia & movies" }).click();
-  await expect(trivia.first()).toBeVisible();
-  await expect(games.first()).toBeHidden();
-  await page.getByRole("button", { name: "All" }).click();
-  await expect(games.first()).toBeVisible();
+  await expect(page.locator(".events-month").first().getByRole("heading")).toBeVisible();
+  await expect(page.locator(".events-month a[data-ticket]").first()).toBeVisible();
+  await expect(page.locator("a[data-ticket][data-game]").first()).toBeVisible();
+  await expect(page.locator(".ticker, .matchup, .events-hero__photo")).toHaveCount(0);
 });
 
 test(".ics download: filename and text/calendar; unknown id is 404", async ({ request }) => {

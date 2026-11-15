@@ -575,7 +575,7 @@
   min-height: 5.5rem;
   border: var(--stroke) solid var(--fg);
   border-radius: 0.75rem;
-  background: var(--card);
+  background: var(--surface);
   color: inherit;
   text-decoration: none;
   transition: background-color var(--d-1) var(--ease-out);
@@ -640,7 +640,7 @@
 }
 @media (hover: hover) {
   .tix__t:hover {
-    background: color-mix(in srgb, var(--pils) 22%, var(--card));
+    background: color-mix(in srgb, var(--pils) 22%, var(--surface));
   }
 }
 .tix__t:active {

@@ -16,8 +16,9 @@ import { PauseMotion } from "./PauseMotion";
 export function Footer() {
   const site = getSite();
   const ext = { target: "_blank", rel: "noopener" } as const;
+  // no skin of its own: paper on paper pages, night on the night pages
   return (
-    <footer className="site-footer" data-skin="paper">
+    <footer className="site-footer">
       {/* the ground line again, as on Home's first screen: the page ends where it began */}
       <svg
         viewBox="0 0 1200 60"

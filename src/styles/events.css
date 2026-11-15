@@ -550,3 +550,115 @@
 .empty-ticket {
   max-width: 34rem;
 }
+
+/* ---------- Events, redesign 2026-11-15 (these override the rules above) ----------
+   The night page, calm: a title beside a ticket in pen, tonight's ticket, the months. */
+.events-body {
+  padding-top: var(--s-7);
+}
+.events-head {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: end;
+  gap: var(--s-4);
+}
+.events-head__art {
+  width: clamp(4.75rem, 18vw, 13rem);
+}
+.events-page .tix--tonight {
+  margin-top: var(--s-6);
+}
+/* Order is the menu's yellow on every page, the night ones included */
+:root:has([data-page-skin="overtime"]) .site-header__order {
+  background: var(--pils);
+  color: var(--ink);
+}
+/* tonight's ticket: larger, and its stub says so */
+.tix__t--tonight {
+  grid-template-columns: 7rem minmax(0, 1fr);
+  min-height: 7.5rem;
+}
+.tix__t--tonight .tix__day {
+  font-size: 2.75rem;
+}
+.tix__t--tonight .tix__when {
+  color: var(--pils);
+}
+.tix__t--tonight .tix__title {
+  font-size: clamp(1.75rem, 1.5rem + 1.25vw, 2.5rem);
+}
+.events-month {
+  display: grid;
+  gap: var(--s-5);
+  margin-top: var(--s-9);
+}
+.events-empty,
+.events-bands {
+  max-width: 52ch;
+  margin: var(--s-9) 0 0;
+  color: var(--fg-muted);
+}
+@media (min-width: 64rem) {
+  .events-page .tix {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+  .events-page .tix--tonight {
+    grid-template-columns: minmax(0, 36rem);
+  }
+}
+
+/* an event's own page */
+.event-page {
+  display: grid;
+  justify-items: start;
+  gap: var(--s-6);
+  max-width: 46rem;
+  padding-top: var(--s-7);
+}
+.event-page > * {
+  justify-self: stretch;
+}
+.event-page > .text-link {
+  justify-self: start;
+}
+.event-head {
+  display: grid;
+  gap: var(--s-3);
+}
+.event-head__date {
+  margin: 0;
+  color: var(--fg-muted);
+  font-family: var(--ff-utility);
+  font-size: 1rem;
+  font-weight: 700;
+  letter-spacing: var(--track-label);
+  text-transform: uppercase;
+}
+.event-hero__title {
+  margin: 0;
+  font-size: clamp(2.25rem, 1.75rem + 2.5vw, 4rem);
+  line-height: 1.02;
+  text-wrap: balance;
+}
+.event-head__rule {
+  display: block;
+  height: var(--stroke);
+  margin-top: var(--s-2);
+  background: var(--fg);
+}
+/* a game night: the line under the title carries the Knicks' two colours */
+.event-head[data-game] .event-head__rule {
+  height: 5px;
+  border-radius: 3px;
+  background: linear-gradient(90deg, var(--sky) 0 50%, var(--ember) 50% 100%);
+}
+.event-prevnext {
+  display: grid;
+  gap: var(--s-4);
+  margin-top: var(--s-7);
+}
+@media (min-width: 48rem) {
+  .event-prevnext {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
