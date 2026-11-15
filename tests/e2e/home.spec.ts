@@ -168,3 +168,19 @@ test("axe: home, after a pour", async ({ page }) => {
   const r = await new AxeBuilder({ page }).include(".hero").analyze();
   expect(r.violations.map((v) => `${v.id}: ${v.help} (${v.nodes.length})`)).toEqual([]);
 });
+
+test("the On tap rows line up: every name starts at the same place in its column", async ({ page }) => {
+  for (const width of [393, 1280]) {
+    await page.setViewportSize({ width, height: 800 });
+    await page.goto("/");
+    await page.evaluate(() => document.fonts.ready);
+    const offsets = await page.evaluate(() =>
+      [...document.querySelectorAll(".home-tap .mrow")].map((r) => {
+        const name = r.querySelector(".mrow__name")?.getBoundingClientRect().left ?? 0;
+        return Math.round(name - r.getBoundingClientRect().left);
+      }),
+    );
+    expect(offsets.length).toBeGreaterThan(3);
+    expect(new Set(offsets).size).toBe(1);
+  }
+});

@@ -575,7 +575,10 @@ html:has(.page--menu) {
 
 .mrow__sum {
   display: grid;
-  grid-template-columns: auto minmax(0, 1fr) minmax(var(--price-w), auto);
+  /* --price-w is set by the Menu page's sections. It carries a fallback because rows are
+     also used on Home, where it was undefined: that made this whole declaration invalid,
+     the columns fell back to three automatic ones, and names started 8 to 36 px apart. */
+  grid-template-columns: calc(2.125rem * 24 / 38) minmax(0, 1fr) minmax(var(--price-w, 3ch), auto);
   grid-template-rows: auto 1fr;
   column-gap: var(--s-4);
   margin-inline: calc(-1 * var(--s-2));
@@ -584,7 +587,7 @@ html:has(.page--menu) {
   list-style: none;
 }
 .mrow__sum:not(:has(.mrow__glass)) {
-  grid-template-columns: minmax(0, 1fr) minmax(var(--price-w), auto);
+  grid-template-columns: minmax(0, 1fr) minmax(var(--price-w, 3ch), auto);
 }
 summary.mrow__sum {
   cursor: pointer;
@@ -601,9 +604,17 @@ summary.mrow__sum:focus-visible {
   outline-offset: 0;
 }
 
+/* A fixed width. Left to size itself, the glass's column came out anywhere from 21 to
+   82 px wide from row to row (an SVG with width:auto in an auto track), so the names
+   beside it did not line up. */
 .mrow__glass {
   grid-row: 1 / span 2;
+  width: calc(2.125rem * 24 / 38);
   padding-top: 1px;
+}
+.mrow__glass .glass {
+  width: 100%;
+  height: auto;
 }
 .mrow__glass .glass--glyph {
   height: 2.125rem;
