@@ -2,7 +2,7 @@
 // rows — or the burger columns, the sauce list, or the week's features by day.
 import type { FeatureGroup } from "@/lib/menu/features";
 import type { SectionView } from "@/lib/menu/view";
-import { Pill } from "../layout/Pill";
+import { SectionHead } from "../layout/SectionHead";
 import { BurgerColumns } from "./BurgerColumns";
 import { IntroBox } from "./IntroBox";
 import { MenuRow } from "./MenuRow";
@@ -37,7 +37,7 @@ export function MenuSection({
         </h4>
         <ul className="mlist">
           {f.items.map((row, i) => (
-            <MenuRow key={row.id} row={row} index={i} />
+            <MenuRow key={row.id} row={row} index={i} disclosure={false} />
           ))}
         </ul>
       </div>
@@ -57,7 +57,7 @@ export function MenuSection({
         ) : null}
         <ul className="mlist">
           {g.items.map((row, i) => (
-            <MenuRow key={row.id} row={row} index={i} />
+            <MenuRow key={row.id} row={row} index={i} disclosure={false} />
           ))}
         </ul>
       </div>
@@ -73,16 +73,10 @@ export function MenuSection({
       aria-labelledby={`${s.id}-title`}
       data-section={s.id}
     >
-      <div className="msec__head">
-        <Pill as="h3" id={`${s.id}-title`}>
-          {s.title}
-        </Pill>
-        {legend ? (
-          <p className="msec__legend" aria-hidden="true">
-            {legend}
-          </p>
-        ) : null}
-      </div>
+      {/* the section's name on the ink line; the pour sizes sit at the line's end */}
+      <SectionHead as="h3" id={`${s.id}-title`} note={legend}>
+        {s.title}
+      </SectionHead>
       {s.note && !legend ? <p className="msec__note">{s.note}</p> : null}
       {legend && s.note ? <p className="sr-only">{s.note}</p> : null}
       {s.intro ? <IntroBox intro={s.intro} modifiers={s.modifiers} producers={producers} /> : null}

@@ -809,83 +809,6 @@ details[data-plain] .mrow__toggle {
 .msec--burgers .mlist--burgers {
   margin-top: var(--s-2);
 }
-@container (min-width: 36rem) {
-  .mlist--burgers {
-    display: grid;
-    grid-template-columns: repeat(3, minmax(0, 1fr));
-    grid-template-rows: auto 1fr auto auto;
-    column-gap: var(--s-5);
-    padding-top: var(--s-4);
-  }
-  .mlist--burgers .mrow {
-    display: grid;
-    grid-row: span 4;
-    grid-template-rows: subgrid;
-    border-top: 0;
-  }
-  .mlist--burgers .mrow__box,
-  .mlist--burgers .mrow__sum {
-    display: grid;
-    grid-row: span 4;
-    grid-template-rows: subgrid;
-    grid-template-columns: minmax(0, 1fr);
-    justify-items: center;
-    row-gap: var(--s-3);
-    margin: 0;
-    padding: 0;
-    text-align: center;
-  }
-  .mlist--burgers .mrow__main {
-    display: contents;
-  }
-  .mlist--burgers .mrow__line {
-    grid-row: 1;
-    justify-content: center;
-  }
-  .mlist--burgers .mrow__name {
-    font-size: 1.125rem;
-    letter-spacing: 0.08em;
-    text-transform: uppercase;
-    display: inline-block;
-    padding: 6px var(--s-4) 8px;
-    border-radius: var(--r-pill);
-    background: var(--fg);
-    color: var(--bg);
-  }
-  .mlist--burgers .mrow__desc {
-    grid-row: 2;
-    align-self: stretch;
-    display: grid;
-    align-items: center;
-    width: 100%;
-    padding: var(--s-4);
-    border: var(--edge);
-    border-radius: var(--r-box);
-    color: var(--fg);
-    font-size: var(--t-body);
-    line-height: var(--lh-body);
-  }
-  .mlist--burgers .mrow__tags {
-    grid-row: 3;
-    justify-content: center;
-    margin: 0;
-  }
-  .mlist--burgers .mrow__price {
-    grid-row: 4;
-    justify-self: center;
-    padding: 6px var(--s-4) 5px;
-    border: var(--edge);
-    border-radius: var(--r-pill);
-  }
-}
-
-/* ---------- Sauces (spec §6.2) ---------- */
-.sauces {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: var(--s-4) var(--s-5);
-  margin: var(--s-5) 0 0;
-}
 @media (min-width: 64rem) {
   .sauces {
     grid-template-columns: repeat(3, minmax(0, 1fr));
@@ -1137,4 +1060,41 @@ details[data-plain] .mrow__toggle {
   .filters {
     display: none;
   }
+}
+
+/* ---------- Menu, redesign 2026-11-15 (these override the rules above) ----------
+   One kind of row everywhere, its whole description shown; section names on the ink
+   line; intros as plain left-aligned text; solid hairlines. */
+.msec .sec-head {
+  margin-bottom: var(--s-2);
+}
+.msec .sec-head__title {
+  font-size: clamp(1.625rem, 1.375rem + 1.25vw, 2.375rem);
+}
+.mrow + .mrow {
+  border-top: 1px solid color-mix(in srgb, var(--fg) 24%, transparent);
+}
+.mrow__desc {
+  display: block;
+  max-width: 60ch;
+}
+.intro-box {
+  margin-top: var(--s-4);
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  text-align: left;
+}
+.intro-box__text,
+.intro-box__mods {
+  max-width: 60ch;
+  margin-inline: 0;
+}
+.mrow__more {
+  max-width: 60ch;
+}
+/* the orange rail of kernels down the side of the desktop menu goes: a third drawing
+   language beside the ink line, and unlabelled */
+.pour-line {
+  display: none;
 }

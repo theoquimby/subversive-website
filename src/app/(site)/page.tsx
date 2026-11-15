@@ -24,6 +24,7 @@ import { hoursEvents } from "@/components/visit/OpenNow";
 import { getEvents, tickets, upcoming } from "@/lib/events/source";
 import { formatClock, formatRange, formatTime, weekdayLabel } from "@/lib/hours/format";
 import { scheduleFor } from "@/lib/hours/schedule";
+import { mapFeatures } from "@/lib/map/features";
 import { projectNY } from "@/lib/map/project";
 import { isBeer } from "@/lib/menu/kinds";
 import { applySeasonal } from "@/lib/menu/seasonal";
@@ -251,7 +252,7 @@ export default async function Home() {
           </Link>
           <SectionHead id="where-title">{homeLabels.whereFrom}</SectionHead>
           <p className="home-lede">{site.sourcingLine}</p>
-          <SourceMap stops={stops} />
+          <SourceMap stops={stops} features={mapFeatures()} />
           <TextLink href="/beer">{homeLabels.ourBeer}</TextLink>
         </section>
       </div>

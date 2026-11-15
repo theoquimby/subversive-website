@@ -817,6 +817,24 @@
   vector-effect: non-scaling-stroke;
   transition: fill var(--d-2) var(--ease-out);
 }
+/* landmarks, quieter than the outline: the main roads as fine dashes, the Hudson as a
+   pen line in the one blue the page has */
+.smap__road {
+  fill: none;
+  stroke: color-mix(in srgb, var(--fg) 42%, transparent);
+  stroke-width: 1px;
+  stroke-dasharray: 5 4;
+  stroke-linecap: round;
+  vector-effect: non-scaling-stroke;
+}
+.smap__river {
+  fill: none;
+  stroke: var(--sky-deep);
+  stroke-width: var(--stroke);
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  vector-effect: non-scaling-stroke;
+}
 /* a statewide source (grain, spirits): the whole state takes the menu's yellow */
 .smap__state[data-all] {
   fill: var(--pils);

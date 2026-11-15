@@ -13,6 +13,7 @@
 // Every word comes from site.json. The list alone carries all the information; the map
 // is hidden from assistive tech.
 import { type CSSProperties, type ReactNode, useState } from "react";
+import type { MapFeatures } from "@/lib/map/features";
 import { BARLEY_VIEWBOX, KERNELS } from "../graphics/BarleyMark";
 import { NY_PATH, NY_PLACES, NY_VIEWBOX } from "../graphics/ny-map.generated";
 
@@ -64,7 +65,7 @@ function road(p: Place, k: number): string {
 // (src/lib/map/project.ts) or marked statewide. Nothing here knows any town by name, so a
 // new supplier needs no change to this file. Only this short list crosses to the browser,
 // never the whole site object (the no-malting test once caught that).
-export function SourceMap({ stops }: { stops: Stop[] }) {
+export function SourceMap({ stops, features }: { stops: Stop[]; features: MapFeatures }) {
   const items = stops;
   // start on the first source that has a town, so the map opens with a road on it
   const [at, setAt] = useState(() =>
@@ -97,6 +98,17 @@ export function SourceMap({ stops }: { stops: Stop[] }) {
             }
           >
             <path d={NY_PATH} className="smap__state" data-all={sel.place ? undefined : ""} />
+            {/* landmarks, kept inside the state's outline: the main roads, thin and dashed,
+                and the Hudson */}
+            <clipPath id="smap-ny">
+              <path d={NY_PATH} />
+            </clipPath>
+            <g clipPath="url(#smap-ny)">
+              {features.roads.map((d) => (
+                <path key={d} d={d} className="smap__road" />
+              ))}
+              <path d={features.river} className="smap__river" />
+            </g>
             {sel.place ? (
               <path key={sel.what} d={road(sel.place, k)} className="smap__route" pathLength={1} />
             ) : null}

@@ -66,14 +66,20 @@ test("filters dim non-matching rows and announce the count", async ({ page }) =>
   await expect(page.locator('[data-row="cheap-dills"]')).not.toHaveAttribute("data-dim", "");
 });
 
-test("/menu#cheap-dills opens the row and scrolls it into view", async ({ page }) => {
+test("/menu#cheap-dills scrolls the row into view; every description is shown whole", async ({ page }) => {
   await page.goto("/menu?show=food#cheap-dills");
   await expect(drinks(page)).toBeVisible();
   const row = page.locator("#cheap-dills");
   await expect(row).toBeInViewport();
-  // short rows are plain; a long one opens
+  // no row hides part of its description behind a toggle (redesign 2026-11-15)
   await page.goto("/menu#chinga-la-migra");
-  await expect(page.locator("details#chinga-la-migra")).toHaveAttribute("open", "");
+  await expect(page.locator("#chinga-la-migra")).toBeInViewport();
+  await expect(page.locator("details.mrow__box")).toHaveCount(0);
+  const clipped = await page.evaluate(
+    () =>
+      [...document.querySelectorAll(".mrow__desc")].filter((d) => d.scrollHeight > d.clientHeight + 1).length,
+  );
+  expect(clipped).toBe(0);
 });
 
 const pastFirstSection = (page: Page) =>
@@ -124,14 +130,13 @@ test("Mushroom & Swiss shows 20, two taps from home", async ({ page, isMobile })
 
 test.describe("without JavaScript", () => {
   test.use({ javaScriptEnabled: false });
-  test("both lists are visible and long rows open", async ({ page }) => {
+  test("both lists are visible and every description is there", async ({ page }) => {
     await page.goto("/menu");
     await expect(drinks(page)).toBeVisible();
     await expect(food(page)).toBeVisible();
     await expect(page.locator(".menu-bar__nojs a", { hasText: "Food" })).toBeVisible();
-    const row = page.locator("details#chinga-la-migra");
-    await row.locator("summary").click();
-    await expect(row).toHaveAttribute("open", "");
+    // nothing waits on a tap: the long description is simply on the page
+    await expect(page.locator("#chinga-la-migra .mrow__desc")).toContainText("CCSM");
   });
 });
 
