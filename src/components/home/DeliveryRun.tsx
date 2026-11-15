@@ -32,7 +32,7 @@ const DOODLES: Record<string, string[]> = {
   taproom: ["M14 7C14 23 17 31 24 31C31 31 34 23 34 7Z", "M24 31V41M16 42H32", "M15 13H33"],
 };
 
-function Doodle({ kind }: { kind: string }) {
+export function Doodle({ kind }: { kind: string }) {
   if (kind === "grain") {
     return (
       <svg

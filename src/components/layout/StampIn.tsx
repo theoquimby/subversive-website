@@ -1,5 +1,6 @@
 "use client";
 
+import { usePathname } from "next/navigation";
 import { useEffect } from "react";
 
 // The set pieces that enter once:
@@ -16,6 +17,9 @@ import { useEffect } from "react";
 // viewport: a sticker at scale 0 sitting just above the fold never crossed that 12% line
 // and waited 2.5 s for its failsafe (critique 11/13).
 export function StampIn() {
+  // re-run on every in-site navigation: the new page brings its own pills and drawings
+  const path = usePathname();
+  // biome-ignore lint/correctness/useExhaustiveDependencies: the path is the trigger
   useEffect(() => {
     const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
     if (reduced) {
@@ -58,6 +62,6 @@ export function StampIn() {
       pills.disconnect();
       objects.disconnect();
     };
-  }, []);
+  }, [path]);
   return null;
 }

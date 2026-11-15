@@ -1,30 +1,32 @@
-// Home (redesign 2026-11-14; plan in .impeccable/critique/2026-11-14-full-site.md).
-// One page on cream paper with the ink line as its spine: the first screen (ground,
-// hills, glass, tap), then each section headed by a title on the line:
-//   on tap (rows, two aligned columns) · from the kitchen (one photo, the menu's line) ·
-//   coming up (rows) · where it comes from (the delivery run) · visit (hours, address)
+// Home (redesign 2026-11-14; Theo's brief that day: "give someone the basic info they are
+// looking for and then give them ways to get to the other stuff", announcements and the
+// things Max wants to feature, never overloaded).
+//   first screen (the glass, the tap, the status) · the facts (today, where, phone) ·
+//   the ways onward (four pen drawings) · coming up (tickets) · on tap (a few featured
+//   beers) · from the kitchen (one photo) · where it comes from (the map you can ask)
+// Hours in full, the whole menu and every event live on their own pages.
 import { homeLabels, microcopy, visitLabels } from "@content/microcopy";
 import { type Photo, photos } from "@content/photos";
 import type { Metadata } from "next";
 import { PhotoFrame } from "@/components/graphics/PhotoFrame";
-import { DeliveryRun } from "@/components/home/DeliveryRun";
 import { Hero } from "@/components/home/Hero";
+import { SourceMap } from "@/components/home/SourceMap";
+import { type WayKey, Ways } from "@/components/home/Ways";
 import { PageWipe } from "@/components/layout/PageWipe";
 import { SectionHead } from "@/components/layout/SectionHead";
 import { IntroBox } from "@/components/menu/IntroBox";
 import { MenuRow, rowPrice } from "@/components/menu/MenuRow";
 import { Link } from "@/components/ui/Link";
 import { ExternalLink, TextLink } from "@/components/ui/TextLink";
-import { AddressBlock } from "@/components/visit/AddressBlock";
-import { HoursCard } from "@/components/visit/HoursCard";
 import { hoursEvents } from "@/components/visit/OpenNow";
 import { getEvents, tickets, upcoming } from "@/lib/events/source";
-import { formatClock, weekdayLabel } from "@/lib/hours/format";
+import { formatClock, formatRange, formatTime, weekdayLabel } from "@/lib/hours/format";
+import { scheduleFor } from "@/lib/hours/schedule";
 import { isBeer } from "@/lib/menu/kinds";
 import { applySeasonal } from "@/lib/menu/seasonal";
 import { getMenu } from "@/lib/menu/source";
-import { buildMenuView, draftBeers, findItem, type ItemView } from "@/lib/menu/view";
-import { getSite } from "@/lib/site/site";
+import { buildMenuView, draftBeers, findItem } from "@/lib/menu/view";
+import { getSite, NAV } from "@/lib/site/site";
 import { now } from "@/lib/time/now";
 import { nyParts, weekdayOf } from "@/lib/time/ny";
 
@@ -37,47 +39,22 @@ export const metadata: Metadata = {
 
 const KITCHEN = "burger-and-beer-wide";
 const MONTHS = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
-
-interface Group {
-  family: string;
-  rows: ItemView[];
-}
-
-function groupByFamily(rows: ItemView[]) {
-  const groups: Group[] = [];
-  for (const r of rows) {
-    const f = r.family ?? "";
-    const g = groups.at(-1);
-    if (g && g.family === f) g.rows.push(r);
-    else groups.push({ family: f, rows: [r] });
-  }
-  return groups;
-}
-
-/** Two columns of whole groups, as even as whole groups allow; each starts at the top. */
-function twoColumns(groups: Group[]): [Group[], Group[]] {
-  const total = groups.reduce((n, g) => n + g.rows.length, 0);
-  const left: Group[] = [];
-  let count = 0;
-  for (const g of groups) {
-    if (left.length > 0 && count + g.rows.length / 2 > total / 2) break;
-    left.push(g);
-    count += g.rows.length;
-  }
-  return [left, groups.slice(left.length)];
-}
+const FEATURED = 4;
 
 export default async function Home() {
   const site = getSite();
   const today = nyParts(now()).date;
   const view = buildMenuView(applySeasonal(await getMenu(), today));
   const { events } = await getEvents();
-  const coming = tickets(upcoming(events, today)).slice(0, 4);
+  const coming = tickets(upcoming(events, today)).slice(0, 3);
   const taps = draftBeers(view);
-  const columns = twoColumns(groupByFamily(taps.slice(0, 8)));
+  // what Max is featuring: the beers that carry a badge on the menu (flagship, seasonal,
+  // the fundraiser), then the first taps to make up the number
+  const featured = [...taps.filter((t) => t.badge), ...taps.filter((t) => !t.badge)].slice(0, FEATURED);
   const burgers = view.food.find((s) => s.id === "smash-burgers");
   const kitchenPhoto = photos[KITCHEN] as Photo;
   const dish = kitchenPhoto.menuItemId ? findItem(view, kitchenPhoto.menuItemId) : undefined;
+  const tonight = scheduleFor(today, { hours: site.hours }, await hoursEvents());
 
   // the first screen's glass: the flagship first, then the taps in menu order
   const flagship = Math.max(
@@ -105,28 +82,95 @@ export default async function Home() {
       <Hero site={site} beers={tapBeers} />
 
       <div className="page home" data-skin="paper">
+        {/* the facts a visitor came for, in one glance */}
+        <dl className="facts">
+          <div className="facts__cell">
+            <dt>{homeLabels.facts.today}</dt>
+            <dd>
+              {tonight.open !== null && tonight.close !== null ? (
+                <>
+                  <span className="facts__big tabular">{formatRange(tonight.open, tonight.close)}</span>
+                  {tonight.kitchenClose !== null && tonight.kitchenClose !== tonight.close ? (
+                    <span className="facts__small">
+                      {visitLabels.kitchenTil(formatTime(tonight.kitchenClose))}
+                    </span>
+                  ) : null}
+                </>
+              ) : (
+                <span className="facts__big">{visitLabels.closed}</span>
+              )}
+              <TextLink href="/visit#hours">{homeLabels.facts.allHours}</TextLink>
+            </dd>
+          </div>
+          <div className="facts__cell">
+            <dt>{homeLabels.facts.findUs}</dt>
+            <dd>
+              <span className="facts__big">{site.address.street}</span>
+              <span className="facts__small">
+                {site.address.city}, {site.address.state} {site.address.zip}
+              </span>
+              <ExternalLink href={site.links.map}>{microcopy.directions}</ExternalLink>
+            </dd>
+          </div>
+          <div className="facts__cell">
+            <dt>{homeLabels.facts.call}</dt>
+            <dd>
+              <a className="facts__big facts__phone tabular" href={`tel:${site.phone.tel}`}>
+                {site.phone.display}
+              </a>
+              <span className="facts__small">{site.phone.note}</span>
+            </dd>
+          </div>
+        </dl>
+
+        {/* the ways onward */}
+        <nav aria-label={homeLabels.waysLabel}>
+          <Ways items={NAV.map((n) => ({ key: n.href.slice(1) as WayKey, href: n.href, label: n.label }))} />
+        </nav>
+
+        {coming.length > 0 ? (
+          <section className="home-section" aria-labelledby="coming-title">
+            <SectionHead id="coming-title">{homeLabels.comingUp}</SectionHead>
+            <ul className="tix">
+              {coming.map((e) => {
+                const [, m, d] = e.date.split("-");
+                return (
+                  <li key={e.id}>
+                    <Link
+                      href={`/events/${e.slug}`}
+                      className="tix__t"
+                      data-game={e.kind === "GAME" ? "" : undefined}
+                    >
+                      <span className="tix__stub">
+                        <span className="tix__day tabular">{Number(d)}</span>
+                        <span className="tix__when">
+                          {weekdayLabel(weekdayOf(e.date), "short")} · {MONTHS[Number(m) - 1]}
+                        </span>
+                      </span>
+                      <span className="tix__body">
+                        <span className="tix__title">{e.displayTitle}</span>
+                        {e.startTime ? (
+                          <span className="tix__time tabular">{formatClock(e.startTime)}</span>
+                        ) : null}
+                      </span>
+                    </Link>
+                  </li>
+                );
+              })}
+            </ul>
+            <TextLink href="/events">{microcopy.allEvents}</TextLink>
+          </section>
+        ) : null}
+
         <section className="home-section" aria-labelledby="tap-title">
           <SectionHead id="tap-title" note={`${view.pourSizes.half} / ${view.pourSizes.full}`}>
             {homeLabels.onTap}
           </SectionHead>
-          <div className="home-tap">
-            {columns.map((col) => (
-              <div key={col[0]?.family ?? "empty"} className="home-tap__col">
-                {col.map((g) => (
-                  <div key={g.family} className="mgroup">
-                    <h3 className="mgroup__head">
-                      <span className="mgroup__title">{g.family}</span>
-                    </h3>
-                    <ul className="mlist">
-                      {g.rows.map((row, i) => (
-                        <MenuRow key={row.id} row={row} index={i} disclosure={false} />
-                      ))}
-                    </ul>
-                  </div>
-                ))}
-              </div>
+          <ul className="mlist home-tap">
+            {featured.map((row, i) => (
+              <MenuRow key={row.id} row={row} index={i} disclosure={false} />
             ))}
-          </div>
+          </ul>
           <TextLink href="/menu">{homeLabels.fullMenu}</TextLink>
         </section>
 
@@ -155,53 +199,10 @@ export default async function Home() {
           </div>
         </section>
 
-        {coming.length > 0 ? (
-          <section className="home-section" aria-labelledby="coming-title">
-            <SectionHead id="coming-title">{homeLabels.comingUp}</SectionHead>
-            <ul className="rows">
-              {coming.map((e) => {
-                const [, m, d] = e.date.split("-");
-                return (
-                  <li key={e.id}>
-                    <Link href={`/events/${e.slug}`} className="rows__row">
-                      <span className="rows__date">
-                        <span className="rows__day tabular">{Number(d)}</span>
-                        <span className="rows__when">
-                          {weekdayLabel(weekdayOf(e.date), "short")} · {MONTHS[Number(m) - 1]}
-                        </span>
-                      </span>
-                      <span className="rows__title">{e.displayTitle}</span>
-                      {e.startTime ? (
-                        <span className="rows__time tabular">{formatClock(e.startTime)}</span>
-                      ) : null}
-                    </Link>
-                  </li>
-                );
-              })}
-            </ul>
-            <TextLink href="/events">{microcopy.allEvents}</TextLink>
-          </section>
-        ) : null}
-
         <section className="home-section" aria-labelledby="where-title">
           <SectionHead id="where-title">{homeLabels.whereFrom}</SectionHead>
           <p className="home-lede">{site.sourcingLine}</p>
-          <DeliveryRun site={site} />
-        </section>
-
-        {/* not a named landmark: the footer already has a region called "Visit" */}
-        <section className="home-section home-visit">
-          <SectionHead id="visit-title">{homeLabels.visit}</SectionHead>
-          <div className="home-visit__grid">
-            <HoursCard hours={site.hours} events={await hoursEvents()} today={today} />
-            <div className="home-visit__side">
-              <AddressBlock site={site} />
-              <p className="home-visit__note">
-                {site.visit.giftCards}{" "}
-                <ExternalLink href={site.links.eGiftCard}>{visitLabels.eGiftCards}</ExternalLink>
-              </p>
-            </div>
-          </div>
+          <SourceMap sourcing={site.sourcing} />
         </section>
       </div>
     </PageWipe>

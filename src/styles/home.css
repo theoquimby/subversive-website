@@ -219,7 +219,8 @@
 .lglass__line .lglass__knob {
   fill: var(--fg);
 }
-.lglass__foam {
+.lglass__foam,
+.lglass__head circle {
   fill: var(--card);
 }
 .lglass__haze {
@@ -387,9 +388,6 @@
   gap: var(--s-6);
   margin-top: var(--section);
 }
-.home-section:first-child {
-  margin-top: var(--s-8);
-}
 .home-section > .text-link {
   justify-self: start;
 }
@@ -401,22 +399,278 @@
   text-wrap: pretty;
 }
 
-/* on tap: two columns of whole groups; both start at the top, so their heads line up */
+/* the facts: today's hours, the address, the phone. Three plain columns between two
+   hairlines; a single column of rows on a phone. */
+.facts {
+  display: grid;
+  margin: var(--s-7) 0 0;
+  border-top: var(--stroke) solid var(--fg);
+  border-bottom: 1px solid var(--hair);
+}
+.facts__cell {
+  display: grid;
+  grid-template-columns: 5.25rem minmax(0, 1fr);
+  align-items: baseline;
+  column-gap: var(--s-4);
+  padding: var(--s-4) 0;
+}
+.facts__cell + .facts__cell {
+  border-top: 1px solid var(--hair);
+}
+.facts dt {
+  color: var(--fg-muted);
+  font-family: var(--ff-utility);
+  font-size: var(--t-label);
+  font-weight: 700;
+  letter-spacing: var(--track-label);
+  text-transform: uppercase;
+}
+.facts dd {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 2px var(--s-3);
+  margin: 0;
+}
+.facts__big {
+  font-family: var(--ff-utility);
+  font-size: 1.5rem;
+  font-weight: 700;
+  line-height: 1.15;
+  letter-spacing: 0.01em;
+  color: inherit;
+  text-decoration: none;
+}
+.facts__small {
+  color: var(--fg-muted);
+  font-size: var(--t-small);
+}
+.facts__phone {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+}
+@media (min-width: 64rem) {
+  .facts {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+  .facts__cell {
+    grid-template-columns: minmax(0, 1fr);
+    align-content: start;
+    row-gap: var(--s-2);
+    padding: var(--s-5) var(--s-6) var(--s-5) 0;
+  }
+  .facts__cell + .facts__cell {
+    padding-left: var(--s-6);
+    border-top: 0;
+    border-left: 1px solid var(--hair);
+  }
+  .facts dd {
+    display: grid;
+    justify-items: start;
+    gap: var(--s-1);
+  }
+}
+
+/* pen drawings: loose ink strokes that draw themselves in, one after another, when they
+   scroll into view (StampIn sets data-draw="in"). With no script, or with reduced motion,
+   they are simply there. */
+.pen {
+  display: block;
+  width: 100%;
+  height: auto;
+  overflow: visible;
+}
+.pen path {
+  fill: none;
+  stroke: var(--fg);
+  stroke-width: 2.2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-dasharray: 1;
+}
+@media (scripting: enabled) and (prefers-reduced-motion: no-preference) {
+  .pen:not([data-draw="in"]) path {
+    stroke-dashoffset: 1;
+  }
+  .pen[data-draw="in"] path {
+    animation: pen-draw 620ms cubic-bezier(0.45, 0, 0.25, 1) both;
+    animation-delay: calc(var(--i, 0) * 110ms);
+  }
+}
+@keyframes pen-draw {
+  from {
+    stroke-dashoffset: 1;
+  }
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+
+/* the ways onward: four drawings, each a door to a page */
+.ways {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--s-7) var(--s-5);
+  margin: var(--s-9) 0 0;
+  padding: 0;
+  list-style: none;
+}
+.ways__link {
+  display: grid;
+  justify-items: center;
+  gap: var(--s-3);
+  color: inherit;
+  text-decoration: none;
+  border-radius: var(--s-3);
+}
+.ways__link:focus-visible {
+  outline: 3px solid var(--focus);
+  outline-offset: 6px;
+}
+.ways__art {
+  width: min(100%, 9.5rem);
+  transition: rotate var(--d-2) var(--ease-out);
+}
+.ways__name {
+  font-family: var(--ff-display);
+  font-size: clamp(1.375rem, 1.25rem + 0.625vw, 1.75rem);
+  line-height: 1.1;
+  background: linear-gradient(var(--fg) 0 0) 50% 100% / 0 var(--stroke) no-repeat;
+  padding-bottom: 5px;
+  transition: background-size var(--d-2) var(--ease-out);
+}
+@media (hover: hover) {
+  .ways__link:hover .ways__art {
+    rotate: -3deg;
+  }
+  .ways__link:hover .ways__name {
+    background-size: 100% var(--stroke);
+  }
+}
+.ways__link:active .ways__art {
+  rotate: 2deg;
+}
+@media (min-width: 48rem) {
+  .ways {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+}
+
+/* coming up: tickets, drawn plainly. An ink outline, a date stub behind a perforation,
+   the title. A game night carries the Knicks' two colours as a thin band on its stub. */
+.tix {
+  display: grid;
+  gap: var(--s-4);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.tix__t {
+  display: grid;
+  grid-template-columns: 6rem minmax(0, 1fr);
+  min-height: 5.5rem;
+  border: var(--stroke) solid var(--fg);
+  border-radius: 0.75rem;
+  background: var(--card);
+  color: inherit;
+  text-decoration: none;
+  transition:
+    translate var(--d-1) var(--ease-out),
+    box-shadow var(--d-1) var(--ease-out);
+}
+.tix__t:focus-visible {
+  outline: 3px solid var(--focus);
+  outline-offset: 3px;
+}
+.tix__stub {
+  position: relative;
+  display: grid;
+  align-content: center;
+  justify-items: center;
+  gap: 3px;
+  padding: var(--s-3) var(--s-2);
+  border-right: var(--stroke) dashed var(--fg);
+}
+.tix__t[data-game] .tix__stub::after {
+  content: "";
+  position: absolute;
+  right: var(--s-3);
+  bottom: var(--s-2);
+  left: var(--s-3);
+  height: 5px;
+  border-radius: 3px;
+  background: linear-gradient(90deg, var(--sky-deep) 0 50%, var(--ember) 50% 100%);
+}
+.tix__t[data-game] .tix__stub {
+  padding-bottom: var(--s-4);
+}
+.tix__day {
+  font-family: var(--ff-display);
+  font-size: 2rem;
+  line-height: 1;
+}
+.tix__when {
+  color: var(--fg-muted);
+  font-family: var(--ff-utility);
+  font-size: var(--t-label);
+  font-weight: 700;
+  letter-spacing: var(--track-label);
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+.tix__body {
+  display: grid;
+  align-content: center;
+  gap: var(--s-1);
+  padding: var(--s-3) var(--s-4);
+}
+.tix__title {
+  font-family: var(--ff-utility);
+  font-size: clamp(1.375rem, 1.3125rem + 0.3125vw, 1.5625rem);
+  font-weight: 700;
+  line-height: 1.15;
+  letter-spacing: 0.01em;
+  text-wrap: balance;
+}
+.tix__time {
+  color: var(--fg-muted);
+  font-weight: 600;
+}
+@media (hover: hover) {
+  .tix__t:hover {
+    translate: -2px -2px;
+    box-shadow: 4px 4px 0 var(--fg);
+  }
+}
+.tix__t:active {
+  translate: 0 0;
+  box-shadow: none;
+}
+@media (min-width: 48rem) {
+  .tix {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+  .tix__t {
+    grid-template-columns: 5.25rem minmax(0, 1fr);
+  }
+}
+
+/* on tap: the few beers being featured, two across on a wide screen */
 .home-tap {
   display: grid;
-  gap: var(--s-7) var(--s-10);
+  column-gap: var(--s-10);
+  border-top: 1px solid var(--hair);
 }
-.home-tap__col {
-  display: grid;
-  align-content: start;
-  gap: var(--s-7);
-}
-.home-tap .mgroup {
-  margin-top: 0;
+.home-tap .mrow + .mrow {
+  border-top: 1px solid var(--hair);
 }
 @media (min-width: 64rem) {
   .home-tap {
     grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  .home-tap .mrow:nth-child(2) {
+    border-top: 0;
   }
 }
 
@@ -464,103 +718,7 @@
   }
 }
 
-/* rows: a date, a title, a time, between hairlines (Home's coming up; Events' list) */
-.rows {
-  margin: 0;
-  padding: 0;
-  border-top: 1px solid var(--hair);
-  list-style: none;
-}
-.rows > li {
-  border-bottom: 1px solid var(--hair);
-}
-.rows__row {
-  display: grid;
-  grid-template-columns: 5.25rem minmax(0, 1fr) auto;
-  align-items: center;
-  column-gap: var(--s-4);
-  min-height: 4.75rem;
-  padding: var(--s-3) 0;
-  color: inherit;
-  text-decoration: none;
-}
-.rows__row:focus-visible {
-  outline: 3px solid var(--focus);
-  outline-offset: 2px;
-}
-.rows__date {
-  display: grid;
-  gap: 3px;
-}
-.rows__day {
-  font-family: var(--ff-display);
-  font-size: 2rem;
-  line-height: 1;
-}
-.rows__when {
-  color: var(--fg-muted);
-  font-family: var(--ff-utility);
-  font-size: var(--t-label);
-  font-weight: 700;
-  letter-spacing: var(--track-label);
-  text-transform: uppercase;
-  white-space: nowrap;
-}
-.rows__title {
-  font-family: var(--ff-utility);
-  font-size: clamp(1.375rem, 1.3125rem + 0.3125vw, 1.5625rem);
-  font-weight: 700;
-  line-height: 1.15;
-  letter-spacing: 0.01em;
-  text-wrap: balance;
-}
-.rows__time {
-  font-weight: 600;
-  white-space: nowrap;
-}
-@media (hover: hover) {
-  .rows__row:hover .rows__title {
-    text-decoration: underline;
-    text-decoration-thickness: 2px;
-    text-underline-offset: 4px;
-  }
-}
-
-/* where it comes from: the delivery run. The ink line is the route; each stop sits on it
-   as a small drawing on a patch of paper. Down the left on a phone, across on a wide
-   screen. */
-.run {
-  --pin: 3.5rem;
-  position: relative;
-  display: grid;
-  gap: var(--s-6);
-  margin: 0;
-  padding: 0;
-  list-style: none;
-}
-.run::before {
-  content: "";
-  position: absolute;
-  top: calc(var(--pin) / 2);
-  bottom: calc(var(--pin) / 2);
-  left: calc(var(--pin) / 2 - var(--stroke) / 2);
-  border-left: var(--stroke) solid var(--fg);
-  transform-origin: 50% 0;
-}
-.run__stop {
-  position: relative;
-  display: grid;
-  grid-template-columns: var(--pin) minmax(0, 1fr);
-  align-items: center;
-  column-gap: var(--s-4);
-}
-.run__pin {
-  display: grid;
-  place-items: center;
-  width: var(--pin);
-  height: var(--pin);
-  background: var(--bg);
-}
+/* a source's small drawing and its three lines of text (the map's list) */
 .run__doodle {
   width: 2.75rem;
   height: 2.75rem;
@@ -606,101 +764,142 @@
   color: var(--fg-muted);
   font-size: var(--t-small);
 }
-@media (min-width: 64rem) {
-  .run {
-    grid-template-columns: repeat(var(--stops), minmax(0, 1fr));
-    gap: var(--s-5);
-  }
-  /* from the first stop's drawing to the last one's */
-  .run::before {
-    top: calc(var(--pin) / 2 - var(--stroke) / 2);
-    bottom: auto;
-    left: calc(var(--pin) / 2);
-    right: calc((100% - (var(--stops) - 1) * var(--s-5)) / var(--stops) - var(--pin) / 2);
-    border-left: 0;
-    border-top: var(--stroke) solid var(--fg);
-    transform-origin: 0 50%;
-  }
-  .run__stop {
-    grid-template-columns: minmax(0, 1fr);
-    align-content: start;
-    align-items: start;
-    row-gap: var(--s-3);
-  }
-}
-/* the route draws as the section scrolls into view, and each stop arrives as the line
-   reaches it. Scroll-linked, so it follows the reader's thumb; where the browser has no
-   scroll timelines, or with reduced motion, everything is simply there. */
-@supports (animation-timeline: view()) {
-  @media (prefers-reduced-motion: no-preference) {
-    .run::before {
-      animation: run-draw linear both;
-      animation-timeline: view();
-      animation-range: entry 15% cover 55%;
-    }
-    .run__pin {
-      animation: run-arrive linear both;
-      animation-timeline: view();
-      animation-range: entry 30% entry 110%;
-    }
-    @media (min-width: 64rem) {
-      .run::before {
-        animation-name: run-draw-across;
-        animation-range: entry 30% cover 45%;
-      }
-    }
-  }
-}
-@keyframes run-draw {
-  from {
-    scale: 1 0;
-  }
-}
-@keyframes run-draw-across {
-  from {
-    scale: 0 1;
-  }
-}
-@keyframes run-arrive {
-  from {
-    opacity: 0;
-    scale: 0.6;
-  }
-}
 
-/* visit: this week's hours and where to find it, on the same two columns */
-.home-visit__grid {
+/* where it comes from: New York in one ink line, and a list you can ask it with */
+.smap {
   display: grid;
-  gap: var(--s-8);
-}
-.home-visit .hours {
-  margin-top: 0;
-}
-.home-visit__side {
-  display: grid;
-  align-content: start;
   gap: var(--s-6);
 }
-.home-visit .address-block {
-  padding-top: 0;
+.smap__svg {
+  display: block;
+  width: 100%;
+  height: auto;
+  overflow: visible;
 }
-.home-visit .address-block__addr {
-  margin-left: 0;
+.smap__state {
+  fill: transparent;
+  stroke: var(--fg);
+  stroke-width: var(--stroke);
+  stroke-linejoin: round;
+  vector-effect: non-scaling-stroke;
+  transition: fill var(--d-2) var(--ease-out);
+}
+/* a statewide source (grain, spirits): the whole state takes the menu's yellow */
+.smap__state[data-all] {
+  fill: var(--pils);
+}
+.smap__route {
+  fill: none;
+  stroke: var(--fg);
+  stroke-width: 5;
+  stroke-linecap: round;
+  stroke-dasharray: 1;
+}
+.smap__dot {
+  fill: var(--bg);
+  stroke: var(--fg);
+  stroke-width: 5;
+  transform-box: fill-box;
+  transform-origin: 50% 50%;
+  transition:
+    scale var(--d-2) var(--ease-out),
+    fill var(--d-1) var(--ease-out);
+}
+.smap__town[data-on] .smap__dot {
+  fill: var(--pils);
+  scale: 1.7;
+}
+.smap__hit {
+  fill: transparent;
+  cursor: pointer;
+}
+.smap__mark path {
+  fill: var(--fg);
+}
+.smap__label {
+  fill: var(--fg);
   font-family: var(--ff-utility);
-  font-size: 1.75rem;
+  font-size: 44px;
   font-weight: 700;
-  line-height: 1.15;
-  letter-spacing: 0.01em;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  /* a paper halo, so the name reads where it crosses the state's outline */
+  paint-order: stroke;
+  stroke: var(--bg);
+  stroke-width: 14px;
+  stroke-linejoin: round;
 }
-.home-visit__note {
-  max-width: 42ch;
+@media (prefers-reduced-motion: no-preference) {
+  .smap__route {
+    animation: smap-draw 520ms var(--ease-out) both;
+  }
+  .smap__label:not(.smap__label--home) {
+    animation: tap-in var(--d-3) var(--ease-out) 160ms both;
+  }
+}
+@keyframes smap-draw {
+  from {
+    stroke-dashoffset: 1;
+  }
+}
+.smap__list {
   margin: 0;
-  color: var(--fg-muted);
+  padding: 0;
+  border-top: 1px solid var(--hair);
+  list-style: none;
+}
+.smap__list > li {
+  border-bottom: 1px solid var(--hair);
+}
+.smap__row {
+  display: grid;
+  grid-template-columns: 3rem minmax(0, 1fr);
+  align-items: center;
+  column-gap: var(--s-4);
+  width: 100%;
+  min-height: 4.5rem;
+  padding: var(--s-2) var(--s-3);
+  border: 0;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+  transition: background-color var(--d-1) var(--ease-out);
+}
+.smap__row[aria-pressed="true"] {
+  background: color-mix(in srgb, var(--pils) 38%, transparent);
+}
+.smap__row:focus-visible {
+  outline: 3px solid var(--focus);
+  outline-offset: -3px;
+}
+.smap__pin {
+  display: grid;
+  place-items: center;
+}
+/* a source's drawing is line only until it is the one chosen */
+.smap__row .run__doodle path,
+.smap__row .run__doodle circle {
+  fill: transparent;
+  transition: fill var(--d-1) var(--ease-out);
+}
+.smap__row[aria-pressed="true"] .run__doodle path,
+.smap__row[aria-pressed="true"] .run__doodle circle {
+  fill: var(--pils);
+}
+.smap__row .run__doodle--mark path,
+.smap__row[aria-pressed="true"] .run__doodle--mark path {
+  fill: var(--fg);
 }
 @media (min-width: 64rem) {
-  .home-visit__grid {
+  .smap {
     grid-template-columns: minmax(0, 7fr) minmax(0, 5fr);
     column-gap: var(--s-10);
-    align-items: start;
+    align-items: center;
+  }
+  .smap__label {
+    font-size: 30px;
+    stroke-width: 10px;
   }
 }

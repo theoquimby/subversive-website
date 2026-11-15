@@ -107,12 +107,9 @@ export const homeLabels = {
   whereFrom: "Where it comes from",
   ourBeer: "Our beer",
   visit: "Visit",
-  facts: [
-    "First come, first served",
-    "Heated tent",
-    "8 spots + street parking",
-    "Leashed dogs outside and in the tent",
-  ],
+  // the facts strip under the first screen: interface labels
+  facts: { today: "Today", allHours: "All hours", findUs: "Find us", call: "Call" },
+  waysLabel: "Pages",
   weekdayTag: { wed: "Wing Wednesday", thu: "Rodeo Thursdays", other: "Dogs welcome in the tent" },
   // the tap-list glass on the first screen: interface labels
   tap: {

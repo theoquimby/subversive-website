@@ -86,21 +86,28 @@
   border-collapse: collapse;
   font-variant-numeric: tabular-nums lining-nums;
 }
+/* (redesign 2026-11-14: Theo found the hours "messy and hard to read". Solid hairlines,
+   three aligned columns at one size, and today's row on a yellow band.) */
 .hours__row {
-  /* the rule is the row's, so its dashes run unbroken across the cells */
-  border-bottom: var(--stroke-dash) dashed color-mix(in srgb, var(--fg) 38%, transparent);
+  border-bottom: 1px solid color-mix(in srgb, var(--fg) 26%, transparent);
 }
 .hours__row > * {
-  padding: var(--s-3) 0;
+  padding: 0.8125rem var(--s-3);
   text-align: left;
   vertical-align: baseline;
+  font-size: 1.0625rem;
 }
-.hours tbody:first-of-type .hours__row:last-child {
-  border-bottom: var(--stroke) solid var(--rule-strong);
+.hours tbody:first-of-type .hours__row:first-child {
+  border-top: 1px solid color-mix(in srgb, var(--fg) 26%, transparent);
 }
+
 .hours__day {
   position: relative;
-  font-weight: 400;
+  width: 38%;
+  font-family: var(--ff-utility);
+  font-size: 1.1875rem;
+  font-weight: 700;
+  letter-spacing: 0.02em;
   white-space: nowrap;
 }
 /* a solid kernel marks today; every row keeps its room so marking moves nothing */
@@ -116,20 +123,22 @@
   clip-path: polygon(0 0, 100% 40%, 100% 100%, 0 60%);
   opacity: 0;
 }
-.hours__row[data-today] .hours__kernel {
-  opacity: 1;
+/* today: the whole row on the menu's yellow */
+.hours__row[data-today] {
+  background: var(--pils);
 }
 .hours__row[data-today] > * {
   font-weight: 600;
 }
+.hours__row[data-today] > .hours__kitchen {
+  color: var(--fg);
+}
 .hours__time {
   font-weight: 600;
   white-space: nowrap;
-  padding-inline: var(--s-4);
 }
 .hours__kitchen {
   color: var(--fg-muted);
-  font-size: var(--t-small);
   text-align: right;
 }
 .hours__row:not([data-date]) > .hours__kitchen {
@@ -141,8 +150,8 @@
   font-weight: 400;
 }
 .hours__special-head {
-  padding: var(--s-6) 0 var(--s-2);
-  border-bottom: var(--stroke) solid var(--rule-strong);
+  padding: var(--s-7) var(--s-3) var(--s-2);
+  border-bottom: 1px solid color-mix(in srgb, var(--fg) 26%, transparent);
   font-family: var(--ff-utility);
   font-weight: 700;
   font-size: var(--t-label);

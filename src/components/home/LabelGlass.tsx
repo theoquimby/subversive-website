@@ -36,13 +36,14 @@ const ONE_LINE = [
   "M-980 319C-950 319 -930 311 -905 308S-865 302 -845 305S-800 290 -772 289S-735 301 -705 302",
   "S-660 284 -628 280S-585 269 -560 275S-520 297 -490 300S-455 307 -430 305S-392 284 -362 277",
   "S-330 265 -305 270S-270 287 -248 284S-205 254 -172 249S-130 255 -112 268S-88 276 -70 274",
-  "S-40 292 -22 302S6 314 22 317S44 318 54 314",
-  // the foot's near edge, up the stem (with its knop), the bowl's left side
-  "C82 309 97 306 97 298V268C93 266 93 260 97 258V249C80 247 64.6 236 59.9 212C52.8 176 45.7 96 43.4 14",
-  // round the rim, down the right side, the stem again, and the foot
-  "A56.6 4.5 0 0 0 156.6 14A56.6 4.5 0 0 0 43.4 14A56.6 4.5 0 0 0 156.6 14",
-  "C154.3 96 147.2 176 140.1 212C135.4 236 120 247 103 249V258C107 260 107 266 103 268V298",
-  "C103 306 118 309 146 313A46 6.5 0 0 1 54 314",
+  // down to the ground, which runs flat under the glass and becomes the foot's near edge
+  "S-40 292 -24 304S-6 320 12 320H100A46 6 0 0 0 146 314",
+  // the foot's far edge to the stem (with its knop), then the bowl's right side
+  "C118 309 103 306 103 298V268C107 266 107 260 103 258V249C120 247 135.4 236 140.1 212C147.2 176 154.3 96 156.6 14",
+  // round the rim, down the left side, the stem again, and the foot closes where it began
+  "A56.6 4.5 0 0 1 43.4 14A56.6 4.5 0 0 1 156.6 14A56.6 4.5 0 0 1 43.4 14",
+  "C45.7 96 52.8 176 59.9 212C64.6 236 80 247 97 249V258C93 260 93 266 97 268V298",
+  "C97 306 82 309 54 314A46 6 0 0 0 100 320",
 ].join("");
 const TAP_LINE = "M4000 -58H132C112 -58 100 -54 100 -44V-34M92 -34H108";
 
@@ -51,6 +52,8 @@ const X0 = 36;
 const X1 = 164;
 const MAX_BUBBLES = 16;
 const MAX_SPILLS = 6;
+const MAX_DROPS = 8;
+const HEAD_BUBBLES = 6;
 
 export interface GlassBeer {
   id?: string;
@@ -118,7 +121,9 @@ export function LabelGlass({
     const body = q<SVGPathElement>(".lglass__body");
     const haze = q<SVGPathElement>(".lglass__haze");
     const foam = q<SVGPathElement>(".lglass__foam");
-    const stream = q<SVGRectElement>(".lglass__stream");
+    const stream = q<SVGPathElement>(".lglass__stream");
+    const dropEls = [...root.querySelectorAll<SVGCircleElement>(".lglass__drops circle")];
+    const headEls = [...root.querySelectorAll<SVGCircleElement>(".lglass__head circle")];
     const handle = q<SVGGElement>(".lglass__handle");
     const bubbleEls = [...root.querySelectorAll<SVGCircleElement>(".lglass__bubbles circle")];
     const spillEls = [...root.querySelectorAll<SVGCircleElement>(".lglass__spills circle")];
@@ -143,6 +148,7 @@ export function LabelGlass({
       next: null as GlassBeer | null,
       bubbles: [] as { x: number; y: number; r: number; vy: number; ph: number }[],
       spills: [] as { y: number; vy: number; r: number; side: 1 | -1 }[],
+      drops: [] as { x: number; y: number; vx: number; vy: number; r: number }[],
     };
     let raf = 0;
     let last = 0;
@@ -150,6 +156,7 @@ export function LabelGlass({
     const colour = (b: GlassBeer) => {
       body.setAttribute("fill", b.color);
       stream.setAttribute("fill", b.color);
+      for (const el of dropEls) el.setAttribute("fill", b.color);
       haze.style.display = b.hazy ? "" : "none";
     };
 
@@ -164,13 +171,44 @@ export function LabelGlass({
       const b = Math.min(s.front, surface);
       if (b - a > 1 && (s.flow > 0.02 || s.tail > SPOUT)) {
         const w = 2.4 + 2.8 * Math.max(s.flow, s.tail > SPOUT ? 0.6 : 0);
-        stream.setAttribute("x", (100 - w / 2 + Math.sin(s.t * 31) * 0.35).toFixed(2));
-        stream.setAttribute("width", w.toFixed(2));
-        stream.setAttribute("y", a.toFixed(1));
-        stream.setAttribute("height", (b - a).toFixed(1));
+        // wider at the spout, narrower and a little unsteady where it lands
+        const wb = w * 0.62;
+        const sway = Math.sin(s.t * 23) * 0.9 + Math.sin(s.t * 37) * 0.4;
+        const midY = (a + b) / 2;
+        stream.setAttribute(
+          "d",
+          `M${(100 - w / 2).toFixed(2)} ${a.toFixed(1)}H${(100 + w / 2).toFixed(2)}` +
+            `Q${(100 + w / 2).toFixed(2)} ${midY.toFixed(1)} ${(100 + wb / 2 + sway).toFixed(2)} ${b.toFixed(1)}` +
+            `H${(100 - wb / 2 + sway).toFixed(2)}Q${(100 - w / 2).toFixed(2)} ${midY.toFixed(1)} ${(100 - w / 2).toFixed(2)} ${a.toFixed(1)}Z`,
+        );
         stream.style.display = "";
       } else stream.style.display = "none";
       handle.setAttribute("transform", `rotate(${(-34 * s.flow).toFixed(1)} 128 -58)`);
+      dropEls.forEach((el, i) => {
+        const d = s.drops[i];
+        if (!d) {
+          el.style.display = "none";
+          return;
+        }
+        el.style.display = "";
+        el.setAttribute("cx", d.x.toFixed(1));
+        el.setAttribute("cy", d.y.toFixed(1));
+        el.setAttribute("r", d.r.toFixed(2));
+      });
+      // a row of bubbles along the head's top edge, riding the surface
+      headEls.forEach((el, k) => {
+        if (s.f < 5) {
+          el.style.display = "none";
+          return;
+        }
+        const at = 1.5 + k * 2.8;
+        const lo = Math.floor(at);
+        const hh = (h[lo] ?? 0) + ((h[lo + 1] ?? 0) - (h[lo] ?? 0)) * (at - lo);
+        el.style.display = "";
+        el.setAttribute("cx", (X0 + (at * (X1 - X0)) / (N - 1)).toFixed(1));
+        el.setAttribute("cy", (s.y + hh * 0.55 - s.f - 1 + Math.sin(s.t * 2.1 + k * 1.9) * 0.8).toFixed(1));
+        el.setAttribute("r", (3.4 + ((k * 7) % 3) * 1.1 + Math.min(2, s.f * 0.04)).toFixed(2));
+      });
       bubbleEls.forEach((el, i) => {
         const bb = s.bubbles[i];
         if (!bb) {
@@ -244,7 +282,16 @@ export function LabelGlass({
         const rise = landing * 118 * (100 / width) * dt;
         s.y = Math.max(LEVEL - 1, s.y - Math.min(rise, 9));
         s.f += landing * s.head * 9.5 * dt;
-        const kick = (0.6 + Math.random() * 0.8) * 620 * landing * dt;
+        const kick = (0.6 + Math.random() * 0.8) * 860 * landing * dt;
+        // droplets jump where the stream lands
+        if (s.drops.length < MAX_DROPS && Math.random() < 34 * landing * dt)
+          s.drops.push({
+            x: 100 + (Math.random() - 0.5) * 6,
+            y: surface,
+            vx: (Math.random() - 0.5) * 90,
+            vy: -(70 + Math.random() * 120),
+            r: 1 + Math.random() * 1.4,
+          });
         v[mid] = (v[mid] ?? 0) + kick;
         v[mid - 1] = (v[mid - 1] ?? 0) + kick * 0.5;
         v[mid + 1] = (v[mid + 1] ?? 0) + kick * 0.5;
@@ -321,6 +368,14 @@ export function LabelGlass({
         b.r += 0.25 * dt;
         if (b.y <= s.y + 3) s.bubbles.splice(i, 1);
       }
+      for (let i = s.drops.length - 1; i >= 0; i--) {
+        const d = s.drops[i];
+        if (!d) continue;
+        d.vy += 760 * dt;
+        d.x += d.vx * dt;
+        d.y += d.vy * dt;
+        if (d.vy > 0 && d.y >= s.y - s.f * 0.5) s.drops.splice(i, 1);
+      }
       for (let i = s.spills.length - 1; i >= 0; i--) {
         const sp = s.spills[i];
         if (!sp) continue;
@@ -331,7 +386,12 @@ export function LabelGlass({
       }
 
       if (s.phase === "settle") {
-        let moving = s.flow > 0.01 || s.tail > SPOUT || s.spills.length > 0 || s.bubbles.length > 0;
+        let moving =
+          s.flow > 0.01 ||
+          s.tail > SPOUT ||
+          s.spills.length > 0 ||
+          s.bubbles.length > 0 ||
+          s.drops.length > 0;
         for (let i = 0; i < N && !moving; i++)
           if (Math.abs(h[i] ?? 0) > 0.08 || Math.abs(v[i] ?? 0) > 0.4) moving = true;
         if (!moving && s.carb <= 0 && Math.abs(s.f - HEAD) < 1.5) s.phase = "idle";
@@ -364,6 +424,7 @@ export function LabelGlass({
         s.tail = SPOUT;
         s.bubbles.length = 0;
         s.spills.length = 0;
+        s.drops.length = 0;
         h.fill(0);
         v.fill(0);
         draw();
@@ -426,16 +487,7 @@ export function LabelGlass({
       </defs>
 
       {/* the stream, from the spout to the surface */}
-      <rect
-        className="lglass__stream"
-        x="97.5"
-        y={SPOUT}
-        width="5"
-        height="0"
-        rx="2"
-        fill={b0.color}
-        style={{ display: "none" }}
-      />
+      <path className="lglass__stream" d="" fill={b0.color} style={{ display: "none" }} />
 
       <g clipPath="url(#lglass-inside)" className="lglass__liquid">
         <path className="lglass__body" d={REST.body} fill={b0.color} />
@@ -446,6 +498,16 @@ export function LabelGlass({
           ))}
         </g>
         <path className="lglass__foam" d={REST.foam} />
+        <g className="lglass__head">
+          {Array.from({ length: HEAD_BUBBLES }, (_, i) => `h${i}`).map((k) => (
+            <circle key={k} r="4" style={{ display: "none" }} />
+          ))}
+        </g>
+        <g className="lglass__drops">
+          {Array.from({ length: MAX_DROPS }, (_, i) => `d${i}`).map((k) => (
+            <circle key={k} r="1.5" fill={b0.color} style={{ display: "none" }} />
+          ))}
+        </g>
       </g>
 
       {/* the barley mark, printed on the bowl as on their glassware */}
