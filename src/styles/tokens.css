@@ -157,8 +157,9 @@
   );
   --spring-sticker-d: 633ms;
 
-  /* Checker rail square (spec §3.2): 22 px phone → 28 px desktop */
-  --sq: clamp(1.375rem, 1.25rem + 0.625vw, 1.75rem);
+  /* Checker rail square: 8 px phone → 11 px desktop, three rows, as fine as the printed
+     menu's (Theo, 2026-11-13: one row of 22 px blocks read as a crude banner) */
+  --sq: clamp(0.5rem, 0.4375rem + 0.3125vw, 0.6875rem);
 }
 
 /* Skins (spec §1.1, §2.1). Paper is the default and the brand; it never auto-inverts. */

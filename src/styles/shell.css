@@ -359,7 +359,7 @@
 .site-footer__inner {
   max-width: var(--content-max);
   margin-inline: auto;
-  padding: var(--s-10) var(--gutter) var(--s-8);
+  padding: var(--s-8) var(--gutter) var(--s-7);
   container-type: inline-size;
 }
 /* The wordmark spans gutter to gutter (Sub/ersive ≈ 5.3 em) */
@@ -374,8 +374,8 @@
 .site-footer__cols {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: var(--s-8) var(--s-6);
-  margin-top: var(--s-9);
+  gap: var(--s-6) var(--s-6);
+  margin-top: var(--s-7);
 }
 .site-footer__cols section {
   display: grid;
@@ -424,8 +424,8 @@
   align-items: center;
   justify-content: space-between;
   gap: var(--s-4) var(--s-6);
-  margin-top: var(--s-9);
-  padding-top: var(--s-5);
+  margin-top: var(--s-7);
+  padding-top: var(--s-4);
   border-top: 1px solid var(--rule);
 }
 .site-footer__small {

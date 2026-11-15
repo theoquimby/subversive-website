@@ -33,8 +33,13 @@ jobs:
       - run: pnpm lint
       - run: pnpm test
 
-      # The release build: no dev kit.
+      # The release build: no dev kit. Its clock is frozen on the seed's first game night,
+      # so the browser tests do not start failing when the calendar passes the seed's dates
+      # (they did on 2026-11-14). Vercel builds the real site itself, on the real clock.
       - run: pnpm build
+        env:
+          SV_E2E: "1"
+          SV_TEST_NOW: "2026-11-13T12:00:00-05:00"
 
       - name: Install Playwright browsers
         run: pnpm exec playwright install --with-deps chromium webkit

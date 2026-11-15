@@ -10,7 +10,7 @@
 .checker {
   --sq-px: round(down, var(--sq), 1px);
   position: relative;
-  height: calc(var(--sq-px) * 2);
+  height: calc(var(--sq-px) * 3);
   overflow: hidden;
   color: var(--fg);
   contain: strict;
@@ -866,7 +866,4 @@ body::after {
 /* icons inside buttons keep a true 2 px stroke at 18 px (2 × 24 / 18) */
 .btn__icon {
   stroke-width: 2.67;
-}
-.checker[data-rows="1"] {
-  height: var(--sq-px);
 }
