@@ -1,12 +1,15 @@
-// /visit (spec §6.4): "Find us". Hours with the next 14 days' special hours, the address
-// with Directions (the page's one primary action) and Call, the four facts in the site's
-// own words, the photo pair and the tent, then gift cards and contact.
-import { microcopy, visitLabels } from "@content/microcopy";
+// /visit (redesign 2026-11-15): "Find us", in the order a visitor needs it. The taproom
+// drawn in pen beside the title and the open-now line; the address with Directions (the
+// page's one primary action) and Call; the week's hours with the special dates beneath;
+// what to know before coming, in the site's own words; one photograph; the gift-card
+// line. Contact lives in the footer on every page, so it is not repeated here.
+import { visitLabels } from "@content/microcopy";
 import type { Metadata } from "next";
 import { PhotoFrame } from "@/components/graphics/PhotoFrame";
+import { Drawing } from "@/components/home/Ways";
 import { PageWipe } from "@/components/layout/PageWipe";
-import { Pill } from "@/components/layout/Pill";
-import { Button } from "@/components/ui/Button";
+import { SectionHead } from "@/components/layout/SectionHead";
+import { ExternalLink } from "@/components/ui/TextLink";
 import { AddressBlock } from "@/components/visit/AddressBlock";
 import { GoodToKnow } from "@/components/visit/GoodToKnow";
 import { HoursCard } from "@/components/visit/HoursCard";
@@ -28,69 +31,33 @@ export default async function VisitPage() {
     <PageWipe>
       <div className="page page--visit">
         <header className="visit-head">
-          <h1 className="page__title">{visitLabels.title}</h1>
-          <OpenNow />
+          <div className="visit-head__text">
+            <h1 className="page__title">{visitLabels.title}</h1>
+            <OpenNow />
+          </div>
+          <Drawing name="visit" className="visit-head__art" />
         </header>
 
         <div className="visit-grid">
+          <AddressBlock site={site} />
           <section id="hours" className="visit-hours" aria-labelledby="hours-title">
-            <Pill id="hours-title">{visitLabels.hours}</Pill>
+            <SectionHead id="hours-title">{visitLabels.hours}</SectionHead>
             <HoursCard hours={site.hours} events={await hoursEvents()} today={today} />
           </section>
-          <AddressBlock site={site} />
-        </div>
-
-        <div className="visit-pair">
-          <PhotoFrame id="exterior-dusk" ratio="4/5" sizes="(min-width: 768px) 40vw, 50vw" />
-          <PhotoFrame id="beer-garden-night" ratio="4/5" sizes="(min-width: 768px) 40vw, 50vw" />
         </div>
 
         <section className="visit-section" aria-labelledby="know-title">
-          <Pill id="know-title">{visitLabels.goodToKnow}</Pill>
-          <GoodToKnow visit={site.visit} />
+          <SectionHead id="know-title">{visitLabels.goodToKnow}</SectionHead>
+          <div className="visit-know">
+            <GoodToKnow visit={site.visit} />
+            <PhotoFrame id="firepit-beers" ratio="4/5" sizes="(min-width: 1024px) 420px, 100vw" />
+          </div>
         </section>
-      </div>
 
-      <PhotoFrame id="heated-tent" ratio="16/10" bleed sizes="100vw" className="visit-tent" />
-
-      <div className="page page--visit page--visit-end">
-        <div className="visit-end">
-          <section id="gift-cards" className="visit-section" aria-labelledby="gift-title">
-            <Pill id="gift-title">{visitLabels.giftCards}</Pill>
-            <p className="visit-prose">{site.visit.giftCards}</p>
-            <Button href={site.links.eGiftCard} external variant="secondary">
-              {visitLabels.eGiftCards}
-            </Button>
-          </section>
-          <section id="contact" className="visit-section" aria-labelledby="contact-title">
-            <Pill id="contact-title">{visitLabels.contact}</Pill>
-            <ul className="contact-list">
-              <li>
-                <a href={`mailto:${site.email}`}>{microcopy.emailUs}</a>
-              </li>
-              <li>
-                <a href={`tel:${site.phone.tel}`} className="tabular">
-                  {site.phone.display}
-                </a>
-              </li>
-              <li>
-                <a href={site.links.instagram} target="_blank" rel="noopener">
-                  Instagram
-                </a>
-              </li>
-              <li>
-                <a href={site.links.facebook} target="_blank" rel="noopener">
-                  Facebook
-                </a>
-              </li>
-              <li>
-                <a href={site.links.bandBookingForm} target="_blank" rel="noopener">
-                  {visitLabels.bookYourBand}
-                </a>
-              </li>
-            </ul>
-          </section>
-        </div>
+        <p id="gift-cards" className="visit-note">
+          {site.visit.giftCards}{" "}
+          <ExternalLink href={site.links.eGiftCard}>{visitLabels.eGiftCards}</ExternalLink>
+        </p>
       </div>
     </PageWipe>
   );

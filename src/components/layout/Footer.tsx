@@ -1,5 +1,7 @@
-// Footer (spec §4.12): always Overtime. Checker rail; the loud wordmark spanning gutter to
-// gutter; three columns (Visit · Do · Follow); the seal turning slowly; the small print;
+// Footer (redesign 2026-11-15): on paper, like every page. The ground line from Home's
+// first screen runs across its top; the wordmark at the header's size with the open-now
+// line; three short columns (Visit · Do · Follow); the seal, small; the small print; the
+// printed menu's checker closes the page. About half its old height on a phone.
 // the global "Pause motion" control (§9.2). The open-now pill and hours summary arrive with
 // lib/hours in M4; the goblin hatch with M7; the mailing list stays hidden until O6.
 import { microcopy } from "@content/microcopy";
@@ -15,13 +17,24 @@ export function Footer() {
   const site = getSite();
   const ext = { target: "_blank", rel: "noopener" } as const;
   return (
-    <footer className="site-footer" data-skin="overtime">
-      <Checker />
+    <footer className="site-footer" data-skin="paper">
+      {/* the ground line again, as on Home's first screen: the page ends where it began */}
+      <svg
+        viewBox="0 0 1200 60"
+        preserveAspectRatio="none"
+        className="site-footer__ground"
+        aria-hidden="true"
+        focusable="false"
+      >
+        <path d="M0 44C80 40 130 20 200 24S300 46 380 40S520 14 600 22S720 46 800 38S930 18 1010 26S1130 44 1200 40" />
+      </svg>
       <div className="site-footer__inner">
-        <Link href="/" className="site-footer__word">
-          <Wordmark name={site.name} />
-        </Link>
-        <OpenNow className="site-footer__open" />
+        <div className="site-footer__top">
+          <Link href="/" className="site-footer__word">
+            <Wordmark name={site.name} />
+          </Link>
+          <OpenNow className="site-footer__open" />
+        </div>
         <div className="site-footer__cols">
           <section aria-labelledby="f-visit">
             <h2 id="f-visit" className="site-footer__head">
@@ -79,6 +92,7 @@ export function Footer() {
           {/* TODO(M7): the goblin hatch ("do not press" stamp) sits here. */}
         </div>
       </div>
+      <Checker />
     </footer>
   );
 }

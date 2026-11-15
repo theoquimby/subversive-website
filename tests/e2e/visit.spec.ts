@@ -8,7 +8,8 @@ test("phone, maps and email links; the email address is never printed", async ({
   const directions = main.getByRole("link", { name: /Directions/ });
   await expect(directions).toHaveAttribute("href", /(g\.page|google|maps\.apple\.com)/);
   await expect(directions).toHaveAttribute("rel", "noopener");
-  const email = main.getByRole("link", { name: "Email us" });
+  // contact lives in the footer on every page since the 2026-11-15 redesign
+  const email = page.locator("footer").getByRole("link", { name: "Email us" });
   await expect(email).toHaveAttribute("href", /^mailto:/);
   const text = await page.locator("body").innerText();
   expect(text).not.toMatch(/@[a-z0-9-]+\.[a-z]/i);
@@ -28,7 +29,7 @@ async function clearsHeader(page: Page, id: string) {
 }
 
 test("#hours clears the sticky header", async ({ page }) => clearsHeader(page, "hours"));
-test("#contact clears the sticky header", async ({ page }) => clearsHeader(page, "contact"));
+test("#gift-cards clears the sticky header", async ({ page }) => clearsHeader(page, "gift-cards"));
 
 test("Apple devices get Apple Maps", async ({ browser }) => {
   const ctx = await browser.newContext({

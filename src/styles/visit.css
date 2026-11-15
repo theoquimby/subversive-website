@@ -350,3 +350,97 @@
   text-decoration: underline var(--stroke) var(--accent);
   text-underline-offset: 4px;
 }
+
+/* ---------- Visit, redesign 2026-11-15 (these override the rules above) ----------
+   The taproom in pen beside the title; the address and its two actions; the hours; what
+   to know as plain ruled lines; one photograph; the gift-card sentence. */
+.visit-head {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: end;
+  gap: var(--s-4);
+}
+/* the title and the drawing share a row; the open-now line has the full width under them */
+.visit-head__text {
+  display: contents;
+}
+.visit-head .page__title {
+  grid-column: 1;
+  grid-row: 1;
+  align-self: end;
+}
+.visit-head__art {
+  grid-column: 2;
+  grid-row: 1;
+  width: clamp(5.75rem, 22vw, 14rem);
+}
+.visit-head .open-now {
+  grid-column: 1 / -1;
+  justify-self: start;
+}
+/* the kitchen's time never wraps under itself */
+.hours__kitchen {
+  font-size: 0.9375rem;
+  white-space: nowrap;
+}
+.hours__day {
+  width: 34%;
+}
+.visit-grid {
+  display: grid;
+  gap: var(--s-8);
+  margin-top: var(--s-7);
+}
+.visit-hours {
+  margin-top: 0;
+}
+.visit-hours .hours {
+  margin-top: var(--s-5);
+}
+.address-block {
+  padding-top: 0;
+}
+.address-block__addr {
+  margin-left: 0;
+  font-family: var(--ff-utility);
+  font-size: clamp(1.75rem, 1.5833rem + 0.8333vw, 2.25rem);
+  font-weight: 700;
+  line-height: 1.12;
+  letter-spacing: 0.01em;
+}
+.visit-section {
+  display: grid;
+  gap: var(--s-6);
+  margin-top: var(--section);
+}
+.visit-know {
+  display: grid;
+  gap: var(--s-7);
+}
+.ledger__icon,
+.tag-sky {
+  display: none;
+}
+.visit-note {
+  max-width: 52ch;
+  margin: var(--section) 0 0;
+  color: var(--fg-muted);
+}
+@media (min-width: 64rem) {
+  .visit-grid {
+    grid-template-columns: minmax(0, 5fr) minmax(0, 7fr);
+    column-gap: var(--s-10);
+    align-items: start;
+  }
+  .address-block {
+    padding-top: 0;
+  }
+  .address-block__addr {
+    font-size: 2.25rem;
+  }
+  .visit-know {
+    grid-template-columns: minmax(0, 7fr) minmax(0, 5fr);
+    column-gap: var(--s-10);
+    align-items: start;
+  }
+}
