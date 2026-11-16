@@ -77,12 +77,6 @@ export default async function BeerPage() {
         <section className="prose-section" aria-labelledby="where-title">
           <SectionHead id="where-title">{homeLabels.whereFrom}</SectionHead>
           <WhereFrom sourcing={site.sourcing} />
-          <PhotoFrame
-            id="grain-in-hands"
-            ratio="16/10"
-            className="beer-wide"
-            sizes="(min-width: 1024px) 832px, 100vw"
-          />
           <p className="prose-links">
             <TextLink href="/menu">{homeLabels.fullMenu}</TextLink>
           </p>

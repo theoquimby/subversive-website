@@ -211,12 +211,44 @@ export function LabelGlass({
       tilt: 0, // the beer's lean, radians; follows tiltTo as a spring
       tiltV: 0,
       tiltTo: 0,
+      reached: false, // the stream has reached the beer since the tap opened
       lipL: 0, // the sheet of head going over each lip, in glass units
       lipR: 0,
       drops: [] as { x: number; y: number; vx: number; vy: number; r: number }[],
     };
     let raf = 0;
     let last = 0;
+    // Beer that leaves the spout takes a moment to fall: what lands by now is what had left
+    // the tap one fall-time ago, and what is still in the air lands after the tap has shut.
+    // Counted as totals (poured, landed), so every drop that leaves the tap lands once. (2026-11-16: before this,
+    // beer in the air was counted as a fixed flow for its whole fall; when the tap shut, the
+    // level stalled for a tenth of a second and then jumped into the fill line and stopped
+    // dead.)
+    // [time, beer that has left the tap in all]; and how much of it has landed
+    const hist: [number, number][] = [];
+    let poured = 0;
+    let landed = 0;
+    /** how much had left the tap by time t */
+    const pouredBy = (t: number) => {
+      const first = hist[0];
+      if (!first || t <= first[0]) return first ? first[1] : 0;
+      for (let i = hist.length - 1; i >= 0; i--) {
+        const h = hist[i] as [number, number];
+        if (h[0] <= t) {
+          const n = hist[i + 1];
+          if (!n) return h[1];
+          return h[1] + ((n[1] - h[1]) * (t - h[0])) / (n[0] - h[0] || 1);
+        }
+      }
+      return 0;
+    };
+    /** seconds for beer to fall from the spout to a surface at y */
+    const fallTime = (y: number) => {
+      const d = Math.max(0, y - SPOUT);
+      return (-60 + Math.sqrt(3600 + 3000 * d)) / 1500;
+    };
+    /** how far the level climbs per unit of flow per second, at level y */
+    const climb = (y: number) => 118 * (100 / (30 + (FLOOR - y) * 0.36));
 
     const colour = (b: GlassBeer) => {
       body.setAttribute("fill", b.color);
@@ -366,9 +398,13 @@ export function LabelGlass({
           s.tail = SPOUT;
           s.tailV = 0;
           s.carb = 1;
+          s.reached = false;
         }
       }
       s.flow += ((s.open ? 1 : 0) - s.flow) * Math.min(1, dt * 11);
+      poured += s.flow * dt;
+      hist.push([s.t, poured]);
+      while (hist.length > 2 && (hist[1] as [number, number])[0] < s.t - 0.6) hist.shift();
 
       // the stream falls; when the tap shuts its tail falls after it
       const mid = (N - 1) / 2;
@@ -377,9 +413,10 @@ export function LabelGlass({
         s.frontV += 1500 * dt;
         s.front = Math.min(surface, s.front + s.frontV * dt);
       }
-      if (!s.open && s.flow < 0.25 && s.front > SPOUT) {
+      if (!s.open && s.flow < 0.12 && s.front > SPOUT) {
+        if (s.tail === SPOUT) s.tailV = 60;
         s.tailV += 1500 * dt;
-        s.tail += (s.tailV + 120) * dt;
+        s.tail += s.tailV * dt;
         if (s.tail >= surface) {
           s.tail = SPOUT;
           s.tailV = 0;
@@ -387,14 +424,25 @@ export function LabelGlass({
           s.frontV = 0;
         }
       }
-      const landing = s.front >= surface - 1 && (s.open ? s.flow : s.tail > SPOUT ? 0.7 : 0);
+      // what lands is what left the spout one fall ago, once the stream has reached the beer
+      const fall = fallTime(surface);
+      if (s.front >= surface - 1 && s.flow > 0.02) s.reached = true;
+      // once the stream has reached the beer, everything that left the tap lands, including
+      // what is still falling after the tap has shut and the stream's tail has gone by
+      let amount = 0;
+      if (s.reached && s.phase !== "drain") {
+        const by = Math.max(landed, pouredBy(s.t - fall));
+        amount = by - landed;
+        landed = by;
+      } else landed = poured;
+      // as a rate, for the splash and the bubbles
+      const landing = amount / dt;
 
-      if (landing && (s.phase === "fill" || s.phase === "topup" || s.tail > SPOUT)) {
+      if (amount > 1e-5) {
         // the bowl is narrow at the bottom, so the level climbs fastest there
-        const width = 30 + (FLOOR - s.y) * 0.36;
-        const rise = landing * 118 * (100 / width) * dt;
+        const rise = amount * climb(s.y);
         s.y = Math.max(LEVEL - 1, s.y - Math.min(rise, 9));
-        s.f += landing * s.head * 9.5 * dt;
+        s.f += amount * s.head * 9.5;
         const kick = (0.6 + Math.random() * 0.8) * 860 * landing * dt;
         // droplets jump where the stream lands
         if (s.drops.length < MAX_DROPS && Math.random() < 34 * landing * dt)
@@ -456,8 +504,18 @@ export function LabelGlass({
       }
 
       if (s.phase === "fill" || s.phase === "topup") {
-        // shut a little early: what is still falling finishes the pour
-        if (s.y <= LEVEL + 7) {
+        // Shut when what is already falling, and what the closing tap still lets out, will
+        // bring the beer to its line: the level then slows into the line on its own.
+        const inAir = poured - landed;
+        // where that beer will bring the level: walked up the bowl, which widens as it rises
+        let left = inAir + s.flow / 11;
+        let ahead = s.y;
+        while (left > 0 && ahead > LEVEL) {
+          const step = Math.min(left, 0.01);
+          ahead -= step * climb(ahead);
+          left -= step;
+        }
+        if (ahead <= LEVEL) {
           s.open = false;
           s.phase = "settle";
         } else if (s.y - s.f <= RIM - 4) {
@@ -473,6 +531,7 @@ export function LabelGlass({
             s.phase = "topup";
             s.open = true;
             s.head = 0.3; // a gentle top-up
+            s.reached = false;
             s.front = SPOUT;
             s.frontV = 60;
           } else s.phase = "settle";
