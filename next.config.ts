@@ -1,4 +1,5 @@
 import type { NextConfig } from "next";
+import type { RemotePattern } from "next/dist/shared/lib/image-config";
 
 const isDev = process.env.NODE_ENV === "development";
 const OPS_ORIGIN = process.env.NEXT_PUBLIC_OPS_ORIGIN ?? "";
@@ -28,13 +29,40 @@ const SQ_FONTS = ORDERING
   ? " https://square-fonts-production-f.squarecdn.com https://d1g145x70srn7h.cloudfront.net"
   : "";
 
+// Pictures from elsewhere, each only when its feature is configured at build time:
+// Ops (a featured event's photograph; NEXT_PUBLIC_OPS_ORIGIN) and Instagram's CDN (the
+// Instagram feed; INSTAGRAM_ACCESS_TOKEN). next/image fetches them on the server, so
+// img-src needs them only for a picture shown unoptimized; both lists say the same thing.
+const INSTAGRAM = Boolean(process.env.INSTAGRAM_ACCESS_TOKEN);
+const IG_HOSTS = ["cdninstagram.com", "fbcdn.net"];
+function opsImagePattern(): RemotePattern | null {
+  try {
+    const u = new URL(OPS_ORIGIN);
+    if (u.protocol !== "https:" && u.protocol !== "http:") return null;
+    return {
+      protocol: u.protocol === "https:" ? "https" : "http",
+      hostname: u.hostname,
+      ...(u.port ? { port: u.port } : {}),
+      pathname: "/**",
+    };
+  } catch {
+    return null; // not set, or not an origin
+  }
+}
+const OPS_IMAGES = opsImagePattern();
+const remotePatterns: RemotePattern[] = [
+  ...(OPS_IMAGES ? [OPS_IMAGES] : []),
+  ...(INSTAGRAM ? IG_HOSTS.map((h): RemotePattern => ({ protocol: "https", hostname: `**.${h}` })) : []),
+];
+const IMG_EXTRA = `${OPS_IMAGES ? ` ${new URL(OPS_ORIGIN).origin}` : ""}${INSTAGRAM ? IG_HOSTS.map((h) => ` https://*.${h}`).join("") : ""}`;
+
 const scriptSrc = isDev ? `'self' 'unsafe-inline' 'unsafe-eval'${SQ_WEB}` : `'self' 'unsafe-inline'${SQ_WEB}`;
 
 const csp = [
   "default-src 'self'",
   `script-src ${scriptSrc}`,
   `style-src 'self' 'unsafe-inline'${SQ_WEB}`, // Motion writes inline styles
-  "img-src 'self' data: blob:",
+  `img-src 'self' data: blob:${IMG_EXTRA}`,
   `font-src 'self'${SQ_FONTS}`,
   // the analytics beacon posts to Ops; allowed only when that origin is configured
   `connect-src 'self'${OPS_ORIGIN ? ` ${OPS_ORIGIN}` : ""}${SQ_WEB}${SQ_CONNECT}${isDev ? " ws:" : ""}`,
@@ -60,6 +88,7 @@ const config: NextConfig = {
   poweredByHeader: false,
   images: {
     formats: ["image/avif", "image/webp"],
+    ...(remotePatterns.length > 0 ? { remotePatterns } : {}),
   },
   experimental: {
     sri: { algorithm: "sha256" },

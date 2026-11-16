@@ -14,6 +14,34 @@ const time = z
 
 const optionalText = z.string().min(1).optional();
 
+// A featured event's own page (Ops → event.page; requested in docs/ops-feed-requests.md):
+// a photograph, an intro, Max's sections, the running order and links. Every part is
+// optional; a page that does not fit is dropped (the event itself is kept, as today).
+const line = (max: number) => z.string().trim().min(1).max(max);
+export const eventPageSchema = z.object({
+  hero: z.url({ protocol: /^https$/ }).nullish(),
+  heroAlt: line(200).nullish(),
+  intro: line(600).nullish(),
+  sections: z
+    .array(z.object({ title: line(80), body: line(4000) }))
+    .max(8)
+    .nullish(),
+  schedule: z
+    .array(z.object({ time: line(20), what: line(140) }))
+    .max(24)
+    .nullish(),
+  links: z
+    .array(
+      z.object({
+        label: line(60),
+        href: z.url({ protocol: /^https$/ }),
+      }),
+    )
+    .max(6)
+    .nullish(),
+});
+export type EventPage = z.infer<typeof eventPageSchema>;
+
 const eventSchema = z.object({
   id: z.string().min(1),
   date: z
@@ -47,6 +75,15 @@ const eventSchema = z.object({
     .transform((s) => s as HHmm)
     .optional(),
   featured: z.boolean().optional(),
+  page: z
+    .unknown()
+    .transform((raw): EventPage | undefined => {
+      if (raw === undefined || raw === null) return undefined;
+      const r = eventPageSchema.safeParse(raw);
+      if (!r.success) console.warn("events: dropped a malformed event page", r.error.issues[0]?.message);
+      return r.success ? r.data : undefined;
+    })
+    .optional(),
   updatedAt: optionalText,
 });
 

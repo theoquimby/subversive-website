@@ -12,11 +12,13 @@ import { type Photo, photos } from "@content/photos";
 import type { Metadata } from "next";
 import { PhotoFrame } from "@/components/graphics/PhotoFrame";
 import { Hero } from "@/components/home/Hero";
+import { PhotoStrip } from "@/components/home/PhotoStrip";
 import { Drawing } from "@/components/home/Ways";
 import { PageWipe } from "@/components/layout/PageWipe";
 import { SectionHead } from "@/components/layout/SectionHead";
 import { IntroBox } from "@/components/menu/IntroBox";
 import { MenuRow, rowPrice } from "@/components/menu/MenuRow";
+import { InstagramFeed } from "@/components/social/InstagramFeed";
 import { Link } from "@/components/ui/Link";
 import { ExternalLink, TextLink } from "@/components/ui/TextLink";
 import { hoursEvents } from "@/components/visit/OpenNow";
@@ -130,13 +132,9 @@ export default async function Home() {
               </dd>
             </div>
           </dl>
-          {/* the front of the place, so a first-time visitor knows what to look for */}
-          <PhotoFrame
-            id="front-day"
-            ratio="16/10"
-            className="home-visit__photo"
-            sizes="(min-width: 1024px) 720px, 100vw"
-          />
+          {/* the place itself, so a first-time visitor knows what to look for: the front,
+              the bar, the taproom floor, the garden, the tent */}
+          <PhotoStrip ids={["front-day", "fire-table", "taproom-inside", "garden-dusk", "tent-inside"]} />
         </section>
 
         {coming.length > 0 ? (
@@ -215,6 +213,9 @@ export default async function Home() {
             </div>
           </div>
         </section>
+
+        {/* the latest posts from Instagram; nothing at all until a token is set */}
+        <InstagramFeed className="home-instagram" />
       </div>
     </PageWipe>
   );

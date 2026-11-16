@@ -1,0 +1,195 @@
+/* ---------- Footer, second redesign (2026-11-16) ----------
+   Max: "some 2010 footer taking up a bunch of space". Out: the giant wordmark slab, the three
+   headed columns, the stacked small print. In: the ground line as the top edge, the useful
+   facts set large in the display face, every other link as one line of plain labels, a
+   colophon row (wordmark, small print, Pause motion), the seal as a small stamp, the checker
+   as the page's last edge. Overrides the older footer rules in shell.css; colours are skin
+   tokens only, so it is paper on paper pages and night on the night pages.
+   Phone: wordmark and seal / facts stacked / links in two even columns / colophon.
+   48rem up: facts on one line and the links on one line, the seal standing beside both;
+   the colophon underneath. */
+
+.site-footer {
+  margin-top: var(--s-10);
+}
+/* the fixed .edge-bottom strip covers the last few pixels of a phone's screen: the checker
+   ends above it, so the page closes on the whole band */
+@media (max-width: 63.99rem) {
+  .site-footer {
+    padding-bottom: max(10px, env(safe-area-inset-bottom));
+  }
+}
+.site-footer .site-footer__ground {
+  height: 2.75rem;
+}
+
+.site-footer .site-footer__inner {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  grid-template-areas:
+    "word  seal"
+    "facts facts"
+    "links links"
+    "rule  rule"
+    "small pause";
+  align-items: center;
+  column-gap: var(--s-5);
+  padding: var(--s-2) var(--gutter) var(--s-5);
+}
+/* the one hairline: between what you use and the colophon */
+.site-footer .site-footer__inner::after {
+  content: "";
+  grid-area: rule;
+  margin-top: var(--s-5);
+  border-top: 1px solid var(--hair);
+}
+
+/* the wordmark: a signature, not a slab */
+.site-footer .site-footer__word {
+  grid-area: word;
+  display: flex;
+  align-items: center;
+  justify-self: start;
+  min-height: 44px;
+  margin-left: var(--optical-left);
+  font-size: var(--t-h3);
+  letter-spacing: normal;
+}
+
+/* the seal: a small stamp in the corner */
+.site-footer .site-footer__seal {
+  grid-area: seal;
+  justify-self: end;
+  align-self: center;
+  font-size: 3.5rem;
+  opacity: 1;
+}
+
+/* ---------- The facts: open now · address · phone ---------- */
+.site-footer__facts {
+  grid-area: facts;
+  display: grid;
+  justify-items: start;
+  margin-top: var(--s-3);
+}
+.site-footer__fact {
+  display: block;
+  width: fit-content;
+  padding-block: 11px;
+  color: var(--fg);
+  font-family: var(--ff-display);
+  font-weight: 400;
+  font-size: var(--t-subline);
+  line-height: 1.25;
+  text-decoration: none;
+}
+.site-footer__fact > span {
+  white-space: nowrap;
+}
+
+/* ---------- Every other link: plain labels, no heads ---------- */
+.site-footer__links {
+  grid-area: links;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  column-gap: var(--s-5);
+  margin: var(--s-4) 0 0;
+  padding: 0;
+  list-style: none;
+}
+.site-footer__links a {
+  display: flex;
+  align-items: center;
+  width: fit-content;
+  min-height: 44px;
+  color: var(--fg);
+  font-family: var(--ff-utility);
+  font-weight: 700;
+  font-size: var(--t-label);
+  line-height: var(--lh-label);
+  letter-spacing: var(--track-label);
+  text-transform: uppercase;
+  text-decoration: none;
+}
+
+/* the pen's underline under a pointer, as on the open-now line */
+@media (hover: hover) {
+  .site-footer__fact:hover,
+  .site-footer__links a:hover {
+    text-decoration: underline;
+    text-decoration-thickness: 2px;
+    text-underline-offset: 4px;
+  }
+}
+
+/* ---------- Colophon ---------- */
+.site-footer .site-footer__small {
+  grid-area: small;
+  margin: var(--s-3) 0 0;
+  color: var(--fg-muted);
+  font-size: var(--t-small);
+  line-height: var(--lh-small);
+}
+.site-footer .site-footer__small span {
+  display: block;
+  white-space: nowrap;
+}
+.site-footer__pause {
+  grid-area: pause;
+  justify-self: end;
+  margin-top: var(--s-3);
+}
+.site-footer .pause-motion {
+  color: var(--fg-muted);
+  font-size: var(--t-label);
+}
+.site-footer .pause-motion[aria-pressed="true"] {
+  color: var(--accent-text);
+}
+
+/* ---------- 48rem up: one band ---------- */
+@media (min-width: 48rem) {
+  .site-footer .site-footer__inner {
+    grid-template-columns: auto minmax(0, 1fr) auto;
+    grid-template-areas:
+      "facts facts seal"
+      "links links seal"
+      "rule  rule  rule"
+      "word  small pause";
+    column-gap: var(--s-7);
+    padding-top: var(--s-3);
+  }
+  .site-footer .site-footer__seal {
+    font-size: 5.5rem;
+  }
+  .site-footer__facts {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    column-gap: var(--s-7);
+    margin-top: 0;
+  }
+  .site-footer__links {
+    display: flex;
+    flex-wrap: wrap;
+    column-gap: var(--s-6);
+    margin-top: var(--s-1);
+  }
+  /* the things to do, then the ways to reach us: a wider step between the two groups */
+  .site-footer__links li:nth-child(5) {
+    margin-left: var(--s-6);
+  }
+  .site-footer .site-footer__inner::after {
+    margin-top: var(--s-4);
+  }
+  .site-footer .site-footer__word,
+  .site-footer .site-footer__small,
+  .site-footer__pause {
+    margin-top: var(--s-2);
+  }
+  .site-footer .site-footer__small {
+    display: flex;
+    flex-wrap: wrap;
+    column-gap: var(--s-4);
+  }
+}

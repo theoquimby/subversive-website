@@ -4,11 +4,12 @@
 // Not here: malt-raking (the malting floor, spec O10), kept in docs/source/legacy.
 import type { StaticImageData } from "next/image";
 // From the brewery's own uploads to its Google listing ("By owner"), 2026-11-15, with
-// Theo's go-ahead. None shows the old "Malting" name.
-import barStools from "../public/photos/bar-stools.webp";
+// Theo's go-ahead. Two that were taken (the bar, whose chalkboard reads "Subversive
+// Malting | Brewing", and the building's side wall, painted the same) were removed on
+// 2026-11-16 under spec O10. Check every new photo for that name, signs and chalkboards
+// included, before adding it.
 import beerGardenNight from "../public/photos/beer-garden-night.webp";
 import brewhouseCopper from "../public/photos/brewhouse-copper.webp";
-import buildingDusk from "../public/photos/building-dusk.webp";
 import burgerAndBeer from "../public/photos/burger-and-beer.webp";
 import burgerAndBeerWide from "../public/photos/burger-and-beer-wide.webp";
 import canInHand from "../public/photos/can-in-hand.webp";
@@ -113,11 +114,6 @@ export const photos = {
     alt: "Inside the taproom: tall tables and stools, hanging plants, the barley mark on the wall",
     focal: [50, 55],
   },
-  "bar-stools": {
-    src: barStools,
-    alt: "The bar, with stools along a high table and the roll-up doors open behind",
-    focal: [45, 55],
-  },
   "taproom-tables": {
     src: taproomTables,
     alt: "The taproom floor: high tables, a fridge of cans, the brewing tanks at the back",
@@ -142,11 +138,6 @@ export const photos = {
     src: tentInside,
     alt: "Inside the canvas tent: picnic tables under a string of lights",
     focal: [50, 60],
-  },
-  "building-dusk": {
-    src: buildingDusk,
-    alt: "The taproom building at dusk, strung with lights",
-    focal: [50, 50],
   },
   "fire-table": {
     src: fireTable,

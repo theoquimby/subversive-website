@@ -157,6 +157,23 @@ export const homeLabels = {
   since: "2018",
 } as const;
 
+// Our beer: the drawing of how a batch is brewed (2026-11-16). Station names only.
+export const brewLabels = {
+  title: "How it's made",
+  aria: "How our beer is made, from New York grain to kegs and cans",
+  grain: "Grain",
+  hops: "Hops",
+  water: "Water",
+  yeast: "Yeast",
+  mill: "Mill",
+  mash: "Mash",
+  runoff: "Run-off",
+  boil: "Boil",
+  ferment: "Ferment",
+  out: "Kegs & cans",
+  again: "Brew another",
+} as const;
+
 // Ordering from the site (2026-11-15). Interface labels and the messages the order sheet
 // raises itself; written plainly, to be read aloud by Max before ordering is switched on.
 export const orderLabels = {
@@ -193,4 +210,40 @@ export const orderLabels = {
   failed: "Something went wrong. Please call us before trying again.",
   unavailable: (name: string) => `${name} can't be ordered right now. Please remove it.`,
   sandbox: "Test mode: no real payment is taken.",
+} as const;
+
+// The row of photographs in Home's Visit band and the large view each one opens
+// (2026-11-16): interface labels.
+export const galleryLabels = {
+  group: "Photos of the brewery",
+  open: (alt: string) => `Open photo: ${alt}`,
+  close: "Close",
+  previous: "Previous photo",
+  next: "Next photo",
+} as const;
+
+// The announcement band under the header (Ops → announcements). Labels only; every line
+// in the band is Max's, from Ops.
+export const announceLabels = {
+  // label: the band's landmark name for screen readers
+  region: "Announcements",
+  // label: the close button on each line
+  dismiss: "Dismiss",
+} as const;
+
+// A featured event's own page (Ops → event.page). Labels only; the sections, times and
+// links are Max's, from Ops.
+export const eventPageLabels = {
+  // label: the heading over the night's running order
+  schedule: "Schedule",
+  // label: the heading over the event's links
+  links: "Links",
+} as const;
+
+// The Instagram feed (InstagramFeed.tsx). Labels only.
+export const socialLabels = {
+  // label: the feed's landmark name and each post's link name
+  instagram: "Instagram",
+  // label: alt text for a post with no caption
+  post: "A post on Instagram",
 } as const;

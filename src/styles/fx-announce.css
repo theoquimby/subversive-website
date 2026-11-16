@@ -1,0 +1,227 @@
+/* ---------- Announcement band (Announcements.tsx, Ops → announcements) ---------- */
+/* Directly under the header, full width, one slim line per announcement. Not a card:
+   a printed strip like the menu's notices. "event" is ink on pils (the hero notice's
+   colours), "closure" ink on ember (the one loud warning), "info" quiet on the page's own
+   ground with a hairline. Text wraps; it is never cut off. The list itself carries no
+   padding, so a band whose lines were all closed takes no room. */
+.announce__list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.announce__line {
+  --announce-bg: var(--bg);
+  --announce-fg: var(--fg);
+  display: flex;
+  align-items: center;
+  gap: var(--s-3);
+  padding-block: var(--s-1);
+  /* the content column of the page, edge to edge in colour */
+  padding-inline: max(
+      var(--gutter),
+      env(safe-area-inset-left),
+      calc((100% - var(--content-max)) / 2 + var(--gutter))
+    )
+    max(var(--gutter), env(safe-area-inset-right), calc((100% - var(--content-max)) / 2 + var(--gutter)));
+  background: var(--announce-bg);
+  color: var(--announce-fg);
+  border-bottom: 1px solid var(--rule);
+}
+.announce__line[data-tone="event"] {
+  --announce-bg: var(--pils);
+  --announce-fg: var(--ink);
+  border-bottom-color: color-mix(in srgb, var(--ink) 14%, transparent);
+}
+.announce__line[data-tone="closure"] {
+  --announce-bg: var(--ember);
+  --announce-fg: var(--ink);
+  border-bottom-color: color-mix(in srgb, var(--ink) 14%, transparent);
+}
+.announce__text {
+  flex: 1 1 auto;
+  min-width: 0;
+  margin: 0;
+  padding-block: var(--s-1);
+  font-size: var(--t-small);
+  font-weight: 600;
+  line-height: var(--lh-small);
+  overflow-wrap: anywhere;
+  text-wrap: pretty;
+}
+.announce__link {
+  color: inherit;
+  font-weight: 700;
+  white-space: nowrap;
+  text-decoration-line: underline;
+  text-decoration-thickness: var(--stroke);
+  text-underline-offset: 3px;
+}
+.announce__line[data-tone="info"] .announce__link {
+  text-decoration-color: var(--accent);
+}
+.announce__ext {
+  width: 0.9em;
+  height: 0.9em;
+  margin-inline-start: 0.15em;
+  vertical-align: -0.1em;
+}
+.announce__close {
+  flex: none;
+  display: grid;
+  place-items: center;
+  /* a 44 px target that does not make the band taller than its text */
+  width: 44px;
+  height: 44px;
+  margin-block: calc(-1 * var(--s-2));
+  margin-inline-end: calc(-1 * var(--s-3));
+  padding: 0;
+  border: 0;
+  border-radius: var(--r-pill);
+  background: transparent;
+  color: inherit;
+  cursor: pointer;
+  transition: background-color var(--d-1) var(--ease-out);
+}
+.announce__close:focus-visible {
+  outline: var(--stroke) solid var(--announce-fg);
+  outline-offset: -6px;
+}
+.announce__icon {
+  width: 18px;
+  height: 18px;
+}
+@media (hover: hover) {
+  .announce__close:hover {
+    background: color-mix(in srgb, var(--announce-fg) 10%, transparent);
+  }
+}
+@media (min-width: 48rem) {
+  .announce__text {
+    font-size: var(--t-body);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .announce__close {
+    transition: none;
+  }
+}
+
+/* ---------- A featured event's own page (events/[slug], Ops → event.page) ---------- */
+/* Below the head ticket: an optional photograph, Max's intro, his sections on the ink
+   line, the running order as rows with hairlines, and his links. Rows, not cards. */
+.event-feature {
+  display: grid;
+  gap: var(--s-8);
+  margin-top: var(--s-8);
+}
+.event-feature__hero {
+  position: relative;
+  margin: 0;
+  overflow: hidden;
+  border: var(--edge);
+  border-radius: var(--r-card);
+  background: var(--surface);
+  aspect-ratio: 3 / 2;
+}
+.event-feature__hero img {
+  object-fit: cover;
+}
+.event-feature__intro {
+  max-width: var(--measure-prose);
+  margin: 0;
+  font-size: var(--t-intro);
+  font-weight: 600;
+  line-height: var(--lh-body);
+  white-space: pre-line;
+}
+.event-feature__sec .event-desc {
+  margin-top: var(--s-4);
+}
+.event-schedule {
+  max-width: var(--prose-max);
+  margin: var(--s-4) 0 0;
+  padding: 0;
+  list-style: none;
+}
+.event-schedule li {
+  display: grid;
+  grid-template-columns: 6.5rem 1fr;
+  gap: var(--s-4);
+  padding-block: var(--s-3);
+  border-bottom: 1px solid var(--rule);
+}
+.event-schedule__time {
+  font-family: var(--ff-utility);
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  color: var(--accent-text);
+}
+.event-feature__links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--s-3) var(--s-6);
+  margin: var(--s-4) 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+/* ---------- Instagram feed (InstagramFeed.tsx; placed by the page that wants it) ---------- */
+/* Five squares: a row of five from tablet up; on phones a row that scrolls sideways
+   with the next square showing at the edge, so it reads as more. */
+.ig-feed {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: grid;
+  grid-auto-flow: column;
+  grid-auto-columns: 42%;
+  gap: var(--s-3);
+  overflow-x: auto;
+  overscroll-behavior-x: contain;
+  scroll-snap-type: x mandatory;
+  scrollbar-width: none;
+}
+.ig-feed::-webkit-scrollbar {
+  display: none;
+}
+.ig-feed li {
+  scroll-snap-align: start;
+}
+.ig-feed__post {
+  display: block;
+  position: relative;
+  aspect-ratio: 1;
+  overflow: hidden;
+  border: var(--edge);
+  border-radius: var(--r-tag);
+  background: var(--surface);
+}
+.ig-feed__post img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: scale var(--d-2) var(--ease-out);
+}
+.ig-feed__post:focus-visible {
+  outline: var(--stroke) solid var(--focus);
+  outline-offset: 3px;
+}
+@media (hover: hover) {
+  .ig-feed__post:hover img {
+    scale: 1.04;
+  }
+}
+@media (min-width: 48rem) {
+  .ig-feed {
+    grid-auto-flow: row;
+    grid-template-columns: repeat(5, 1fr);
+    grid-auto-columns: auto;
+    overflow: visible;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .ig-feed__post img {
+    transition: none;
+  }
+}

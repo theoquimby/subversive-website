@@ -14,6 +14,11 @@
 @import "./fx-fetch.css";
 @import "./fx-truck.css";
 @import "./order.css";
+@import "./fx-gallery.css";
+@import "./fx-announce.css";
+@import "./fx-brew.css";
+/* the footer's redesign overrides the older footer rules in shell.css */
+@import "./fx-footer.css";
 @import "./print.css";
 
 /*

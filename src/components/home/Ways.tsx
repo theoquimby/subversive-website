@@ -24,14 +24,19 @@ const DRAWINGS = {
     "M55 52C66 50 78 51 92 49",
     "M56 61C62 60 70 60 78 59",
   ],
-  // the taproom: walls and roof in one stroke, the big door, smoke from the fire
+  // the taproom, front on (2026-11-16, drawn from the photographs): long, low, a flat roof
+  // under a thin cap; two glass roll-up doors side by side under the sign; the barley mark
+  // painted beside them; a plain side door, a small square window; lights along the roof
   visit: [
-    "M6 80C28 78 92 81 114 79",
-    "M20 79C19 66 20 52 19 42C32 34 46 26 59 19C72 26 85 33 98 41C97 54 99 67 98 79",
-    "M33 79C33 70 32 61 33 53C44 52 55 53 66 52C67 61 66 70 67 79",
-    "M33 62C44 61 56 62 66 61M33 70C44 69 56 70 67 70",
-    "M77 79C77 72 76 64 77 58C81 57 85 58 88 57C89 64 88 72 89 79",
-    "M73 23C68 17 78 14 73 8C70 4 76 2 77 0",
+    "M4 80C30 78 90 81 116 79",
+    "M9 79C8 64 9 50 8 36C40 35.4 80 36.2 112 35.6C111 50 113 64 112 79",
+    "M7 37L6 32.6C40 31.8 82 32.6 114 31.8L113 36",
+    "M30 79V51.6C36 51.2 44 51.5 50 51.2V79M53 79V51.2C59 51.5 66 51.1 73 51.4V79M40 51.4V79M63 51.3V79M30 58.4C37 58 44 58.4 50 58.1M53 58.1C60 58.4 66 58 73 58.3M30 65.2C37 64.9 44 65.3 50 65M53 65C60 65.3 66 64.9 73 65.2M30 72C37 71.7 44 72.1 50 71.8M53 71.8C60 72.1 66 71.7 73 72",
+    "M33 46.6C38 46 44 46.4 49 46.1M51.5 44.8V48M49.9 46.4H53.1M54.5 46.1C60 45.8 66 46.4 70 46",
+    "M81 45L83.6 48.4L81 51.8L78.4 48.4ZM77.6 54.4L81 57.8L84.4 54.4M77.6 60.8L81 64.2L84.4 60.8M77.6 67.2L81 70.6L84.4 67.2M77.6 73.6L81 77L84.4 73.6",
+    "M15 79V58C18 57.7 21 57.9 24 57.7V79M21.4 68.6v1.2",
+    "M93 48C96.5 47.7 100.5 48 104 47.8C104.2 51 104 54.4 104.2 58C100.5 58.2 96.5 57.9 93 58.1C93.2 54.6 93 51.2 93 48ZM98.6 48V58",
+    "M8 37.4C16 41.6 26 41.6 34 37.4C42 41.6 52 41.6 60 37.4C68 41.6 78 41.6 86 37.4C94 41.6 104 41.6 112 37.4M21 40.9v1.4M47 40.9v1.4M73 40.9v1.4M99 40.9v1.4",
   ],
   // the house glass, empty, with one last drop (the 404 page)
   empty: [
@@ -41,15 +46,19 @@ const DRAWINGS = {
     "M44 85C52 79 68 79 76 85C68 89 52 89 44 85",
     "M60 36C56 42 56 46 60 47C64 46 64 42 60 36Z",
   ],
-  // the street (Visit): the taproom, a string of lights, the heated tent
+  // the street (Visit): the same taproom from the corner of the yard, its short side with
+  // the side door and window, the long front with the doors and the barley mark; the lights
+  // run along the roof and out to an umbrella over a picnic table
   street: [
     "M4 80C36 78 84 81 116 79",
-    "M12 79C11 68 12 56 11 47C20 41 29 36 38 30C47 36 56 41 65 47C64 58 66 68 65 79",
-    "M22 79C22 72 21 65 22 59C31 58 40 59 48 58C49 65 48 72 49 79M22 66C31 65 40 66 48 65M22 72C31 71 40 72 49 72",
-    "M38 30C50 42 62 46 76 52M48 38v4M58 44v4M68 48v4",
-    "M76 79C76 70 75 61 76 54C84 46 98 46 106 54C107 62 106 71 107 79",
-    "M76 54C80 59 84 59 88 55C92 59 96 59 100 55C102 57 104 57 106 54",
-    "M86 79V66C86 62 96 62 96 66V79",
+    "M8 79C7 67 8 55 7.6 43.4C15 41 22 38.8 30 36.6C50 38 70 40 88 42C87 54 89 67 88 79M30 36.6C29.4 50 30.6 66 30 80",
+    "M6.6 44.6L6 41.2L30 34L90 39.6L89.4 43",
+    "M40 79.6V53.8C45 53.6 50 53.9 54 54V79.4M57 79.3V54.2C62 54.4 67 54.6 71 54.9V79.2M47 53.8V79.5M64 54.5V79.3M40 60C45 59.9 50 60.1 54 60.2M57 60.3C62 60.5 67 60.6 71 60.8M40 66.4C45 66.3 50 66.5 54 66.5M57 66.6C62 66.7 67 66.8 71 67M40 72.8C45 72.8 50 72.9 54 72.9M57 73C62 73 67 73.1 71 73.2",
+    "M41 49C45 48.8 49 49.1 52.5 49.2M55 47.6V50.8M53.4 49.3H56.6M58.5 49.3C62 49.4 66 49.7 69 49.9M79.5 49L81.8 52L79.5 55L77.2 52ZM76.6 57L79.5 60L82.4 57M76.6 62.6L79.5 65.6L82.4 62.6M76.6 68.2L79.5 71.2L82.4 68.2M76.6 73.8L79.5 76.8L82.4 73.8",
+    "M13 79V60.4C15.4 60 17.6 59.8 20 59.4V79.2M18 69.6v1.2M23 48.6L27.6 47.6L27.8 53.6L23.2 54.4Z",
+    "M8 44.8C13 48.4 21 46.6 30 38.6C38 44.4 48 45 58 41.4C66 46.4 78 46.8 88 43.6C93 47.6 99 47.4 105 44.6M17.5 46.6v1.3M43.3 44v1.3M72.3 46.1v1.3M96.1 47.2v1.3",
+    "M93 50C98 43.4 112 43.4 117 50C115 51.4 112.6 51.4 111 50C109 51.4 107 51.4 105 50C103 51.4 101 51.4 99 50C97 51.4 94.6 51.4 93 50M99 50C100 47.6 102 45.6 105 45M111 50C110 47.6 108 45.6 105 45M105 42.6V45",
+    "M105 50V79.4M94 66.2C101 65.8 109 66.2 116 65.8M97.4 66.4L95 79.4M112.8 66.2L115.2 79.4M91.6 72.4C94 72.2 97 72.4 99 72.3M111 72.3C113 72.4 116 72.2 118 72.4",
   ],
   // the barn it began in (About): a gambrel roof, the crossed door, a silo, two birds
   barn: [
@@ -76,9 +85,9 @@ export type WayKey = keyof typeof DRAWINGS;
 // One living part in a drawing (2026-11-15): which stroke moves, how, and about which
 // point. The loops are in graphics.css (.mv); they are small and stop with reduced motion.
 const MOVES: Partial<Record<WayKey, Record<number, { move: string; at?: [number, number] }>>> = {
-  visit: { 5: { move: "float" } }, // smoke from the fire
+  visit: { 8: { move: "sway", at: [60, 37] } }, // the lights along the roof
   empty: { 4: { move: "drip" } }, // the last drop
-  street: { 3: { move: "sway", at: [38, 30] } }, // the string of lights
+  street: { 6: { move: "sway", at: [56, 41] } }, // the lights, roof to umbrella
   barn: { 5: { move: "bob" } }, // the two birds
 };
 // a whole drawing that moves: the barley in a breeze, the ticket rocking a little

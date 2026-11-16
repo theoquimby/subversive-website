@@ -4,6 +4,7 @@
 import { unstable_cache } from "next/cache";
 import { z } from "zod";
 import { fetchOps, opsBase } from "../ops/fetch";
+import { type Announcement, currentAnnouncements, parseAnnouncements } from "./announcements";
 import { type Site, weekly } from "./schema";
 import { getSite } from "./site";
 
@@ -24,12 +25,17 @@ export const opsSiteSchema = z.object({
     .optional(),
   email: z.email().nullable().optional(),
   links: z.record(z.string(), z.url()).optional(),
+  // optional, newer than the contract: each entry checked on its own (announcements.ts),
+  // so a bad one never sinks the hours
+  announcements: z.unknown().optional().transform(parseAnnouncements),
 });
 export type OpsSite = z.infer<typeof opsSiteSchema>;
 
 export interface LiveSite extends Site {
   /** one line from Max, or null; already dropped once its last day has passed */
   notice: { text: string; until: string | null } | null;
+  /** the band under the header: those that stand today, at most three; usually none */
+  announcements: Announcement[];
 }
 
 const LINK_KEYS = ["order", "eGiftCard", "map", "instagram", "facebook", "bandBookingForm"] as const;
@@ -51,6 +57,7 @@ export function mergeSite(file: Site, ops: OpsSite, today: string): LiveSite {
     links,
     // the feed stops sending a notice after its last day; an old cache might not
     notice: ops.notice && (ops.notice.until === null || ops.notice.until >= today) ? ops.notice : null,
+    announcements: currentAnnouncements(ops.announcements, today),
   };
 }
 
@@ -63,11 +70,11 @@ const read = unstable_cache(
 /** The site as it stands now: site.json, with Ops laid over it when the feed is on and well. */
 export async function getLiveSite(today: string): Promise<LiveSite> {
   const file = getSite();
-  if (!opsBase()) return { ...file, notice: null };
+  if (!opsBase()) return { ...file, notice: null, announcements: [] };
   try {
     return mergeSite(file, await read(), today);
   } catch (e) {
     console.warn(`site: Ops feed not used (${e instanceof Error ? e.message : "error"}); using site.json`);
-    return { ...file, notice: null };
+    return { ...file, notice: null, announcements: [] };
   }
 }

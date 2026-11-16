@@ -535,32 +535,37 @@
   }
 }
 
-/* ---------- Visit as a walk through the place (Theo, 2026-11-15) ---------- */
+/* ---------- Visit as a walk through the place (Theo 2026-11-15; polished 2026-11-16) ----------
+   Every stop is the same two things: its words (the drawing standing beside the name, the
+   sentence under them) and one picture of one footprint: two photographs, one wide
+   photograph, or the fetch strip in a frame of its own. A wandering line leads on to the
+   next stop, with the same room above it as below. */
 .walk {
   margin-top: var(--section);
 }
 .walk__stops {
   display: grid;
-  gap: var(--s-4);
-  margin: var(--s-6) 0 0;
+  gap: var(--s-5);
+  margin: var(--s-7) 0 0;
   padding: 0;
   list-style: none;
 }
-/* a stop: its drawing beside its name, the sentence under, the photograph after */
 .stop {
   display: grid;
-  grid-template-columns: 5.5rem minmax(0, 1fr);
-  column-gap: var(--s-4);
-  row-gap: var(--s-4);
-  align-items: end;
+  grid-template-columns: minmax(0, 1fr);
+  row-gap: var(--s-5);
   scroll-margin-top: calc(var(--header-h) + var(--s-4));
+}
+.stop__words {
+  display: grid;
+  grid-template-columns: 5.5rem minmax(0, 1fr);
+  align-items: end;
+  gap: var(--s-3) var(--s-4);
+  max-width: 34rem;
 }
 .stop__art {
   grid-row: 1;
   grid-column: 1;
-}
-.stop__text {
-  display: contents;
 }
 .stop__title {
   grid-row: 1;
@@ -571,33 +576,46 @@
   font-weight: 400;
   line-height: 1.05;
 }
-.stop__text > :not(.stop__title) {
+.stop__text {
   grid-column: 1 / -1;
+  margin: 0;
+  font-size: 1.0625rem;
+  line-height: 1.5;
+  text-wrap: pretty;
+}
+.stop__words > .text-link {
+  grid-column: 1 / -1;
+  justify-self: start;
+}
+
+/* the picture: one footprint for all three kinds, never wider than the words above it */
+.stop .stop__pic {
+  width: 100%;
   max-width: 34rem;
   margin: 0;
 }
-.stop__text > .tag-sky {
-  justify-self: start;
+/* the second photograph of a pair sits a little low (graphics.css); its room is kept so
+   the line to the next stop never touches it */
+.stop .photo-pair.stop__pic {
+  padding-bottom: var(--s-3);
 }
-.stop__text > p {
-  font-size: 1.0625rem;
-  line-height: 1.5;
+.stop .stop__pic--wide {
+  rotate: -0.5deg;
 }
-.stop__photo {
-  grid-column: 1 / -1;
+/* fetch, framed like the photographs, with sky above the dog for the ball. Not turned:
+   the throw is measured against the strip's own box. */
+.stop__pic--play {
+  padding: var(--s-8) var(--s-2) var(--s-2);
+  border: var(--edge);
+  border-radius: var(--r-box);
+  background: var(--surface);
 }
-.stop:nth-child(odd) .stop__photo {
-  rotate: -0.6deg;
-}
-.stop:nth-child(even) .stop__photo {
-  rotate: 0.5deg;
-}
-/* the way on: a wandering line to the next stop, turning the other way each time */
+
+/* the way on, turning the other way each time */
 .stop .stop__trail {
-  grid-column: 1 / -1;
   justify-self: center;
   width: 3.5rem;
-  margin-block: var(--s-1);
+  margin: 0;
 }
 .stop:nth-child(even) .stop__trail {
   scale: -1 1;
@@ -606,48 +624,49 @@
   stroke: color-mix(in srgb, var(--fg) 62%, transparent);
   stroke-width: 3.6;
 }
+
 @media (min-width: 64rem) {
   .walk__stops {
     gap: var(--s-6);
+    margin-top: var(--s-8);
   }
-  /* wide: drawing, words and photograph share a row; stops alternate sides */
+  /* wide: words and picture share a row, centred on each other; stops alternate sides */
   .stop {
-    grid-template-columns: 8.5rem minmax(0, 26rem) minmax(0, 1fr);
-    column-gap: var(--s-7);
+    grid-template-columns: minmax(0, 6fr) minmax(0, 5fr);
+    column-gap: var(--s-10);
+    row-gap: var(--s-6);
     align-items: center;
   }
-  .stop__art {
+  .stop__words {
     grid-row: 1;
-    align-self: center;
+    grid-column: 1;
+    grid-template-columns: 8.5rem minmax(0, 26rem);
+    column-gap: var(--s-6);
+    width: 100%;
+    max-width: 36rem;
   }
-  .stop__text {
-    display: grid;
+  /* the sentence hangs under the name, the drawing in its margin */
+  .stop__text,
+  .stop__words > .text-link {
+    grid-column: 2;
+  }
+  .stop .stop__pic {
     grid-row: 1;
     grid-column: 2;
-    gap: var(--s-3);
-    justify-items: start;
-  }
-  .stop__title,
-  .stop__text > :not(.stop__title) {
-    grid-row: auto;
-    grid-column: auto;
-  }
-  .stop__photo {
-    grid-row: 1;
-    grid-column: 3;
     justify-self: end;
-    width: min(100%, 28rem);
+    max-width: 30rem;
+  }
+  .stop__pic--play {
+    padding-top: var(--s-9);
   }
   .stop:nth-child(even) {
-    grid-template-columns: minmax(0, 1fr) 8.5rem minmax(0, 26rem);
+    grid-template-columns: minmax(0, 5fr) minmax(0, 6fr);
   }
-  .stop:nth-child(even) .stop__art {
+  .stop:nth-child(even) .stop__words {
     grid-column: 2;
+    justify-self: end;
   }
-  .stop:nth-child(even) .stop__text {
-    grid-column: 3;
-  }
-  .stop:nth-child(even) .stop__photo {
+  .stop:nth-child(even) .stop__pic {
     grid-column: 1;
     justify-self: start;
   }
@@ -658,36 +677,7 @@
   }
 }
 
-/* photographs are placed on purpose (Theo, 2026-11-15): beside the address, the door and
-   the room behind it; at a stop, that very place seen two ways */
-.visit-doors {
-  margin-top: var(--s-2);
-}
-.stop .stop__photo {
+/* the door and the room beside the address: the column's own gap spaces them */
+.visit-left .visit-doors {
   margin-top: 0;
-  rotate: none;
-}
-@media (min-width: 64rem) {
-  .stop .stop__photo {
-    width: min(100%, 30rem);
-  }
-}
-
-/* something to do at a stop (fetch, under Dogs): the full width of the stop */
-.stop .stop__play {
-  grid-column: 1 / -1;
-  width: 100%;
-  max-width: 34rem;
-}
-@media (min-width: 64rem) {
-  .stop .stop__play {
-    grid-row: 2;
-    grid-column: 2 / -1;
-  }
-  .stop:nth-child(even) .stop__play {
-    grid-column: 3;
-  }
-  .stop:has(.stop__play) .stop__trail {
-    grid-row: 3;
-  }
 }

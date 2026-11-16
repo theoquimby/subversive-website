@@ -1,0 +1,164 @@
+/* ---------- Photos of the brewery, and the large view (2026-11-16) ---------- */
+/* Home's Visit band: a row of photographs of the place. On a phone a row pushed along with a
+   finger, each photo about 70% of the screen, the next one peeking, snapping to each; on a
+   wide screen all of them in one row, the first larger. Each is cut a fraction of a degree
+   off square, like every photo on the site. Components: src/components/home/PhotoStrip.tsx,
+   Lightbox.tsx. */
+.gallery-wrap {
+  margin-top: var(--s-5);
+}
+.gallery {
+  display: flex;
+  gap: var(--s-3);
+  margin: 0 calc(-1 * var(--gutter));
+  padding: var(--s-2) var(--gutter) var(--s-4);
+  list-style: none;
+  overflow-x: auto;
+  overscroll-behavior-x: contain;
+  scroll-snap-type: x mandatory;
+  scroll-padding-inline: var(--gutter);
+  scrollbar-width: none;
+}
+.gallery::-webkit-scrollbar {
+  display: none;
+}
+.gallery__item {
+  flex: none;
+  width: min(70vw, 22rem);
+  scroll-snap-align: start;
+}
+.gallery__thumb {
+  display: block;
+  width: 100%;
+  aspect-ratio: 4 / 3;
+  padding: 0;
+  border: 0;
+  color: inherit;
+  font: inherit;
+  cursor: zoom-in;
+  -webkit-tap-highlight-color: transparent;
+}
+.gallery__item:nth-child(odd) .gallery__thumb {
+  rotate: -0.6deg;
+}
+.gallery__item:nth-child(even) .gallery__thumb {
+  rotate: 0.5deg;
+}
+.gallery__thumb:focus-visible {
+  outline: 3px solid var(--focus);
+  outline-offset: 3px;
+}
+@media (min-width: 64rem) {
+  .gallery {
+    display: grid;
+    grid-template-columns: minmax(0, 2.2fr) repeat(4, minmax(0, 1fr));
+    align-items: end;
+    gap: var(--s-4);
+    margin: 0;
+    padding: var(--s-2) 0 0;
+    overflow: visible;
+  }
+  .gallery__item {
+    width: auto;
+  }
+  .gallery__item:not(:first-child) .gallery__thumb {
+    aspect-ratio: 4 / 5;
+  }
+  .gallery__item:first-child .gallery__thumb {
+    rotate: -0.4deg;
+  }
+}
+
+/* The large view: the photo fitted to a dark screen, its description beneath between two
+   pen arrows, the close mark at the top right. Above the header and the sheets. */
+.lightbox-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 120;
+  background: color-mix(in srgb, var(--ink) 94%, transparent);
+}
+.lightbox {
+  position: fixed;
+  inset: 0;
+  z-index: 121;
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr) auto;
+  padding: env(safe-area-inset-top) max(var(--s-2), env(safe-area-inset-right)) env(safe-area-inset-bottom)
+    max(var(--s-2), env(safe-area-inset-left));
+  color: var(--bone);
+}
+.lightbox:focus {
+  outline: none;
+}
+.lightbox__top {
+  display: flex;
+  justify-content: flex-end;
+  padding-top: var(--s-2);
+}
+.lightbox__stage {
+  position: relative;
+  margin: 0 var(--s-2);
+  touch-action: pan-y pinch-zoom;
+}
+.lightbox__foot {
+  display: grid;
+  grid-template-columns: 48px minmax(0, 1fr) 48px;
+  align-items: center;
+  gap: var(--s-3);
+  width: 100%;
+  max-width: 48rem;
+  justify-self: center;
+  padding: var(--s-3) 0 var(--s-4);
+}
+.lightbox__caption {
+  margin: 0;
+  color: color-mix(in srgb, var(--bone) 82%, transparent);
+  font-size: var(--t-small);
+  line-height: 1.4;
+  text-align: center;
+  text-wrap: balance;
+}
+.lightbox__btn {
+  display: grid;
+  place-items: center;
+  width: 48px;
+  height: 48px;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  background: none;
+  color: inherit;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+.lightbox__btn svg {
+  width: 1.5rem;
+  height: 1.5rem;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2.5;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+.lightbox__btn:focus-visible {
+  outline: 3px solid var(--sky);
+  outline-offset: -4px;
+}
+@media (prefers-reduced-motion: no-preference) {
+  .lightbox-overlay,
+  .lightbox__top,
+  .lightbox__foot {
+    animation: lightbox-in 240ms var(--ease-out) backwards;
+    transition: opacity 240ms var(--ease-out);
+  }
+  .lightbox-overlay[data-leaving],
+  .lightbox[data-leaving] .lightbox__top,
+  .lightbox[data-leaving] .lightbox__foot {
+    opacity: 0;
+  }
+}
+@keyframes lightbox-in {
+  from {
+    opacity: 0;
+  }
+}

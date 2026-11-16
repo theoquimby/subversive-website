@@ -5,8 +5,9 @@
 //
 // One of the old site's three brewery paragraphs names a process the brand has dropped
 // (spec O10), so it is left out whole rather than edited. TODO(Max): approve a rewording.
-import { homeLabels } from "@content/microcopy";
+import { brewLabels, homeLabels } from "@content/microcopy";
 import type { Metadata } from "next";
+import { BrewProcess } from "@/components/beer/BrewProcess";
 import { PhotoFrame } from "@/components/graphics/PhotoFrame";
 import { Drawing } from "@/components/home/Ways";
 import { WhereFrom } from "@/components/home/WhereFrom";
@@ -73,6 +74,12 @@ export default async function BeerPage() {
             </ul>
           </section>
         </div>
+
+        {/* how a batch is brewed, as a living drawing */}
+        <section className="prose-section brew-section" aria-labelledby="brew-title">
+          <SectionHead id="brew-title">{brewLabels.title}</SectionHead>
+          <BrewProcess />
+        </section>
 
         <section className="prose-section" aria-labelledby="where-title">
           <SectionHead id="where-title">{homeLabels.whereFrom}</SectionHead>

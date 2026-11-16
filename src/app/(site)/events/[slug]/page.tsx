@@ -8,6 +8,7 @@ import type { Metadata, Viewport } from "next";
 import { notFound, permanentRedirect } from "next/navigation";
 import { AddToCalendar } from "@/components/events/AddToCalendar";
 import { EventDescription } from "@/components/events/EventDescription";
+import { EventFeature } from "@/components/events/EventFeature";
 import { EventMark } from "@/components/events/EventMark";
 import { dateParts, detailLine } from "@/components/events/EventTicket";
 import { Lights } from "@/components/events/Lights";
@@ -153,6 +154,8 @@ export default async function EventPage({ params }: Params) {
               <ShareButton />
             </div>
           </div>
+          {/* a featured night's own page from Ops (event.page); nothing when it has none */}
+          <EventFeature page={e.page} title={e.displayTitle} />
           {prev || next ? (
             <nav className="event-prevnext" aria-label={`${eventLabels.previous} / ${eventLabels.next}`}>
               {prev ? (

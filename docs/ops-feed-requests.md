@@ -144,3 +144,80 @@ The menu now has a detail view for each item, which shows a photo when the item 
 For the Ops menu feed: an optional `photo` on each item (an image address, 4:3, at least
 828 px wide, with `photoAlt` text). Until then a photo can be named in `content/menu.json`
 by its id in `content/photos`.
+
+## Announcements and featured event pages (asked 2026-11-16)
+
+Max wants a site-wide announcement band and, for big nights like Oktoberfest, an event
+page with more on it, both entered in Ops. The website side is built and dormant: it
+shows nothing new until Ops sends these fields. Every field is optional; anything that
+does not fit is dropped on its own (it never stops the hours, the other announcements or
+the event from showing).
+
+### `announcements` on `GET /api/public/site`
+
+```json
+{
+  "hours": { "...": "as today" },
+  "notice": null,
+  "announcements": [
+    {
+      "id": "thanksgiving-2026",
+      "text": "Closed Thanksgiving Day.",
+      "tone": "closure",
+      "from": "2026-11-20",
+      "until": "2026-11-26"
+    },
+    {
+      "id": "oktoberfest-2027",
+      "text": "Oktoberfest is October 2 and 3.",
+      "tone": "event",
+      "link": { "href": "/events/oktoberfest-2027", "label": "Details" }
+    }
+  ]
+}
+```
+
+- `id`: stable and unique (up to 64 characters). Visitors who close an announcement don't
+  see that id again on that browser, so a changed message needs a new id.
+- `text`: Max's words, up to 140 characters. Under about 90 keeps it to two lines on a phone.
+- `link`: optional; `href` is a path on the website (`/events/...`) or a full `https://`
+  address; `label` up to 40 characters.
+- `tone`: `closure` (orange), `event` (yellow), or `info` (plain; the default).
+- `from` / `until`: optional `YYYY-MM-DD`, New York, both days included. Ops can also
+  just stop sending it.
+- The website shows the first three that stand today, in the order sent, under the header
+  on every page. The existing `notice` keeps working on Home as before.
+- A revalidate ping with `{"tags": ["site"]}` on save makes it appear at once.
+
+### `page` on an event in `GET /api/public/events`
+
+```json
+{
+  "id": "evt_okt27",
+  "slug": "oktoberfest-2027",
+  "date": "2027-10-02",
+  "title": "Oktoberfest",
+  "kind": "FESTIVAL",
+  "featured": true,
+  "page": {
+    "hero": "https://<ops origin>/uploads/oktoberfest.jpg",
+    "heroAlt": "The long tables in the yard",
+    "intro": "Two days in the yard.",
+    "sections": [{ "title": "Food", "body": "Paragraphs, with blank lines between them." }],
+    "schedule": [{ "time": "12:00", "what": "First pour" }],
+    "links": [{ "label": "Tickets", "href": "https://..." }]
+  }
+}
+```
+
+- With `page`, the event's own page shows these below its usual top part: the photograph,
+  the intro, each section under its own heading, the schedule as a list, then the links.
+  Without it the page is exactly as today.
+- `hero`: shown only when it is served from the Ops origin (`NEXT_PUBLIC_OPS_ORIGIN` on the
+  website; the image settings and the content-security policy allow that one host when it
+  is set). Landscape, at least 1600 px wide. `heroAlt` describes it; otherwise the title.
+- Limits: intro 600 characters, up to 8 sections (title 80, body 4000), 24 schedule rows
+  (`time` up to 20 characters, any wording, e.g. `12:00` or `Noon`; `what` 140), 6 links
+  (`https://` only).
+- `slug` matters here: a stable slug keeps `/events/oktoberfest-2027` the same address
+  the announcement links to.

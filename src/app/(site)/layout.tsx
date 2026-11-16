@@ -2,6 +2,7 @@ import { Analytics } from "@vercel/analytics/next";
 import { SpeedInsights } from "@vercel/speed-insights/next";
 import type { ReactNode } from "react";
 import { TicketTear } from "@/components/events/TicketTear";
+import { Announcements } from "@/components/layout/Announcements";
 import { Beacon } from "@/components/layout/Beacon";
 import { Curtain } from "@/components/layout/Curtain";
 import { Footer } from "@/components/layout/Footer";
@@ -20,6 +21,8 @@ export default function SiteLayout({ children }: { children: ReactNode }) {
   return (
     <>
       <Header />
+      {/* Max's announcements from Ops; nothing at all until Ops sends some */}
+      <Announcements />
       <main id="main" className="site-main">
         {children}
       </main>
