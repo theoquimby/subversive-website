@@ -78,13 +78,13 @@ export default async function EventsPage() {
             </ul>
           ) : null}
 
-          {byMonth(later).map((g) => (
+          {byMonth(later).map((g, gi) => (
             <section key={g.key} className="events-month" aria-labelledby={`m-${g.key}`}>
               <SectionHead id={`m-${g.key}`}>{g.name}</SectionHead>
               <ul className="tix">
-                {g.events.map((e) => (
+                {g.events.map((e, i) => (
                   <li key={e.id}>
-                    <TicketLink event={e} />
+                    <TicketLink event={e} lit={tonight.length === 0 && gi === 0 && i === 0} />
                   </li>
                 ))}
               </ul>
@@ -100,14 +100,15 @@ export default async function EventsPage() {
             </p>
           ) : null}
 
-          <p className="events-private">
-            <TextLink href="/private-events">{inquiryLabels.link}</TextLink>
-          </p>
-
-          <p className="events-bands">
-            {site.bands}{" "}
-            <ExternalLink href={site.links.bandBookingForm}>{visitLabels.bookYourBand}</ExternalLink>
-          </p>
+          <div className="events-close">
+            <p className="events-private">
+              <TextLink href="/private-events">{inquiryLabels.link}</TextLink>
+            </p>
+            <p className="events-bands">
+              {site.bands}{" "}
+              <ExternalLink href={site.links.bandBookingForm}>{visitLabels.bookYourBand}</ExternalLink>
+            </p>
+          </div>
         </div>
       </div>
     </PageWipe>

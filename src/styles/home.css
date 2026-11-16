@@ -604,19 +604,6 @@
   padding: var(--s-3) var(--s-2);
   border-right: var(--stroke) dashed var(--fg);
 }
-.tix__t[data-game] .tix__stub::after {
-  content: "";
-  position: absolute;
-  right: var(--s-3);
-  bottom: var(--s-2);
-  left: var(--s-3);
-  height: 5px;
-  border-radius: 3px;
-  background: linear-gradient(90deg, var(--sky-deep) 0 50%, var(--ember) 50% 100%);
-}
-.tix__t[data-game] .tix__stub {
-  padding-bottom: var(--s-4);
-}
 .tix__day {
   font-family: var(--ff-display);
   font-size: 2rem;
@@ -989,4 +976,61 @@
   .smap__svg {
     --label: 30px;
   }
+}
+
+/* ---------- Review pass 2026-11-15: the ticket is cut by hand ---------- */
+/* an uneven outline like the buttons', a half-round notch punched at each end of the
+   perforation, and a game night's two marker strokes in place of the striped bar */
+.tix__t {
+  --tb: var(--stroke);
+  --tc: var(--fg);
+  position: relative;
+  border: var(--tb) solid var(--tc);
+  border-radius: 15px 9px 13px 8px / 9px 14px 8px 13px;
+}
+.tix > li:nth-child(even) .tix__t {
+  border-radius: 9px 14px 8px 15px / 13px 8px 14px 9px;
+}
+.tix__stub {
+  border-right: var(--tb) dashed var(--tc);
+}
+.tix__stub::before,
+.tix__stub::after {
+  content: "";
+  position: absolute;
+  right: calc(-0.4375rem - var(--tb) / 2);
+  width: 0.875rem;
+  height: 0.875rem;
+  border: var(--tb) solid var(--tc);
+  border-radius: 50%;
+  background: var(--bg);
+}
+.tix__stub::before {
+  top: calc(-0.4375rem - var(--tb));
+  clip-path: inset(50% 0 0 0);
+}
+.tix__stub::after {
+  bottom: calc(-0.4375rem - var(--tb));
+  clip-path: inset(0 0 50% 0);
+}
+.tix__game,
+.event-head__game {
+  --knicks: var(--court);
+  width: 3.25rem;
+  height: auto;
+  overflow: visible;
+  stroke-width: 3.4;
+  stroke-linecap: round;
+}
+:root:has([data-page-skin="overtime"]) :is(.tix__game, .event-head__game) {
+  --knicks: var(--sky);
+}
+.game-strokes__a {
+  stroke: var(--knicks);
+}
+.game-strokes__b {
+  stroke: var(--ember);
+}
+.tix__t[data-game] .tix__stub {
+  padding-bottom: var(--s-3);
 }

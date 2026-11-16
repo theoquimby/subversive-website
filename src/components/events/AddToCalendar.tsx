@@ -10,8 +10,7 @@ import { Icon } from "../graphics/Icon";
 export function AddToCalendar({ icsHref, googleHref }: { icsHref: string; googleHref: string }) {
   return (
     <DropdownMenu.Root modal={false}>
-      <DropdownMenu.Trigger className="btn btn--quiet">
-        <Icon name="calendar-plus" className="btn__icon" />
+      <DropdownMenu.Trigger className="btn btn--primary event-actions__main">
         <span className="btn__label">{microcopy.addToCalendar}</span>
       </DropdownMenu.Trigger>
       <DropdownMenu.Portal>

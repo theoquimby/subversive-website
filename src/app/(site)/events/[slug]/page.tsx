@@ -9,8 +9,9 @@ import { notFound, permanentRedirect } from "next/navigation";
 import { AddToCalendar } from "@/components/events/AddToCalendar";
 import { EventDescription } from "@/components/events/EventDescription";
 import { dateParts, detailLine } from "@/components/events/EventTicket";
-import { TicketLink } from "@/components/events/TicketLink";
+import { GameStrokes, TicketLink } from "@/components/events/TicketLink";
 import { Sticker } from "@/components/graphics/Sticker";
+import { Drawing } from "@/components/home/Ways";
 import { PageWipe } from "@/components/layout/PageWipe";
 import { ShareButton } from "@/components/menu/ShareButton";
 import { Button } from "@/components/ui/Button";
@@ -103,13 +104,15 @@ export default async function EventPage({ params }: Params) {
       <div className="events-page" data-page-skin="overtime">
         <div className="page event-page">
           <TextLink href="/events">{microcopy.allEvents}</TextLink>
+          <Drawing name="events" className="event-page__art" />
           <header className="event-head" data-game={e.kind === "GAME" ? "" : undefined}>
+            <h1 className="event-hero__title">{e.displayTitle}</h1>
             <p className="event-head__date">
               {p.weekdayLong}, {p.monthLong} {p.day}
               {detailLine(e) ? <span className="tabular"> · {detailLine(e)}</span> : null}
               {past ? <span> · {eventLabels.over}</span> : null}
             </p>
-            <h1 className="event-hero__title">{e.displayTitle}</h1>
+            {e.kind === "GAME" ? <GameStrokes className="event-head__game" /> : null}
             <span className="event-head__rule" aria-hidden="true" />
           </header>
           <EventDescription text={e.description} />
@@ -132,10 +135,12 @@ export default async function EventPage({ params }: Params) {
                 googleHref={googleCalendarUrl(e, site)}
               />
             ) : null}
-            <Button href={site.links.map} external variant="quiet">
-              {microcopy.directions}
-            </Button>
-            <ShareButton />
+            <div className="event-actions__row">
+              <Button href={site.links.map} external variant="quiet">
+                {microcopy.directions}
+              </Button>
+              <ShareButton text />
+            </div>
           </div>
           {prev || next ? (
             <nav className="event-prevnext" aria-label={`${eventLabels.previous} / ${eventLabels.next}`}>
