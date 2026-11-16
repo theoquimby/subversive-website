@@ -16,6 +16,15 @@
 // behind a bar. The model writes straight to the SVG (no React render per frame) and
 // stops itself when everything is still.
 //
+// Fidelity pass, 2026-11-15 (Theo): the beer answers the phone. Where the device reports
+// its tilt, the surface finds the world's level and sloshes on the way (the tilt itself is
+// a spring, so the beer overshoots and settles); bubbles rise against gravity, not up the
+// screen. Bubbles leave from a few fixed points on the bowl in strings, as in a real
+// glass, and the stream drags a burst of them under where it lands. Head that goes over
+// the rim domes above it and runs down the outside as drips with tails, not loose dots.
+// iOS only gives the tilt after a tap and its own permission prompt: it is asked for on
+// the first tap in the hero.
+//
 // Without JavaScript, or with reduced motion, the glass is simply full.
 import { useEffect, useRef } from "react";
 import { BARLEY_VIEWBOX, KERNELS } from "../graphics/BarleyMark";
@@ -50,7 +59,16 @@ const TAP_LINE = "M4000 -58H132C112 -58 100 -54 100 -44V-34M92 -34H108";
 const N = 17; // surface springs
 const X0 = 36;
 const X1 = 164;
-const MAX_BUBBLES = 16;
+const MAX_BUBBLES = 30;
+const TILT = 17; // degrees of lean the beer will follow before it would be over the rim
+// where strings of bubbles leave the bowl: x, y
+const SITES: [number, number][] = [
+  [80, 226],
+  [93, 239],
+  [106, 240],
+  [119, 229],
+  [100, 176],
+];
 const MAX_SPILLS = 6;
 const MAX_DROPS = 8;
 const HEAD_BUBBLES = 6;
@@ -126,7 +144,8 @@ export function LabelGlass({
     const headEls = [...root.querySelectorAll<SVGCircleElement>(".lglass__head circle")];
     const handle = q<SVGGElement>(".lglass__handle");
     const bubbleEls = [...root.querySelectorAll<SVGCircleElement>(".lglass__bubbles circle")];
-    const spillEls = [...root.querySelectorAll<SVGCircleElement>(".lglass__spills circle")];
+    const spillEls = [...root.querySelectorAll<SVGPathElement>(".lglass__spills path")];
+    const dome = q<SVGPathElement>(".lglass__dome");
     const still = window.matchMedia("(prefers-reduced-motion: reduce)");
 
     const h = new Float32Array(N);
@@ -146,8 +165,13 @@ export function LabelGlass({
       rest: 0,
       carb: 0,
       next: null as GlassBeer | null,
-      bubbles: [] as { x: number; y: number; r: number; vy: number; ph: number }[],
-      spills: [] as { y: number; vy: number; r: number; side: 1 | -1 }[],
+      bubbles: [] as { x: number; y: number; r: number; vx: number; vy: number; ph: number }[],
+      // a drip: its leading end, where its tail still clings, its speed, its size
+      spills: [] as { y: number; top: number; vy: number; r: number; side: 1 | -1 }[],
+      tilt: 0, // the beer's lean, radians; follows tiltTo as a spring
+      tiltV: 0,
+      tiltTo: 0,
+      dome: 0, // how far the head stands above the rim
       drops: [] as { x: number; y: number; vx: number; vy: number; r: number }[],
     };
     let raf = 0;
@@ -159,6 +183,18 @@ export function LabelGlass({
       for (const el of dropEls) el.setAttribute("fill", b.color);
       haze.style.display = b.hazy ? "" : "none";
     };
+
+    const xOf = (i: number) => X0 + (i * (X1 - X0)) / (N - 1);
+    /** where the surface wants to be at spring i: the world's level, seen from a leaning glass */
+    const level = (i: number) => Math.max(-19, Math.min(19, -Math.tan(s.tilt) * (xOf(i) - 100)));
+    /** the surface's offset at any x */
+    const hAt = (x: number) => {
+      const at = Math.max(0, Math.min(N - 1.001, ((x - X0) / (X1 - X0)) * (N - 1)));
+      const lo = Math.floor(at);
+      return (h[lo] ?? 0) + ((h[lo + 1] ?? 0) - (h[lo] ?? 0)) * (at - lo);
+    };
+    /** the outside of the bowl at a height, on one side */
+    const edge = (y: number, side: 1 | -1) => 100 + side * (58.4 - (y - 14) * 0.086);
 
     const draw = () => {
       const d = shapes(s.y, s.f, h, s.t);
@@ -226,13 +262,39 @@ export function LabelGlass({
           el.style.display = "none";
           return;
         }
-        // down the outside of the bowl, then straight to the ground
-        const edge = sp.y < 212 ? 57.6 - (sp.y - 14) * 0.086 : 40;
         el.style.display = "";
-        el.setAttribute("cx", (100 + sp.side * (edge + 2.5)).toFixed(1));
-        el.setAttribute("cy", sp.y.toFixed(1));
-        el.setAttribute("r", sp.r.toFixed(2));
+        const r = sp.r;
+        if (sp.y < 212) {
+          // clinging to the bowl: a rounded leading end and a tail back up to where it left
+          const xi = edge(sp.y, sp.side);
+          const xo = xi + sp.side * r * 1.7;
+          const xt = edge(sp.top, sp.side);
+          el.setAttribute(
+            "d",
+            `M${xt.toFixed(1)} ${sp.top.toFixed(1)}L${xi.toFixed(1)} ${sp.y.toFixed(1)}` +
+              `A${(r * 0.75).toFixed(2)} ${r.toFixed(2)} 0 0 ${sp.side > 0 ? 0 : 1} ${xo.toFixed(1)} ${sp.y.toFixed(1)}` +
+              `L${(xt + sp.side * 2.6).toFixed(1)} ${sp.top.toFixed(1)}Z`,
+          );
+        } else {
+          // off the bowl: a falling drop, pointed at the top
+          const x = 100 + sp.side * 42.5;
+          el.setAttribute(
+            "d",
+            `M${x.toFixed(1)} ${(sp.y - r * 2.2).toFixed(1)}Q${(x + r * 1.1).toFixed(1)} ${sp.y.toFixed(1)} ${x.toFixed(1)} ${(sp.y + r).toFixed(1)}` +
+              `Q${(x - r * 1.1).toFixed(1)} ${sp.y.toFixed(1)} ${x.toFixed(1)} ${(sp.y - r * 2.2).toFixed(1)}Z`,
+          );
+        }
       });
+      // head standing above the rim, with a slow uneven crown
+      if (s.dome > 0.4) {
+        const a = s.dome;
+        const w = (k: number) => (15 - a * (1 + 0.16 * Math.sin(s.t * 1.7 + k * 2.1))).toFixed(1);
+        dome.setAttribute(
+          "d",
+          `M45.5 15.5Q57 ${w(0)} 72 ${w(1)}T100 ${(15 - a * 1.12).toFixed(1)}T128 ${w(2)}Q143 ${w(3)} 154.5 15.5Z`,
+        );
+        dome.style.display = "";
+      } else dome.style.display = "none";
     };
 
     const step = (dt: number) => {
@@ -292,6 +354,16 @@ export function LabelGlass({
             vy: -(70 + Math.random() * 120),
             r: 1 + Math.random() * 1.4,
           });
+        // ...and the stream drags a burst of bubbles under with it
+        if (s.bubbles.length < MAX_BUBBLES && s.y < FLOOR - 30 && Math.random() < 30 * landing * dt)
+          s.bubbles.push({
+            x: 100 + (Math.random() - 0.5) * 10,
+            y: Math.min(236, surface + s.f * 0.5 + 6 + Math.random() * 10),
+            r: 0.7 + Math.random() * 1.5,
+            vx: (Math.random() - 0.5) * 26,
+            vy: -(50 + Math.random() * 80),
+            ph: Math.random() * 6,
+          });
         v[mid] = (v[mid] ?? 0) + kick;
         v[mid - 1] = (v[mid - 1] ?? 0) + kick * 0.5;
         v[mid + 1] = (v[mid + 1] ?? 0) + kick * 0.5;
@@ -303,12 +375,28 @@ export function LabelGlass({
       s.f -= lost;
       s.y = Math.max(LEVEL - 1, s.y - lost * 0.12);
 
-      // too much head: it domes over the rim and runs down the outside of the glass
-      const crest = s.y - s.f;
+      // too much head: it stands above the rim, then runs down the outside of the glass.
+      // Each side is judged on its own, so a lean sends it over the low side.
+      const crestL = s.y + hAt(52) - s.f;
+      const crestR = s.y + hAt(148) - s.f;
+      const crest = Math.min(crestL, crestR);
+      const over = Math.max(0, RIM + 3 - crest);
+      // it stands a moment after the excess has gone, as foam does
+      const stand = Math.min(13, over * 2.4 + (s.spills.some((sp) => sp.y < 60) ? 5 : 0));
+      s.dome += (stand - s.dome) * Math.min(1, dt * (stand > s.dome ? 9 : 1.6));
       if (crest < RIM + 1) {
         s.f -= Math.min(s.f, 34 * dt + Math.max(0, RIM - 7 - crest));
-        if (s.spills.length < MAX_SPILLS && Math.random() < 14 * dt)
-          s.spills.push({ y: 13, vy: 30, r: 4.6 + Math.random() * 3.2, side: Math.random() < 0.5 ? 1 : -1 });
+        if (s.spills.length < MAX_SPILLS && Math.random() < 11 * dt) {
+          const low =
+            Math.abs(crestL - crestR) < 1.5 ? (Math.random() < 0.5 ? -1 : 1) : crestL < crestR ? -1 : 1;
+          s.spills.push({
+            y: 17,
+            top: 14.5,
+            vy: 12 + Math.random() * 16,
+            r: 4.4 + Math.random() * 3,
+            side: low,
+          });
+        }
       }
 
       if (s.phase === "fill" || s.phase === "topup") {
@@ -335,11 +423,14 @@ export function LabelGlass({
         }
       }
 
-      // the surface: springs that pull back to level and pass their motion along
+      // the lean follows the phone as a spring, a little underdamped: the beer overshoots
+      s.tiltV += (70 * (s.tiltTo - s.tilt) - 5.5 * s.tiltV) * dt;
+      s.tilt += s.tiltV * dt;
+      // the surface: springs that pull to the world's level and pass their motion along
       for (let i = 0; i < N; i++) {
-        const acc = -150 * (h[i] ?? 0) - 3.4 * (v[i] ?? 0);
+        const acc = -150 * ((h[i] ?? 0) - level(i)) - 3.4 * (v[i] ?? 0);
         v[i] = (v[i] ?? 0) + acc * dt;
-        h[i] = Math.max(-11, Math.min(11, (h[i] ?? 0) + (v[i] ?? 0) * dt));
+        h[i] = Math.max(-21, Math.min(21, (h[i] ?? 0) + (v[i] ?? 0) * dt));
       }
       for (let pass = 0; pass < 3; pass++) {
         for (let i = 0; i < N; i++) {
@@ -351,22 +442,39 @@ export function LabelGlass({
       // bubbles leave the bottom while the beer is fresh, and speed up as they rise
       if (s.phase !== "drain" && s.phase !== "idle") s.carb = Math.max(0, s.carb - dt / 11);
       const lively = s.carb * (s.flow > 0.1 ? 2.2 : 1);
-      if (s.y < FLOOR - 24 && s.bubbles.length < MAX_BUBBLES && Math.random() < lively * 16 * dt)
-        s.bubbles.push({
-          x: 76 + Math.random() * 48,
-          y: 236 - Math.random() * 14,
-          r: 0.8 + Math.random() * 1.3,
-          vy: 16 + Math.random() * 14,
-          ph: Math.random() * 6,
-        });
+      if (s.y < FLOOR - 24 && s.bubbles.length < MAX_BUBBLES && Math.random() < lively * 22 * dt) {
+        // a string leaves from one of a few points on the bowl, as in a real glass
+        const site = SITES[Math.floor(Math.random() * SITES.length)] as [number, number];
+        if (site[1] > s.y + 12)
+          s.bubbles.push({
+            x: site[0] + (Math.random() - 0.5) * 2.4,
+            y: site[1],
+            r: 0.6 + Math.random() * Math.random() * 1.9,
+            vx: 0,
+            vy: 10 + Math.random() * 10,
+            ph: Math.random() * 6,
+          });
+      }
+      const gx = Math.sin(s.tilt);
+      const gy = Math.cos(s.tilt);
       for (let i = s.bubbles.length - 1; i >= 0; i--) {
         const b = s.bubbles[i];
         if (!b) continue;
-        b.vy += 46 * dt;
+        // buoyancy is against gravity, wherever that is; bigger bubbles rise faster
+        const lift = 40 + b.r * 14;
+        b.vy += lift * gy * dt;
+        b.vx += -lift * gx * dt - b.vx * 1.8 * dt;
+        b.vy = Math.min(b.vy, 62 + b.r * 22);
         b.y -= b.vy * dt;
-        b.x += Math.sin(s.t * 6 + b.ph) * 7 * dt;
-        b.r += 0.25 * dt;
-        if (b.y <= s.y + 3) s.bubbles.splice(i, 1);
+        b.x += (b.vx + Math.sin(s.t * 6 + b.ph) * 6) * dt;
+        b.y = Math.min(b.y, 241);
+        b.r += 0.22 * dt;
+        if (b.y <= s.y + hAt(b.x) + 3) {
+          // it reaches the surface and joins the head with the smallest of nudges
+          const at = Math.round(((b.x - X0) / (X1 - X0)) * (N - 1));
+          if (at >= 0 && at < N) v[at] = (v[at] ?? 0) - b.r * 5;
+          s.bubbles.splice(i, 1);
+        }
       }
       for (let i = s.drops.length - 1; i >= 0; i--) {
         const d = s.drops[i];
@@ -379,9 +487,16 @@ export function LabelGlass({
       for (let i = s.spills.length - 1; i >= 0; i--) {
         const sp = s.spills[i];
         if (!sp) continue;
-        sp.vy += (sp.y < 212 ? 260 : 900) * dt;
+        if (sp.y < 212) {
+          // creeping down the glass: slow to start, and the tail lets go behind it
+          sp.vy += (60 + sp.r * 26) * dt;
+          sp.vy = Math.min(sp.vy, 150);
+          sp.top += (sp.y - sp.top - 14 > 0 ? sp.vy * 0.8 : sp.vy * 0.25) * dt;
+        } else {
+          sp.vy += 900 * dt;
+          sp.r *= 1 - 0.9 * dt;
+        }
         sp.y += sp.vy * dt;
-        if (sp.y > 212) sp.r *= 1 - 1.2 * dt;
         if (sp.y >= GROUND - 2) s.spills.splice(i, 1);
       }
 
@@ -392,8 +507,9 @@ export function LabelGlass({
           s.spills.length > 0 ||
           s.bubbles.length > 0 ||
           s.drops.length > 0;
+        if (Math.abs(s.tiltTo - s.tilt) > 0.003 || Math.abs(s.tiltV) > 0.02 || s.dome > 0.4) moving = true;
         for (let i = 0; i < N && !moving; i++)
-          if (Math.abs(h[i] ?? 0) > 0.08 || Math.abs(v[i] ?? 0) > 0.4) moving = true;
+          if (Math.abs((h[i] ?? 0) - level(i)) > 0.08 || Math.abs(v[i] ?? 0) > 0.4) moving = true;
         if (!moving && s.carb <= 0 && Math.abs(s.f - HEAD) < 1.5) s.phase = "idle";
         // a head that came up short or tall eases to its settled size
         s.f += (HEAD - s.f) * Math.min(1, dt * 0.9);
@@ -425,6 +541,10 @@ export function LabelGlass({
         s.bubbles.length = 0;
         s.spills.length = 0;
         s.drops.length = 0;
+        s.tilt = 0;
+        s.tiltV = 0;
+        s.tiltTo = 0;
+        s.dome = 0;
         h.fill(0);
         v.fill(0);
         draw();
@@ -442,11 +562,52 @@ export function LabelGlass({
       }
     };
 
+    // ---- the phone's lean. gamma is the roll in portrait; turned on its side it is beta.
+    const onTilt = (e: DeviceOrientationEvent) => {
+      if (e.gamma === null || e.beta === null || still.matches) return;
+      const turn = window.screen.orientation?.angle ?? 0;
+      const deg = turn === 90 ? e.beta : turn === 270 ? -e.beta : e.gamma;
+      s.tiltTo = (Math.max(-TILT, Math.min(TILT, deg)) * Math.PI) / 180;
+      // wake the model if the glass was at rest and the lean is worth answering
+      if (!raf && Math.abs(s.tiltTo - s.tilt) > 0.012) {
+        if (s.phase === "idle") s.phase = "settle";
+        last = performance.now();
+        raf = requestAnimationFrame(frame);
+      }
+    };
+    let listening = false;
+    const listen = () => {
+      if (listening) return;
+      listening = true;
+      window.addEventListener("deviceorientation", onTilt);
+    };
+    // iOS hands the tilt over only after a tap and its own prompt; elsewhere it is simply there
+    const Orientation = window.DeviceOrientationEvent as
+      | (typeof DeviceOrientationEvent & { requestPermission?: () => Promise<string> })
+      | undefined;
+    const hero = root.closest(".tap-hero") ?? root;
+    const ask = () => {
+      Orientation?.requestPermission?.()
+        .then((answer) => {
+          if (answer === "granted") listen();
+        })
+        .catch(() => {
+          // refused or unavailable: the glass simply stays level
+        });
+    };
+    if (Orientation && !still.matches) {
+      if (typeof Orientation.requestPermission === "function")
+        hero.addEventListener("click", ask, { once: true });
+      else listen();
+    }
+
     model.current = {
       start,
       stop: () => {
         cancelAnimationFrame(raf);
         raf = 0;
+        window.removeEventListener("deviceorientation", onTilt);
+        hero.removeEventListener("click", ask);
       },
     };
 
@@ -522,9 +683,10 @@ export function LabelGlass({
       {/* head that went over the rim */}
       <g className="lglass__spills">
         {Array.from({ length: MAX_SPILLS }, (_, i) => `s${i}`).map((k) => (
-          <circle key={k} r="3" style={{ display: "none" }} />
+          <path key={k} d="" style={{ display: "none" }} />
         ))}
       </g>
+      <path className="lglass__dome" d="" style={{ display: "none" }} />
 
       <g className="lglass__line">
         <path d={GROUND_LINE} />

@@ -190,3 +190,54 @@ test("Home does not carry the supplier map; it lives on Our beer", async ({ page
   await expect(page.locator(".smap")).toHaveCount(0);
   await expect(page.locator("#where-title")).toHaveCount(0);
 });
+
+test("the beer leans with the phone: after a tap, a tilt tips the surface and it settles there", async ({
+  page,
+  browserName,
+}) => {
+  // Desktop WebKit cannot construct a DeviceOrientationEvent ("Illegal constructor"), so a
+  // tilt cannot be faked there. On a real iPhone the tilt also needs the system's own
+  // permission prompt after a tap; neither can be exercised here.
+  test.skip(browserName === "webkit", "a tilt cannot be simulated in desktop WebKit");
+  // motion on for this one: the tilt is not followed with reduced motion
+  await page.emulateMedia({ reducedMotion: "no-preference" });
+  await page.goto("/");
+  // iOS gives the tilt only after a tap; a test browser may give it at once. Tap either way.
+  await page.locator(".tap-hero__pour").click();
+  await page.waitForTimeout(3600);
+  const ends = () =>
+    page.locator(".lglass__body").evaluate((el) => {
+      const n = (el.getAttribute("d") ?? "").match(/-?\d+(\.\d+)?/g)?.map(Number) ?? [];
+      // the surface's first point, and its last (just before the path drops to the floor)
+      return { l: n[1] ?? 0, r: n[n.length - 3] ?? 0 };
+    });
+  const tilt = (gamma: number) =>
+    page.evaluate(
+      (g) =>
+        window.dispatchEvent(
+          new DeviceOrientationEvent("deviceorientation", { alpha: 0, beta: 70, gamma: g }),
+        ),
+      gamma,
+    );
+  await tilt(15);
+  // right side down: the beer stands higher on the right of the glass (a smaller y)
+  await expect
+    .poll(
+      async () => {
+        const { l, r } = await ends();
+        return l - r;
+      },
+      { timeout: 4000 },
+    )
+    .toBeGreaterThan(12);
+  await tilt(0);
+  await expect
+    .poll(
+      async () => {
+        const { l, r } = await ends();
+        return Math.abs(l - r);
+      },
+      { timeout: 6000 },
+    )
+    .toBeLessThan(1);
+});

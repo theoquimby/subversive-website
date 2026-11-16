@@ -43,7 +43,16 @@ test("a strip in the page's colour is fixed at the bottom edge on phones and tab
     expect(box?.height).toBeGreaterThanOrEqual(6);
     expect(box?.width).toBe(page.viewportSize()?.width);
     expect(await rgb(page, ".edge-bottom")).toBe(await rgb(page, "body"));
-    expect(await strip.evaluate((el) => getComputedStyle(el).pointerEvents)).toBe("none");
+    // Safari finds the edge element by hit-testing: the strip must be what a touch 4 px inside
+    // the bottom edge, at the middle, lands on
+    const hit = await page.evaluate(
+      () => document.elementFromPoint(window.innerWidth / 2, window.innerHeight - 4)?.className,
+    );
+    expect(hit).toBe("edge-bottom");
+    const top = await page.evaluate(
+      () => document.elementFromPoint(window.innerWidth / 2, 4)?.closest("#site-header")?.id,
+    );
+    expect(top).toBe("site-header");
   }
 });
 
