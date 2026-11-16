@@ -129,7 +129,8 @@ test("a shared item link opens on its item, in its own list; Close clears the ad
   await expect(food(page)).toBeVisible();
   const sheet = page.getByRole("dialog");
   await expect(sheet.getByRole("heading", { name: "Mushroom & Swiss" })).toBeVisible();
-  await expect(sheet.locator(".item__prices dd")).toHaveText("20");
+  // one price sits beside the name
+  await expect(sheet.locator(".item__head .item__price")).toHaveText("20");
   await expect(sheet.locator(".item__desc")).toContainText("Swiss cheese");
   // the section's add-ons come along
   await expect(sheet.locator(".item__more")).toContainText("bacon");

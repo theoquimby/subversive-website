@@ -43,7 +43,7 @@ export default async function BeerPage() {
           <Drawing name="beer" className="prose-head__art" />
         </header>
 
-        <div className="prose-split">
+        <div className="prose-split beer-top">
           <div className="prose">
             <p className="prose__lede">{site.sourcingLine}</p>
             {paragraphs.map((p) => (
@@ -51,19 +51,19 @@ export default async function BeerPage() {
             ))}
           </div>
           <PhotoFrame id="kettle-dark" ratio="3/2" reveal={false} sizes="(min-width: 1024px) 480px, 100vw" />
-        </div>
 
-        {/* what is pouring now: every tap, as on Home, with the two pour sizes named once */}
-        <section className="prose-section" aria-labelledby="tap-title">
-          <SectionHead id="tap-title" note={`${view.pourSizes.half} / ${view.pourSizes.full}`}>
-            {homeLabels.onTap}
-          </SectionHead>
-          <ul className="mlist home-tap">
-            {taps.map((row, i) => (
-              <MenuRow key={row.id} row={row} index={i} />
-            ))}
-          </ul>
-        </section>
+          {/* what is pouring now: every tap, as on Home, with the two pour sizes named once */}
+          <section className="prose-section" aria-labelledby="tap-title">
+            <SectionHead id="tap-title" note={`${view.pourSizes.half} / ${view.pourSizes.full}`}>
+              {homeLabels.onTap}
+            </SectionHead>
+            <ul className="mlist home-tap">
+              {taps.map((row, i) => (
+                <MenuRow key={row.id} row={row} index={i} />
+              ))}
+            </ul>
+          </section>
+        </div>
 
         <section className="prose-section" aria-labelledby="where-title">
           <SectionHead id="where-title">{homeLabels.whereFrom}</SectionHead>

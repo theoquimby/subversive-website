@@ -1052,10 +1052,8 @@ textarea.field__input {
 .site-footer__ground {
   height: 3.25rem;
 }
-@media (max-width: 47.99rem) {
-  .site-footer__small span {
-    display: block;
-  }
+.site-footer__small span {
+  display: block;
 }
 
 /* ---------- Review pass 2026-11-15: the inquiry form and the 404 ---------- */
@@ -1125,5 +1123,22 @@ textarea.field__input {
   }
   .not-found .not-found__art {
     margin-top: var(--s-3);
+  }
+}
+
+/* second review, 2026-11-15: Our beer. On a phone the taps come before the photo; wide,
+   the photo stands beside the text and the taps run under both */
+.beer-top > .photo {
+  order: 3;
+}
+.beer-top > .prose-section {
+  margin-top: 0;
+}
+@media (min-width: 64rem) {
+  .beer-top > .photo {
+    order: 0;
+  }
+  .beer-top > .prose-section {
+    grid-column: 1 / -1;
   }
 }

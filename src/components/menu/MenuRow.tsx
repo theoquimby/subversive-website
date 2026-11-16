@@ -55,6 +55,7 @@ export function MenuRow({
             </span>
           ) : null}
           {item.description ? <span className="mrow__desc">{item.description}</span> : null}
+          {item.modifiers ? <span className="mrow__more">{item.modifiers}</span> : null}
           {item.tags?.length ? (
             <span className="mrow__tags">
               {item.tags.map((t) => (
@@ -67,7 +68,6 @@ export function MenuRow({
         </span>
         {price ? <span className="mrow__price">{price}</span> : null}
       </span>
-      {item.modifiers ? <span className="mrow__more">{item.modifiers}</span> : null}
     </>
   );
 

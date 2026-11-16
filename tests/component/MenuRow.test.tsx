@@ -30,10 +30,11 @@ describe("MenuRow (spec §4.4; review pass 2026-11-15)", () => {
     expect(c.querySelector(".mrow__price")?.textContent).toMatch(/^5\s\/\s8$/);
   });
 
-  it("modifiers follow the row", () => {
+  it("the add-on note sits under the description, before the tags", () => {
     const c = mount("house-salad");
-    expect(c.querySelector(".mrow__sum .mrow__more")).toBeNull();
-    expect(c.querySelector(".mrow__box > .mrow__more")?.textContent).toContain("grilled chicken +6");
+    const more = c.querySelector(".mrow__desc + .mrow__more");
+    expect(more?.textContent).toContain("grilled chicken +6");
+    expect(more?.nextElementSibling?.className).toBe("mrow__tags");
   });
 
   it("on the menu the whole row is one link to the item's detail view, carrying the beer's colour", () => {

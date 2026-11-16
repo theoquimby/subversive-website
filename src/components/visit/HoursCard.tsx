@@ -23,6 +23,8 @@ export function HoursCard({
   // Today's own row tells tonight's truth: a late night or a closure replaces the regular
   // hours there, so the first answer a visitor reads is the right one (critique 11/13).
   const tonight = special.find((r) => r.date === today);
+  // ...and so today is not listed a second time below (two rows were marked as today)
+  const coming = special.filter((r) => r.date !== today);
   const todayWeekday = weekdayOf(today);
   return (
     <table className="hours" data-hours="">
@@ -52,14 +54,14 @@ export function HoursCard({
           );
         })}
       </tbody>
-      {special.length > 0 ? (
+      {coming.length > 0 ? (
         <tbody className="hours__special">
           <tr>
             <th scope="colgroup" colSpan={3} className="hours__special-head">
               {visitLabels.specialHours}
             </th>
           </tr>
-          {special.map((r) => (
+          {coming.map((r) => (
             <tr
               key={r.date}
               className="hours__row"

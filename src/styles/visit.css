@@ -495,3 +495,42 @@
   margin-top: var(--s-8);
   color: var(--fg);
 }
+
+/* second review, 2026-11-15: the photo and the hours keep the page's right gutter on a
+   phone (an automatic grid column had grown 14 px past it) */
+.visit-grid {
+  grid-template-columns: minmax(0, 1fr);
+}
+@media (min-width: 64rem) {
+  .visit-grid {
+    grid-template-columns: minmax(0, 7fr) minmax(0, 5fr);
+  }
+}
+.visit-left,
+.visit-hours {
+  min-width: 0;
+}
+.page--visit {
+  padding-bottom: var(--s-8);
+}
+/* on a phone the three columns sit a little closer, so the table fits inside the gutters */
+@media (max-width: 30rem) {
+  .hours__row > * {
+    padding-inline: var(--s-2);
+  }
+  .hours__kitchen {
+    font-size: 0.9375rem;
+  }
+}
+/* the narrowest phones: the note beside the hours may take two lines rather than push the
+   table past the screen (it ran 59 px over at 320) */
+@media (max-width: 23rem) {
+  .hours .hours__row > * {
+    padding-inline: var(--s-1);
+    font-size: 1rem;
+  }
+  .hours .hours__row > .hours__kitchen {
+    font-size: 0.8125rem;
+    white-space: normal;
+  }
+}

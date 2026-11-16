@@ -667,8 +667,7 @@
 /* the room dims; the print stays paper: the lit ticket (tonight's, or the next one) is
    bone with ink type, the later ones are thin outlines */
 .events-page .tix__t {
-  --tb: 1px;
-  --tc: color-mix(in srgb, var(--bone) 45%, transparent);
+  --tc: color-mix(in srgb, var(--bone) 72%, transparent);
   background: transparent;
 }
 .events-page .tix__t.tix__t--lit {
@@ -693,47 +692,17 @@
     background: var(--card);
   }
 }
-/* one column, no wider than a ticket reads well */
+/* a phone: one column. Wide: two tickets across within a month, so the month's line and
+   its tickets share both edges and nothing is indented off the page's left edge */
 .events-page .tix,
 .events-page .tix--tonight {
   grid-template-columns: minmax(0, 1fr);
-  max-width: 45rem;
 }
-/* on a wide screen the months hang on a pen line down the left, a knot at each date */
-@media (min-width: 48rem) {
-  .events-month .tix {
-    position: relative;
-    padding-left: 2.5rem;
-  }
-  .events-month .tix::before {
-    content: "";
-    position: absolute;
-    top: 0.25rem;
-    bottom: 0.25rem;
-    left: 0.375rem;
-    width: 8px;
-    background: color-mix(in srgb, var(--bone) 55%, transparent);
-    mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='8' height='120' fill='none'%3E%3Cpath d='M4 0C2.4 18 5.8 38 4.2 60C2.8 80 5.6 102 4 120' stroke='%23000' stroke-width='2' stroke-linecap='round'/%3E%3C/svg%3E")
-      repeat-y;
-  }
-  .events-month .tix > li {
-    position: relative;
-  }
-  .events-month .tix > li::before {
-    content: "";
-    position: absolute;
-    top: 50%;
-    left: calc(-2.5rem + 0.375rem + 4px - 0.375rem);
-    width: 0.75rem;
-    height: 0.75rem;
-    border: 2px solid var(--bone);
-    border-radius: 55% 45% 52% 48% / 48% 55% 45% 52%;
-    background: var(--bg);
-    translate: 0 -50%;
-  }
-  .events-month .tix > li:has(.tix__t--lit)::before {
-    background: var(--pils);
-    border-color: var(--pils);
+@media (min-width: 64rem) {
+  .events-page .tix,
+  .events-page .tix--tonight {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    column-gap: var(--s-6);
   }
 }
 /* the page closes on one block: private events, then bands */
@@ -741,7 +710,7 @@
   display: grid;
   gap: var(--s-2);
   max-width: 45rem;
-  margin-top: var(--s-9);
+  margin-top: var(--s-8);
   padding-top: var(--s-5);
   border-top: 1px solid var(--hair);
 }
@@ -756,8 +725,10 @@
   font-size: 1.0625rem;
   line-height: 1.35;
 }
+/* a game night: the two strokes underline the title */
 .event-head .event-head__game {
-  width: 5.5rem;
+  width: clamp(6rem, 24vw, 8.5rem);
+  margin-top: calc(-1 * var(--s-1));
 }
 .event-head[data-game] .event-head__rule {
   height: var(--stroke);
@@ -781,9 +752,6 @@
   flex-wrap: wrap;
   gap: var(--s-3);
 }
-.event-page > .event-page__art {
-  display: none;
-}
 /* the drawing left of the title, the title beside it (this sheet loads after the shell's) */
 .events-page .events-head {
   grid-template-columns: auto minmax(0, 1fr);
@@ -793,21 +761,37 @@
     width: auto;
   }
 }
-/* wide: the column starts at the page's left edge; a ticket is drawn at the right */
+/* wide: the column starts at the page's left edge, at a reading width */
 @media (min-width: 64rem) {
   .event-page {
-    grid-template-columns: minmax(0, 46rem) minmax(0, 1fr);
     max-width: var(--content-max);
   }
   .event-page > * {
-    grid-column: 1;
+    max-width: 46rem;
   }
-  .event-page > .event-page__art {
-    display: block;
-    grid-row: 2 / span 3;
-    grid-column: 2;
-    align-self: start;
-    justify-self: end;
-    width: clamp(9rem, 16vw, 13rem);
+}
+
+/* second review, 2026-11-15 */
+/* the lit ticket is cut paper: its notches are bites with no outline of their own */
+.events-page .tix__t--lit .tix__stub::before,
+.events-page .tix__t--lit .tix__stub::after {
+  border-color: var(--bg);
+}
+/* the list's game mark is a small one: eight in a row should not become a texture */
+.events-page .tix__game,
+.tix__game {
+  width: 2.25rem;
+}
+/* the page ends sooner: the footer brings its own space */
+.events-body,
+.event-page {
+  padding-bottom: var(--s-8);
+}
+/* wide: the three actions share one row */
+@media (min-width: 48rem) {
+  .event-actions {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
   }
 }

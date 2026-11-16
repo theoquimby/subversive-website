@@ -30,7 +30,6 @@ export const menuLabels = {
   filters: { drinks: "Filter drinks", food: "Filter food" },
   share: "Share",
   close: "Close",
-  price: "Price",
   linkCopied: "Link copied",
   matches: (n: number, show: "drinks" | "food") =>
     show === "drinks"

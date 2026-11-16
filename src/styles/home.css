@@ -998,19 +998,19 @@
 .tix__stub::after {
   content: "";
   position: absolute;
-  right: calc(-0.4375rem - var(--tb) / 2);
-  width: 0.875rem;
-  height: 0.875rem;
+  right: calc(-0.5rem - var(--tb) / 2);
+  width: 1rem;
+  height: 1rem;
   border: var(--tb) solid var(--tc);
   border-radius: 50%;
   background: var(--bg);
 }
 .tix__stub::before {
-  top: calc(-0.4375rem - var(--tb));
+  top: calc(-0.5rem - var(--tb));
   clip-path: inset(50% 0 0 0);
 }
 .tix__stub::after {
-  bottom: calc(-0.4375rem - var(--tb));
+  bottom: calc(-0.5rem - var(--tb));
   clip-path: inset(0 0 50% 0);
 }
 .tix__game,

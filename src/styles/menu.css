@@ -1107,3 +1107,43 @@ a.mrow__box:active {
   font-size: var(--t-small);
   line-height: var(--lh-small);
 }
+
+/* second review, 2026-11-15 */
+/* a sub-group's line is a hairline: only the section's head carries the ink line */
+.mgroup__head {
+  border-bottom-width: 1px;
+  border-bottom-color: var(--hair);
+}
+/* descriptions fill their lines; balance is for headings */
+.mrow__desc,
+.intro-box__text,
+.intro-box__mods,
+.msec__note {
+  text-wrap: wrap;
+}
+.mrow__main .mrow__more {
+  margin: 0;
+  padding: 0;
+}
+a.mrow__box:active .mrow__name {
+  text-decoration: underline 2px;
+  text-underline-offset: 0.16em;
+}
+/* the detail view: the name in the rows' own type, the price on its line */
+.item__head {
+  align-items: baseline;
+  justify-content: space-between;
+}
+.item__name {
+  font-family: var(--ff-utility);
+  font-size: clamp(1.875rem, 1.625rem + 1.25vw, 2.375rem);
+  font-weight: 700;
+  letter-spacing: 0.01em;
+}
+.item__price {
+  flex: none;
+  font-family: var(--ff-utility);
+  font-size: 1.75rem;
+  font-weight: 700;
+  line-height: 1.1;
+}

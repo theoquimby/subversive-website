@@ -40,8 +40,9 @@ describe("HoursCard (spec §4.9)", () => {
     expect(c.querySelector('tr[data-weekday="sat"] .hours__time')?.textContent).toBe("12–8:30");
 
     const special = [...c.querySelectorAll("tr[data-date]")].map((r) => r.getAttribute("data-date"));
-    expect(special).toEqual(["2026-11-13", "2026-11-15", "2026-11-21", "2026-11-25"]);
-    expect(c.querySelector('tr[data-date="2026-11-13"] .hours__time')?.textContent).toBe("4:30–9:30");
+    // today is not listed a second time: its weekday row above already tells tonight's truth,
+    // and two rows marked as today read as a contradiction (second review, 2026-11-15)
+    expect(special).toEqual(["2026-11-15", "2026-11-21", "2026-11-25"]);
 
     expect(c.querySelector('tr[data-weekday="fri"]')?.hasAttribute("data-today")).toBe(true);
     expect(c.querySelector('tr[data-weekday="sat"]')?.hasAttribute("data-today")).toBe(false);

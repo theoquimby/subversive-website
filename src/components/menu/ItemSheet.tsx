@@ -132,6 +132,9 @@ export function ItemSheet() {
     else if (e.key === "ArrowLeft") step(-1);
   };
 
+  // one price sits beside the name; a price per pour size gets its own line
+  const single = item && item.prices.length === 1 ? item.prices[0]?.[1] : undefined;
+
   return (
     <Sheet
       open={open}
@@ -152,7 +155,7 @@ export function ItemSheet() {
           ) : null}
           <div className="item__head">
             <Dialog.Title className="item__name">{item.name}</Dialog.Title>
-            <span className="item__rule" aria-hidden="true" />
+            {single ? <span className="item__price tabular">{single}</span> : null}
           </div>
           {item.meta || item.badge ? (
             <p className="item__meta">
@@ -160,11 +163,11 @@ export function ItemSheet() {
               {item.badge ? <span className="item__badge">{item.badge}</span> : null}
             </p>
           ) : null}
-          {item.prices.length ? (
+          {!single && item.prices.length ? (
             <dl className="item__prices">
               {item.prices.map(([size, price]) => (
-                <div key={size || price}>
-                  <dt className={size ? undefined : "sr-only"}>{size || menuLabels.price}</dt>
+                <div key={size}>
+                  <dt>{size}</dt>
                   <dd className="tabular">{price}</dd>
                 </div>
               ))}
