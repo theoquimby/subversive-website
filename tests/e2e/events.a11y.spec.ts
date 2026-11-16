@@ -13,8 +13,10 @@ for (const route of ROUTES) {
     await page.emulateMedia({ reducedMotion: "reduce" });
     await page.goto(route, { waitUntil: "networkidle" });
     await page.evaluate(() => document.fonts.ready);
-    // under a loaded test server a stylesheet can arrive after the network goes quiet;
-    // the page is not ready to be judged until every sheet is in (found 2026-11-15)
+    // every stylesheet is in before the page is judged. This did NOT cure the intermittent
+    // failure on the past-event page (2026-11-15): about 1 run in 60 under load, part of
+    // the shell's styles is missing when axe runs although every sheet reports loaded.
+    // Unexplained; see the critique notes.
     await page.waitForFunction(() =>
       [...document.querySelectorAll<HTMLLinkElement>('link[rel="stylesheet"]')].every((l) => l.sheet),
     );

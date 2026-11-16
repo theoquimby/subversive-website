@@ -127,6 +127,7 @@ export function InquiryForm({ endpoint }: { endpoint: string }) {
   return (
     <form className="inquiry" onSubmit={onSubmit} noValidate>
       {field("name", L.name, { autoComplete: "name", maxLength: 120 })}
+      <p className="inquiry__either">{L.either}</p>
       <div className="inquiry__pair">
         {field("email", L.email, {
           type: "email",
@@ -161,7 +162,7 @@ export function InquiryForm({ endpoint }: { endpoint: string }) {
                 onChange={() => setKind(k)}
                 className="sr-only"
               />
-              <span>{k}</span>
+              <span className="choice">{k}</span>
             </label>
           ))}
         </div>

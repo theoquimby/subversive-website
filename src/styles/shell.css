@@ -1057,3 +1057,73 @@ textarea.field__input {
     display: block;
   }
 }
+
+/* ---------- Review pass 2026-11-15: the inquiry form and the 404 ---------- */
+/* said before the two fields, not after a failed send */
+.inquiry__either {
+  margin: 0 0 calc(-1 * var(--s-3));
+  color: var(--fg);
+  font-size: var(--t-small);
+}
+/* the kind of event uses the site's one choice shape (the menu's filters) */
+.choices__item > .choice {
+  border-radius: 235px 20px 255px 22px / 22px 255px 20px 225px;
+  font-weight: 700;
+}
+.choices__item:nth-child(even) > .choice {
+  border-radius: 22px 235px 20px 255px / 245px 20px 225px 22px;
+}
+/* no browser grip: the box grows with what is written */
+textarea.field__input {
+  field-sizing: content;
+  min-height: 7rem;
+  max-height: 60svh;
+  resize: none;
+}
+.inquiry__done {
+  background: color-mix(in srgb, var(--pils) 38%, transparent);
+}
+/* wide: the form at left, the other ways to ask in a column of their own at right */
+@media (min-width: 64rem) {
+  .inquiry-wrap {
+    grid-template-columns: minmax(0, 38rem) minmax(14rem, 20rem);
+    align-items: start;
+    justify-content: space-between;
+    max-width: none;
+  }
+  .inquiry__other {
+    flex-direction: column;
+    gap: var(--s-3);
+    padding-top: 0;
+    padding-left: var(--s-7);
+    border-top: 0;
+    border-left: 1px solid var(--hair);
+  }
+}
+
+/* 404: the empty glass is one of the site's small drawings, left of the headline as on
+   every inner page, at Home's size and line weight; nothing hangs below the fold */
+.not-found {
+  grid-template-columns: minmax(0, 1fr);
+  gap: var(--s-5);
+  align-items: start;
+  min-height: 0;
+  padding-bottom: var(--section);
+}
+.not-found .not-found__copy {
+  padding-bottom: 0;
+}
+.not-found .not-found__art {
+  order: -1;
+  justify-self: start;
+  width: clamp(4.75rem, 14vw, 8.25rem);
+}
+@media (min-width: 64rem) {
+  .not-found {
+    grid-template-columns: auto minmax(0, 1fr);
+    column-gap: var(--s-7);
+  }
+  .not-found .not-found__art {
+    margin-top: var(--s-3);
+  }
+}

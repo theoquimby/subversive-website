@@ -106,6 +106,7 @@ export const inquiryLabels = {
   name: "Name",
   email: "Email",
   phone: "Phone",
+  either: "Email or phone. One is enough.",
   date: "Date",
   datePlaceholder: "MM/DD/YYYY",
   guests: "Guests",
