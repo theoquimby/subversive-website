@@ -692,6 +692,12 @@ body {
   opacity: 0;
   visibility: hidden;
   pointer-events: none;
+  /* not in the page at all between page changes: an invisible full-screen fixed layer is
+     still a fixed layer at both edges of a phone's screen */
+  display: none;
+}
+:root[data-curtain-to] .curtain {
+  display: block;
 }
 :root[data-curtain-to="night"] .curtain {
   background: var(--night);
@@ -1198,5 +1204,24 @@ html {
     content: "";
     position: absolute;
     inset: -11px -6px;
+  }
+}
+
+/* The top edge gets the same thing as the bottom (2026-11-15): the bottom strip, which is
+   position: fixed, cleared Safari's bottom bar on Theo's phone, while the pinned header,
+   which is position: sticky, did not clear the strip by the Dynamic Island. So a fixed
+   strip in the page's colour sits over the header's empty top 10 px. */
+.edge-top {
+  position: fixed;
+  top: 0;
+  right: 0;
+  left: 0;
+  z-index: 51;
+  height: max(10px, env(safe-area-inset-top));
+  background-color: var(--bg);
+}
+@media (min-width: 64rem), print {
+  .edge-top {
+    display: none;
   }
 }

@@ -673,9 +673,17 @@
 }
 
 /* ---------- Paper grain (spec §3.8) ---------- */
+/* Laid over the whole document, not pinned to the screen (2026-11-15). Pinned, it was a
+   full-screen fixed layer above everything, blended into the page, touching both screen
+   edges: the one thing on the page that could stop iPhone Safari from giving its top and
+   bottom bars a solid colour from our header and edge strips. The grain now scrolls with
+   the paper, as a sheet's own texture would. */
+body {
+  position: relative;
+}
 body::after {
   content: "";
-  position: fixed;
+  position: absolute;
   inset: 0;
   z-index: 2147482000;
   pointer-events: none;

@@ -49,10 +49,15 @@ test("a strip in the page's colour is fixed at the bottom edge on phones and tab
       () => document.elementFromPoint(window.innerWidth / 2, window.innerHeight - 4)?.className,
     );
     expect(hit).toBe("edge-bottom");
-    const top = await page.evaluate(
-      () => document.elementFromPoint(window.innerWidth / 2, 4)?.closest("#site-header")?.id,
-    );
-    expect(top).toBe("site-header");
+    const top = await page.evaluate(() => document.elementFromPoint(window.innerWidth / 2, 4)?.className);
+    expect(top).toBe("edge-top");
+    expect(await rgb(page, ".edge-top")).toBe(await rgb(page, "body"));
+    // it covers only the header's empty top: the logo and Order are still what a tap lands on
+    await page.evaluate(() => window.scrollTo(0, 0));
+    const brand = await page.locator("#site-header .brand").boundingBox();
+    const onLink = (x: number, y: number) =>
+      page.evaluate((at) => !!document.elementFromPoint(at.x, at.y)?.closest("a"), { x, y });
+    expect(await onLink((brand?.x ?? 0) + 20, (brand?.y ?? 0) + (brand?.height ?? 0) / 2)).toBe(true);
   }
 });
 
@@ -155,4 +160,29 @@ test("Back returns to where the reader was", async ({ page }) => {
   await page.goBack();
   await expect(page).toHaveURL(/\/events$/);
   await expect.poll(() => page.evaluate(() => window.scrollY)).toBeGreaterThan(before - 80);
+});
+
+test("between page changes nothing fixed covers the screen: only the two edge strips are pinned", async ({
+  page,
+}) => {
+  test.skip((page.viewportSize()?.width ?? 0) >= 1024, "phones and tablets");
+  for (const route of ["/", "/menu", "/events"]) {
+    await page.goto(route, { waitUntil: "networkidle" });
+    const fixed = await page.evaluate(() => {
+      const out: string[] = [];
+      const check = (el: Element, pseudo?: string) => {
+        const s = getComputedStyle(el, pseudo);
+        if (s.position === "fixed" && s.display !== "none" && (pseudo ? s.content !== "none" : true))
+          out.push(`${el.tagName.toLowerCase()}.${el.className}${pseudo ?? ""}`);
+      };
+      for (const el of document.querySelectorAll("body, body *")) {
+        check(el);
+        check(el, "::before");
+        check(el, "::after");
+      }
+      return out;
+    });
+    // the mobile menu's toast and the share toast are fixed but small and away from the edges' middle
+    expect(fixed.filter((f) => !f.includes("toast")).sort()).toEqual(["div.edge-bottom", "div.edge-top"]);
+  }
 });

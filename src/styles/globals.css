@@ -190,7 +190,8 @@
 
 /* Skip link: off-screen until focused, then a stamped pill at the top-left */
 .skip-link {
-  position: fixed;
+  /* not fixed: nothing invisible is pinned at the top edge of a phone's screen */
+  position: absolute;
   top: max(var(--s-3), env(safe-area-inset-top));
   left: max(var(--s-3), env(safe-area-inset-left));
   z-index: 100;
