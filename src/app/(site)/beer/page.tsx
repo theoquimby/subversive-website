@@ -92,15 +92,17 @@ export default async function BeerPage() {
           </section>
         </div>
 
+        {/* where the grain and the rest come from, then how it becomes beer (Theo,
+            2026-11-16: "How it's made" after "Where it comes from") */}
+        <section className="prose-section" aria-labelledby="where-title">
+          <SectionHead id="where-title">{homeLabels.whereFrom}</SectionHead>
+          <WhereFrom sourcing={site.sourcing} />
+        </section>
+
         {/* how a batch is brewed, as a living drawing */}
         <section id="brew" className="prose-section brew-section" aria-labelledby="brew-title">
           <SectionHead id="brew-title">{brewLabels.title}</SectionHead>
           <BrewProcess beers={brews} />
-        </section>
-
-        <section className="prose-section" aria-labelledby="where-title">
-          <SectionHead id="where-title">{homeLabels.whereFrom}</SectionHead>
-          <WhereFrom sourcing={site.sourcing} />
           <p className="prose-links">
             <TextLink href="/menu">{homeLabels.fullMenu}</TextLink>
           </p>

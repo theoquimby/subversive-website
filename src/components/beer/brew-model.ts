@@ -18,11 +18,17 @@
 //   flight    hop cones, yeast and any extra input are thrown: each follows a parabola
 //             under gravity from where it leaves to where it lands.
 //   particles small fixed pools; sprouts and the kiln's colour change in steps.
+//   shovel    the hand moves of a malthouse (2026-11-16): the sack into the steep, the wet
+//             grain out to the floor, turning the bed, the floor into the kiln, and the spent
+//             grain out of the mash tun. One shovel, one move at a time: it scoops (the
+//             source drops by a scoopful), carries along an arc, and tips; the grain falls as
+//             dots under gravity and counts in the destination only when it lands.
 // The extra inputs and the cold rest come from the beer's own menu words (brew-recipe.ts).
 
 import {
   along,
   BALE,
+  BIN,
   EXTRA,
   FERM,
   GERM,
@@ -37,6 +43,8 @@ import {
   MILL,
   type Pt,
   RIM,
+  SACK,
+  SHOVEL,
   STEEP,
   type Stage,
   spread,
@@ -90,6 +98,7 @@ function hopperY(g: number) {
   const a = Math.min(2016, g * 2584);
   return (80 - Math.sqrt(Math.max(0, 6400 - 3.0476 * (2016 - a)))) / 1.5238;
 }
+const binY = (v: number) => BIN.bottom - v * 52;
 const tankY = (v: number) => 89 - (v / (STEEP_WATER + MASH_WATER)) * 58;
 const jarY = (v: number) => 48 - v * 28;
 const contY = (i: number, v: number) =>
@@ -267,6 +276,34 @@ interface Dot {
   link: number;
   fill: string;
   into: Into | "yeast";
+  /** a shovelful's dot: how much grain it carries, where it lands, and the height it lands at */
+  share: number;
+  pile: Pile;
+  ty: number;
+}
+/** where grain lies, for the shovel */
+export type Pile = "sack" | "steep" | "floor" | "kiln" | "mash" | "bin";
+interface Shovel {
+  x: number;
+  y: number;
+  a: number; // degrees; the lip down is positive
+  face: 1 | -1;
+  load: number;
+  fill: string;
+  from: Pile;
+  to: Pile;
+  /** scoops still to go in this move (a move that empties its source has no limit) */
+  left: number;
+  n: number;
+  /** 0 at rest, 1 to the source, 2 digging, 3 carrying, 4 tipping */
+  phase: 0 | 1 | 2 | 3 | 4;
+  t: number;
+  x0: number;
+  y0: number;
+  a0: number;
+  busy: boolean;
+  rx: number;
+  ry: number;
 }
 interface Hop {
   st: 0 | 1 | 2 | 3 | 4; // unused, flying, floating in the kettle, on its bottom, gone in
@@ -299,13 +336,13 @@ export interface Brew {
   drained: number;
   floorG: number;
   sprout: number;
-  rake: number;
   kilnG: number;
   toast: number;
   kilnHeat: number;
   heap: number;
   mashW: number;
   mashG: number;
+  binG: number;
   mashC: number;
   mashSteam: number;
   kettle: number;
@@ -355,6 +392,9 @@ export interface Brew {
   fx: Dot[];
   blip: Dot;
   nextBlip: number;
+  sh: Shovel;
+  /** where the stage's shovel work has got to */
+  shStep: number;
 }
 
 export const POOLS = {
@@ -381,6 +421,9 @@ const dot = (): Dot => ({
   link: 0,
   fill: "",
   into: "kettle",
+  share: 0,
+  pile: "steep",
+  ty: 0,
 });
 const pool = (n: number) => Array.from({ length: n }, dot);
 const newLink = (): Link => ({
@@ -439,13 +482,13 @@ export function createBrew(recipe: Recipe = NO_RECIPE): Brew {
     drained: 0,
     floorG: 0,
     sprout: 0,
-    rake: -1,
     kilnG: 0,
     toast: 0,
     kilnHeat: 0,
     heap: 0,
     mashW: 0,
     mashG: 0,
+    binG: 0,
     mashC: 0,
     mashSteam: 0,
     kettle: 0,
@@ -504,13 +547,47 @@ export function createBrew(recipe: Recipe = NO_RECIPE): Brew {
     fx: pool(POOLS.fx),
     blip: dot(),
     nextBlip: 0,
+    sh: {
+      x: 0,
+      y: 0,
+      a: SHOVEL.lean,
+      face: 1,
+      load: 0,
+      fill: "",
+      from: "sack",
+      to: "steep",
+      left: 0,
+      n: 0,
+      phase: 0,
+      t: 0,
+      x0: 0,
+      y0: 0,
+      a0: SHOVEL.lean,
+      busy: false,
+      rx: 0,
+      ry: 0,
+    },
+    shStep: 0,
   };
+}
+
+/** the shovel leaning where it lives */
+function home(s: Brew, L: Layout) {
+  const sh = s.sh;
+  sh.rx = L.shovelRest[0];
+  sh.ry = L.shovelRest[1];
+  sh.x = sh.rx;
+  sh.y = sh.ry;
+  sh.a = SHOVEL.lean;
+  sh.face = 1;
+  sh.phase = 0;
 }
 
 /** The whole process at once: every vessel full, the keg and cans filled and lidded. What the
     server draws, and all there is without JavaScript or with reduced motion. */
 export function stillBrew(L: Layout): Brew {
   const s = createBrew();
+  home(s, L);
   s.steepG = GRAIN * 0.6;
   s.steepW = STEEP_WATER * 0.8;
   s.floorG = GRAIN * 0.8;
@@ -553,6 +630,7 @@ const ORDER: Stage[] = [
   "mill",
   "mash",
   "runoff",
+  "spent",
   "boil",
   "transfer",
   "ferment",
@@ -572,12 +650,12 @@ export function setStage(s: Brew, stage: Stage, L: Layout) {
     drained: 0,
     floorG: 0,
     sprout: 0,
-    rake: -1,
     kilnG: 0,
     toast: 0,
     heap: 0,
     mashW: 0,
     mashG: 0,
+    binG: 0,
     mashC: 0,
     kettle: 0,
     heat: 0,
@@ -598,9 +676,15 @@ export function setStage(s: Brew, stage: Stage, L: Layout) {
     stirred: false,
     exLeft: [0, 0],
     exNext: [0, 0],
-    exDone: { mash: at > 4, kettle: at > 7, ferm: at > 9 },
-    dryDone: at > 9,
+    exDone: { mash: at > 4, kettle: at > 8, ferm: at > 10 },
+    dryDone: at > 10,
+    shStep: 0,
   });
+  // the shovel puts down whatever it held and goes back to its place
+  s.sh.load = 0;
+  s.sh.busy = false;
+  if (s.sh.rx === 0 && s.sh.ry === 0) home(s, L);
+  else s.sh.phase = 0;
   for (const l of s.lids) {
     l.st = 0;
     l.y = 0;
@@ -649,6 +733,10 @@ export function setStage(s: Brew, stage: Stage, L: Layout) {
     s.boil = 0.6;
   }
   if (at >= 8) {
+    s.mashG = 0;
+    s.binG = GRAIN;
+  }
+  if (at >= 9) {
     s.kettle = 0;
     s.heat = 0;
     s.boil = 0;
@@ -664,7 +752,7 @@ export function setStage(s: Brew, stage: Stage, L: Layout) {
     });
     s.hopsTossed = 3;
   }
-  if (at >= 10) {
+  if (at >= 11) {
     s.fermP = 1;
     s.yeastIn = true;
     s.jar = 0.6;
@@ -813,11 +901,194 @@ function tossHop(s: Brew, L: Layout, i: number, into: "kettle" | "ferm") {
   throwTo(h, from, [aim[0] + (into === "kettle" ? (i - 1) * 22 : 0), aim[1]], into === "kettle" ? 0.75 : 0.9);
 }
 
+// ---- the shovel ---------------------------------------------------------------------------
+
+const SCOOP = 0.17; // a shovelful: three empty the sack
+const DIG = [0, 0.2, 0.13, 0.28, 0.18]; // seconds for each phase; carrying adds its distance
+const DOTS = 5; // a shovelful falls as this many dots
+/** the grain each pile holds */
+function amount(s: Brew, p: Pile) {
+  return p === "sack"
+    ? s.sack
+    : p === "steep"
+      ? s.steepG
+      : p === "floor"
+        ? s.floorG
+        : p === "kiln"
+          ? s.kilnG
+          : p === "mash"
+            ? s.mashG
+            : s.binG;
+}
+function give(s: Brew, p: Pile, v: number) {
+  if (p === "sack") s.sack += v;
+  else if (p === "steep") s.steepG += v;
+  else if (p === "floor") s.floorG += v;
+  else if (p === "kiln") s.kilnG += v;
+  else if (p === "mash") s.mashG += v;
+  else s.binG += v;
+}
+const FLOOR_AT = [0.2, 0.5, 0.8, 0.35, 0.65];
+/** Where the blade digs into a pile (dig) or tips over it, whole drawing; n spreads the
+    scoops about. And the height grain lands at, there. */
+function spot(s: Brew, L: Layout, p: Pile, n: number, dig: boolean): { at: Pt; lands: number } {
+  const A = L.at;
+  if (p === "sack") {
+    const mx = L.sackFlip ? A.sack[0] + 76 - SACK.mouth[0] : A.sack[0] + SACK.mouth[0];
+    const at: Pt = [mx, A.sack[1] + SACK.mouth[1] - 2];
+    return { at, lands: at[1] };
+  }
+  if (p === "steep") {
+    const x = A.steep[0] + STEEP.cx + ((n % 3) - 1) * 8;
+    const surf = A.steep[1] + steepY(s.steepG + s.steepW);
+    return { at: [x, dig ? A.steep[1] + steepY(s.steepG) : A.steep[1] + STEEP.top - 18], lands: surf };
+  }
+  if (p === "floor" || p === "kiln") {
+    const face = p === "floor" ? GERM : KILN;
+    const o = p === "floor" ? A.germ : A.kiln;
+    const g = p === "floor" ? s.floorG : s.kilnG;
+    const u = FLOOR_AT[n % FLOOR_AT.length] ?? 0.5;
+    const x = o[0] + face.x0 + 8 + (face.width - 16) * u + face.depth[0] * 0.5;
+    const top = o[1] + face.front - g * face.thick + face.depth[1] * 0.5;
+    return { at: [x, dig ? top : top - 20], lands: top };
+  }
+  if (p === "mash") {
+    const x = A.mash[0] + MASH.cx + ((n % 3) - 1) * 24;
+    const top = A.mash[1] + mashY(s.mashG);
+    return { at: [x, dig ? top : A.mash[1] + MASH.top - 16], lands: top };
+  }
+  const x = A.bin[0] + BIN.cx;
+  return { at: [x, A.bin[1] + BIN.top - 14], lands: A.bin[1] + binY(s.binG) };
+}
+/** Set the shovel to work moving grain from one pile to another; false if there is none. */
+function startJob(s: Brew, from: Pile, to: Pile, left = Number.POSITIVE_INFINITY) {
+  if (amount(s, from) <= 1e-6) return false;
+  const sh = s.sh;
+  sh.from = from;
+  sh.to = to;
+  sh.left = left;
+  sh.n = 0;
+  sh.busy = true;
+  begin(sh, 1);
+  return true;
+}
+/** the shovel's move is over and every grain of it has landed */
+const moved = (s: Brew) => !s.sh.busy && !s.grains.some((d) => d.on && d.link === -1);
+function begin(sh: Shovel, phase: Shovel["phase"]) {
+  sh.phase = phase;
+  sh.t = 0;
+  sh.x0 = sh.x;
+  sh.y0 = sh.y;
+  sh.a0 = sh.a;
+}
+const SHOVEL_FILL: Record<Pile, string> = {
+  sack: "var(--brew-grain)",
+  steep: "var(--brew-wet)",
+  floor: "var(--brew-wet)",
+  kiln: "var(--brew-toast)",
+  mash: "var(--brew-bed)",
+  bin: "var(--brew-bed)",
+};
+function shovel(s: Brew, L: Layout, dt: number) {
+  const sh = s.sh;
+  sh.rx = L.shovelRest[0];
+  sh.ry = L.shovelRest[1];
+  if (sh.phase === 0) {
+    // home: it leans by the steep
+    const k = Math.min(1, dt * 4);
+    sh.x += (sh.rx - sh.x) * k;
+    sh.y += (sh.ry - sh.y) * k;
+    sh.a += (SHOVEL.lean - sh.a) * k;
+    return;
+  }
+  sh.t += dt;
+  const src = spot(s, L, sh.from, sh.n, true);
+  const dst = spot(s, L, sh.to, sh.from === sh.to ? sh.n + 2 : sh.n, false);
+  const dist = Math.hypot(dst.at[0] - src.at[0], dst.at[1] - src.at[1]);
+  const dur = (DIG[sh.phase] ?? 0.2) + (sh.phase === 3 ? dist / 1200 : 0);
+  const u = Math.min(1, sh.t / dur);
+  const e = smooth(u);
+  /** along an arc that rises h above the straight line between a and b */
+  const arc = (a: Pt, b: Pt, h: number): Pt => [
+    a[0] + (b[0] - a[0]) * e,
+    a[1] + (b[1] - a[1]) * e - h * 4 * e * (1 - e),
+  ];
+  if (sh.phase === 1) {
+    // to the pile, blade down to dig
+    sh.face = dst.at[0] >= src.at[0] ? 1 : -1;
+    const p = arc([sh.x0, sh.y0], [src.at[0] - sh.face * 6, src.at[1] - 6], 14);
+    sh.x = p[0];
+    sh.y = p[1];
+    sh.a = sh.a0 + (18 - sh.a0) * e;
+    if (u >= 1) begin(sh, 2);
+  } else if (sh.phase === 2) {
+    // in, and lift: a shovelful leaves the pile
+    sh.x = src.at[0] - sh.face * 6 + sh.face * 10 * e;
+    sh.y = src.at[1] - 6 + 6 * Math.sin(Math.PI * u);
+    sh.a = 18 - 30 * e;
+    if (u >= 1) {
+      const have = amount(s, sh.from);
+      const take = have - SCOOP < 0.01 ? have : SCOOP;
+      give(s, sh.from, -take);
+      sh.load = take;
+      sh.fill = SHOVEL_FILL[sh.from];
+      begin(sh, 3);
+    }
+  } else if (sh.phase === 3) {
+    // carried over, level
+    const p = arc([sh.x0, sh.y0], dst.at, 26 + dist * 0.18);
+    sh.x = p[0];
+    sh.y = p[1];
+    sh.a = sh.a0 + (0 - sh.a0) * e;
+    if (u >= 1) begin(sh, 4);
+  } else {
+    // tipped: the grain slides off the lip and falls
+    sh.a = 115 * e;
+    if (u >= 0.35 && sh.load > 0) {
+      const rad = (sh.a * Math.PI) / 180;
+      const k = SHOVEL.size;
+      const lx = sh.x + sh.face * k * (SHOVEL.lip[0] * Math.cos(rad) - SHOVEL.lip[1] * Math.sin(rad));
+      const ly = sh.y + k * (SHOVEL.lip[0] * Math.sin(rad) + SHOVEL.lip[1] * Math.cos(rad));
+      const share = sh.load / DOTS;
+      for (let i = 0; i < DOTS; i++) {
+        const d = s.grains.find((x) => !x.on);
+        if (!d) {
+          give(s, sh.to, share);
+          continue;
+        }
+        d.on = true;
+        d.link = -1;
+        d.s = -1;
+        d.x = lx + (Math.random() - 0.5) * 6;
+        d.y = ly + (Math.random() - 0.5) * 3;
+        d.vx = sh.face * (10 + Math.random() * 30);
+        d.vy = 10 + Math.random() * 25;
+        d.r = 1.4 + Math.random() * 0.6;
+        d.share = share;
+        d.pile = sh.to;
+        d.ty = dst.lands + (Math.random() - 0.5) * 3;
+        d.fill = sh.fill;
+      }
+      sh.load = 0;
+    }
+    if (u >= 1) {
+      sh.left -= 1;
+      sh.n += 1;
+      if (sh.left > 0 && amount(s, sh.from) > 1e-6) begin(sh, 1);
+      else {
+        sh.busy = false;
+        begin(sh, 0);
+      }
+    }
+  }
+}
+
 // ---- the batch, stage by stage -------------------------------------------------------------
 
 function go(s: Brew, stage: Stage) {
   s.stage = stage;
   s.stageT = 0;
+  s.shStep = 0;
   for (const k of s.links) k.open = false;
 }
 
@@ -837,9 +1108,11 @@ function control(s: Brew, L: Layout, dt: number) {
   const L10 = k[10] as Link;
   switch (s.stage) {
     case "grain":
-      (k[0] as Link).open = s.sack > 0;
+      // the sack is shovelled into the steep while the tank fills it
+      if (s.shStep === 0) s.shStep = startJob(s, "sack", "steep") ? 1 : 2;
+      if (s.shStep === 1 && moved(s)) s.shStep = 2;
       (k[1] as Link).open = s.stageT > 0.2 && s.tankS > 0;
-      if (s.stageT > 1 && s.sack <= 0 && s.tankS <= 0 && empty(k[0]) && empty(k[1])) go(s, "steep");
+      if (s.stageT > 1 && s.shStep === 2 && s.tankS <= 0 && empty(k[1])) go(s, "steep");
       break;
     case "steep":
       // soak, with air bubbling up through it; then the water goes down the drain
@@ -847,17 +1120,19 @@ function control(s: Brew, L: Layout, dt: number) {
       if (s.stageT > 0.7 && s.steepW <= 0 && empty(k[2])) go(s, "germ");
       break;
     case "germ":
-      (k[3] as Link).open = s.steepG > 0;
-      if (s.steepG <= 0 && empty(k[3])) {
-        s.sprout = Math.min(1, s.sprout + dt / 1.1);
-        if (s.rake < 0 && s.sprout > 0.25) s.rake = 0;
-      }
-      if (s.rake >= 0 && s.rake < 1) s.rake = Math.min(1, s.rake + dt / 0.9);
-      if (s.sprout >= 1 && s.rake >= 1) go(s, "kiln");
+      // the wet grain is shovelled out onto the floor; it sprouts, and is turned twice
+      if (s.shStep === 0) s.shStep = startJob(s, "steep", "floor") ? 1 : 2;
+      if (s.shStep === 1 && moved(s)) s.shStep = 2;
+      if (s.shStep >= 2) s.sprout = Math.min(1, s.sprout + dt / 1.4);
+      if (s.shStep === 2 && s.sprout > 0.1) s.shStep = startJob(s, "floor", "floor", 2) ? 3 : 4;
+      if (s.shStep === 3 && moved(s)) s.shStep = 4;
+      if (s.sprout >= 1 && s.shStep === 4) go(s, "kiln");
       break;
     case "kiln":
-      (k[4] as Link).open = s.floorG > 0;
-      if (s.floorG <= 0 && empty(k[4])) s.toast = Math.min(1, s.toast + dt / 1.1);
+      // the green grain is shovelled into the kiln, then toasts
+      if (s.shStep === 0) s.shStep = startJob(s, "floor", "kiln") ? 1 : 2;
+      if (s.shStep === 1 && moved(s)) s.shStep = 2;
+      if (s.shStep === 2) s.toast = Math.min(1, s.toast + dt / 0.9);
       if (s.toast >= 1) go(s, "mill");
       break;
     case "mill":
@@ -882,11 +1157,17 @@ function control(s: Brew, L: Layout, dt: number) {
         go(s, "mash");
       break;
     case "mash":
-      if (s.stageT > 0.5 && s.paddle.stir <= 0 && s.mashC >= 1) go(s, "runoff");
+      if (s.stageT > 0.3 && s.paddle.stir <= 0 && s.mashC >= 1) go(s, "runoff");
       break;
     case "runoff":
       (k[8] as Link).open = s.mashW > 0;
-      if (s.mashW <= 0 && empty(k[8])) go(s, "boil");
+      if (s.mashW <= 0 && empty(k[8])) go(s, "spent");
+      break;
+    case "spent":
+      // the spent grain is dug out of the tun into the bin while the kettle comes up to the boil
+      if (s.shStep === 0) s.shStep = startJob(s, "mash", "bin") ? 1 : 2;
+      if (s.shStep === 1 && moved(s)) s.shStep = 2;
+      if (s.shStep === 2) go(s, "boil");
       break;
     case "boil": {
       const due = [0.2, 0.55, 0.9];
@@ -910,7 +1191,7 @@ function control(s: Brew, L: Layout, dt: number) {
         tossHop(s, L, 4, "ferm");
       }
       s.fermP = Math.max(s.fermP, smooth((s.stageT - 0.3) / 2.4));
-      const end = s.recipe.lager ? 4 : 3;
+      const end = s.recipe.lager ? 3.6 : 2.6;
       if (s.stageT > end && s.exLeft.every((n) => n <= 0)) go(s, "out");
       break;
     }
@@ -933,7 +1214,7 @@ function control(s: Brew, L: Layout, dt: number) {
           s.beltT = 0;
         }
       } else if (s.outPhase === 2) {
-        s.beltT += dt / 0.4;
+        s.beltT += dt / 0.35;
         s.belt = s.beltFrom + (s.beltTo - s.beltFrom) * smooth(s.beltT);
         if (s.beltT >= 1) {
           const lid = s.lids[s.slot - 1];
@@ -965,7 +1246,7 @@ export function step(s: Brew, L: Layout, dt: number) {
   s.stageT += dt;
   control(s, L, dt);
 
-  const { steep: S, germ: Gm, kiln: Kn, mill: M, mash: H, kettle: K, ferm: F, out: O } = L.at;
+  const { steep: S, mill: M, mash: H, kettle: K, ferm: F, out: O } = L.at;
   const g = (i: number) => L.links[i] as LinkGeo;
 
   s.tiltV += (70 * (s.tiltTo - s.tilt) - 5.5 * s.tiltV) * dt;
@@ -978,24 +1259,15 @@ export function step(s: Brew, L: Layout, dt: number) {
     const norm = amt / dt / (RATE[i] ?? 0.3);
     kick(r, gl.out[0] - origin[0], (0.6 + Math.random() * 0.8) * 420 * norm * dt * scale);
   };
-  const germTop = Gm[1] + GERM.front - s.floorG * GERM.thick;
-  const kilnTop = Kn[1] + KILN.front - s.kilnG * KILN.thick;
 
-  // malting: the sack and the tank into the steep; its water to the drain; the grain to the
-  // floor, to the kiln, and on to the mill
-  s.sack -= move(s, g(0), 0, dt, s.sack, 1, true);
-  s.steepG += land(s, g(0), 0, S[1] + steepY(s.steepG + s.steepW));
+  // malting: the tank into the steep, its water to the drain; the shovel does the grain's
+  // hand moves; the kiln's grain goes on to the mill by auger
+  shovel(s, L, dt);
   s.tankS -= move(s, g(1), 1, dt, s.tankS, 1, true);
   s.steepW += land(s, g(1), 1, S[1] + steepY(s.steepG + s.steepW));
   s.steepW -= move(s, g(2), 2, dt, s.steepW, 1, true);
   s.steepW = Math.max(0, s.steepW);
   s.drained += land(s, g(2), 2, L.drain[1]);
-  s.steepG -= move(s, g(3), 3, dt, s.steepG, 1, true);
-  s.steepG = Math.max(0, s.steepG);
-  s.floorG += land(s, g(3), 3, germTop - 6);
-  s.floorG -= move(s, g(4), 4, dt, s.floorG, 1, true);
-  s.floorG = Math.max(0, s.floorG);
-  s.kilnG += land(s, g(4), 4, kilnTop - 5);
   s.kilnG -= move(s, g(5), 5, dt, s.kilnG, 1, true);
   s.kilnG = Math.max(0, s.kilnG);
   s.heap += land(s, g(5), 5, M[1] + hopperY(s.heap) - 2);
@@ -1030,7 +1302,19 @@ export function step(s: Brew, L: Layout, dt: number) {
   const turning = (s.links[6] as Link).flow > 0.05 && (s.heap > 0 || !empty(s.links[6])) ? 1 : 0;
   s.spin += (turning - s.spin) * Math.min(1, dt * 4);
   s.roller += s.spin * 7 * dt;
-  for (const i of [0, 3, 4, 5]) grains(s, g(i), i, s.grains, dt, 1.6);
+  grains(s, g(5), 5, s.grains, dt, 1.6);
+  // a shovelful falls as dots; each counts where it lands
+  for (const p of s.grains) {
+    if (!p.on || p.link !== -1) continue;
+    p.vy += GRAVITY * dt;
+    p.vx *= 1 - 2 * dt;
+    p.x += p.vx * dt;
+    p.y += p.vy * dt;
+    if (p.y >= p.ty) {
+      p.on = false;
+      give(s, p.pile, p.share);
+    }
+  }
   grains(s, g(6), 6, s.cracked, dt, 1.3);
 
   // water into the mash
@@ -1049,7 +1333,7 @@ export function step(s: Brew, L: Layout, dt: number) {
   splash(s.ket, g(8), K, a, 8);
 
   // the boil
-  const fire = (s.stage === "runoff" && s.kettle > 0.12) || s.stage === "boil" ? 1 : 0;
+  const fire = (s.stage === "runoff" && s.kettle > 0.12) || s.stage === "spent" || s.stage === "boil" ? 1 : 0;
   s.heat += (fire - s.heat) * Math.min(1, dt * 1.2);
   s.boil += ((s.kettle > 0.05 ? s.heat : 0) - s.boil) * Math.min(1, dt * 0.8);
   if (s.stage === "boil") {
@@ -1207,7 +1491,7 @@ export function step(s: Brew, L: Layout, dt: number) {
   s.krausen += (9 * s.co2 + (s.fermP > 0.5 && s.ferm > 0.05 ? 2.5 : 0) - s.krausen) * Math.min(1, dt * 1.2);
   if (s.ferm < 0.02) s.krausen = Math.min(s.krausen, s.ferm * 100);
   // a lager's cold rest: frost comes up on the tank, and goes once it is packed
-  const cold = s.recipe.lager && s.stage === "ferment" && s.stageT > 2.6 ? 1 : 0;
+  const cold = s.recipe.lager && s.stage === "ferment" && s.stageT > 2.2 ? 1 : 0;
   s.frost += (cold - s.frost) * Math.min(1, dt * (cold ? 1.6 : 0.8));
   if (s.co2 > 0.02 && Math.random() < s.co2 * 26 * dt) {
     const b = s.cb.find((d) => !d.on);
@@ -1300,6 +1584,9 @@ export function moving(s: Brew) {
   if (s.hops.some((h) => h.st === 1 || (h.st === 2 && s.kettle > 0))) return true;
   if (s.paddle.stir > 0 || Math.abs(s.paddle.a) > 0.05 || Math.abs(s.paddle.v) > 0.2) return true;
   if (Math.abs(s.tiltTo - s.tilt) > 0.003 || Math.abs(s.tiltV) > 0.02) return true;
+  const sh = s.sh;
+  if (sh.phase !== 0 || Math.hypot(sh.x - sh.rx, sh.y - sh.ry) > 0.3 || Math.abs(sh.a - SHOVEL.lean) > 0.5)
+    return true;
   return !(rowStill(s.mash) && rowStill(s.ket) && rowStill(s.fer));
 }
 
@@ -1315,6 +1602,14 @@ export function stir(s: Brew) {
 
 /** The layout changed under a running model: what was in flight in the old drawing goes. */
 export function relayout(s: Brew, L: Layout) {
+  // a shovelful in the air, or on the blade, arrives at once; the shovel starts again from home
+  for (const d of s.grains) if (d.on && d.link === -1) give(s, d.pile, d.share);
+  const sh = s.sh;
+  if (sh.load > 0) give(s, sh.to, sh.load);
+  sh.load = 0;
+  const busy = sh.busy;
+  home(s, L);
+  if (busy) begin(sh, 1);
   for (const p of [s.grains, s.cracked, s.fx]) for (const d of p) d.on = false;
   const K = L.at.kettle;
   s.hops.forEach((h, i) => {
@@ -1381,10 +1676,10 @@ export function paint(s: Brew, L: Layout, put: Put) {
   put(
     "vS",
     "transform",
-    `rotate(${f1((s.links[3]?.flow ?? 0) * 90)} ${STEEP.valveAt[0]} ${STEEP.valveAt[1]})`,
+    `rotate(${f1((s.links[2]?.flow ?? 0) * 90)} ${STEEP.valveAt[0]} ${STEEP.valveAt[1]})`,
   );
 
-  // the floor: wet grain spread out; each kernel puts out a rootlet, in steps; one pass of the rake
+  // the floor: wet grain spread out; each kernel puts out a rootlet, in steps
   const gt = s.floorG * GERM.thick;
   const gb = bed(GERM, gt);
   put("germ.bed", "d", gb.d);
@@ -1393,12 +1688,22 @@ export function paint(s: Brew, L: Layout, put: Put) {
   show(put, "germ.edge", s.floorG > 0.003);
   const grow = Math.floor(clamp(s.sprout, 0, 1) * 3.999);
   SPROUTS_AT(s, put, gt, grow);
-  const rk = s.rake >= 0 && s.rake < 1;
-  show(put, "rake", rk);
-  if (rk) {
-    const x = GERM.x0 + 4 + (GERM.width - 8) * smooth(s.rake);
-    put("rake", "transform", `translate(${f1(x)} ${f1(GERM.front - gt - 2)})`);
-  }
+
+  // the shovel, and the bin it fills with spent grain
+  const sh = s.sh;
+  put(
+    "shovel",
+    "transform",
+    `translate(${f1(sh.x)} ${f1(sh.y)}) scale(${sh.face * SHOVEL.size} ${SHOVEL.size}) rotate(${f1(sh.a)})`,
+  );
+  show(put, "shovel.load", sh.load > 0);
+  if (sh.fill) put("shovel.load", "fill", sh.fill);
+  const bny = binY(s.binG);
+  const bn = liquid(null, BIN.cx, BIN.a, bny, BIN.bottom + 12);
+  put("bin.g", "d", bn.body);
+  put("bin.top", "d", bn.top);
+  show(put, "bin.g", s.binG > 0.003);
+  show(put, "bin.top", s.binG > 0.003);
 
   // the kiln: the bed dries and toasts, a quarter at a time; warm air off it
   const kt = s.kilnG * KILN.thick;

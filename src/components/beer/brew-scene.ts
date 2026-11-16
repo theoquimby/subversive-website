@@ -3,6 +3,7 @@
 // key (`k`) is one the model paints; its moving attributes come from `paint`, never from here.
 import {
   BALE,
+  BIN,
   CONE,
   EXTRA,
   ell,
@@ -20,6 +21,7 @@ import {
   OUT,
   type Pt,
   SACK,
+  SHOVEL,
   STEEP,
   TANK,
 } from "./brew-layout";
@@ -73,6 +75,7 @@ export function scene(L: Layout, recipe: Recipe, uid: string, labels: Record<Lab
     ["fer", FERM.inside],
     ["keg", OUT.kegFill],
     ["can", OUT.canFill],
+    ["bin", BIN.inside],
   ];
 
   const out: Prim[] = [];
@@ -166,7 +169,6 @@ export function scene(L: Layout, recipe: Recipe, uid: string, labels: Record<Lab
           k,
         ),
       ),
-      g([path("M0 0L18 -24M-7 0H7M-6 0V3.5M-2 0V3.5M2 0V3.5M6 0V3.5")], undefined, undefined, "rake"),
     ]),
   );
   // the kiln
@@ -360,6 +362,17 @@ export function scene(L: Layout, recipe: Recipe, uid: string, labels: Record<Lab
     });
     out.push(station(p, kids));
   });
+  // the bin the spent grain is shovelled into
+  out.push(
+    station(A.bin, [
+      path(BIN.inside, "brew__solid"),
+      clipped("bin", [
+        live("path", "bin.g", "brew__liq brew--bed"),
+        live("path", "bin.top", "brew__liq brew--wet"),
+      ]),
+      path(BIN.lines),
+    ]),
+  );
   // the filler
   out.push(
     station(A.out, [
@@ -398,6 +411,17 @@ export function scene(L: Layout, recipe: Recipe, uid: string, labels: Record<Lab
         ...keys("gc", POOLS.cracked).map((k) => live("circle", k, "brew__cracked")),
         ...keys("fx", POOLS.fx).map((k) => live("circle", k, "brew__toss")),
         ...keys("hop", POOLS.hops).map((k) => g(cone(), undefined, undefined, k)),
+        // the shovel: the blade, a shovelful on it when it has one, the handle
+        g(
+          [
+            path(SHOVEL.blade, "brew__paper2"),
+            live("path", "shovel.load", "brew__liq brew--grain", { d: SHOVEL.load }),
+            path(SHOVEL.handle),
+          ],
+          undefined,
+          undefined,
+          "shovel",
+        ),
       ],
       undefined,
       "brew__ink",

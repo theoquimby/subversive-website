@@ -15,6 +15,7 @@ export type Stage =
   | "mill"
   | "mash"
   | "runoff"
+  | "spent"
   | "boil"
   | "transfer"
   | "ferment"
@@ -64,6 +65,7 @@ export interface Layout {
     out: Pt;
     hops: Pt;
     jar: Pt;
+    bin: Pt;
   };
   /** the sack is drawn mirrored, its mouth to the left */
   sackFlip: boolean;
@@ -82,13 +84,17 @@ export interface Layout {
   /** the brewhouse behind it all: one quiet path, and contact hatching under feet */
   room: string;
   hatch: string;
+  /** where the shovel leans when it is not in use: the blade's middle on the floor */
+  shovelRest: Pt;
   shelves: string;
   labels: readonly { key: LabelKey; x: number; y: number; anchor?: "start" | "middle" | "end" }[];
   /** what a tap replays from; "paddle" stirs */
   hits: readonly { to: Stage | "paddle"; r: readonly [number, number, number, number] }[];
 }
 
-export const GRAIN_LINKS = [0, 3, 4, 5, 6] as const;
+/** augers that are drawn; the grain's other moves are by shovel (links 0, 3 and 4 stay
+    in the list, unused, so the indices hold) */
+export const GRAIN_LINKS = [5, 6] as const;
 export const LIQUID_LINKS = [
   { i: 1, tone: "water" },
   { i: 2, tone: "water" },
@@ -401,6 +407,30 @@ export const FERM = {
 };
 
 /** the filler: a belt, a nozzle, a capper; a keg and three cans ride the belt */
+/** the shovel, side on: the blade's middle at the origin, the lip to the right, the handle
+    up to the left; it turns about the blade */
+export const SHOVEL = {
+  blade: "M-11 -6V1C-5 4.5 6 4 12 0C6 1.5 -4 1.5 -9 -1V-6Z",
+  load: "M-9 -1.5C-5 -8 5 -7 11 -0.5C5 1 -4 1.2 -9 -1.5Z",
+  handle: "M-10 -5L-33 -30M-36 -27L-30 -33",
+  lip: [12, 0] as Pt,
+  /** drawn this much larger than its coordinates */
+  size: 1.35,
+  /** how it leans at rest, degrees */
+  lean: 35,
+};
+
+/** the bin the spent grain is shovelled into */
+export const BIN = {
+  cx: 20,
+  a: 18,
+  top: 10,
+  bottom: 40,
+  lines: `${ell(20, 10, 18, 18 * RIM)}M2 10V40M38 10V40${near(20, 40, 18, 18 * RIM)}M0 18H2M38 18H40`,
+  inside: barrel(20, 10, 40, 18, 18 * RIM),
+  foot: [2, 38, 44] as const,
+};
+
 export const OUT = {
   belt: "M2 96H338L348 88H12ZM2 96V104H338V96M338 104L348 96V88M30 104V120M310 104V120M20 120H40M300 120H320",
   /** the frame that holds the nozzle and the capper over the belt */
@@ -489,6 +519,7 @@ function phone(): Layout {
     ferm: [210, 840] as Pt,
     jar: [314, 831] as Pt,
     out: [10, 1134] as Pt,
+    bin: [170, 556] as Pt,
   };
   const W = 360;
   const floors = [230, 380, 600, 800, 1090, 1254];
@@ -511,7 +542,8 @@ function phone(): Layout {
     foot(at.hops, BALE.foot) +
     foot(at.ferm, FERM.foot) +
     OUT.foot.map((fp) => foot(at.out, fp)).join("") +
-    foot(at.jar, JAR.foot);
+    foot(at.jar, JAR.foot) +
+    foot(at.bin, BIN.foot);
   return {
     id: "phone",
     box: [W, 1290],
@@ -570,9 +602,9 @@ function phone(): Layout {
         [
           [286, 536],
           [286, 576],
-          [266, 588],
-          [198, 588],
-          [152, 456],
+          [276, 584],
+          [236, 584],
+          [236, 456],
           [120, 456],
         ],
         AUGER,
@@ -636,17 +668,18 @@ function phone(): Layout {
     aim: { mash: [80, 490], kettle: [112, 690], ferm: [246, 862] },
     room,
     hatch: hatchAll,
+    shovelRest: [214, 220.5],
     shelves: shelf(312, 356, 880),
     labels: [
       { key: "water", x: 38, y: 14 },
-      { key: "malting", x: 196, y: 60 },
+      { key: "malting", x: 290, y: 60 },
       { key: "grain", x: 310, y: 254 },
       { key: "steep", x: 198, y: 254 },
       { key: "germinate", x: 79, y: 404 },
       { key: "kiln", x: 252, y: 404 },
       { key: "mash", x: 40, y: 624 },
       { key: "mill", x: 286, y: 624 },
-      { key: "runoff", x: 162, y: 622, anchor: "start" },
+      { key: "runoff", x: 162, y: 642, anchor: "start" },
       { key: "boil", x: 115, y: 824 },
       { key: "hops", x: 300, y: 824 },
       { key: "yeast", x: 334, y: 900 },
@@ -683,6 +716,7 @@ function wide(): Layout {
     ferm: [970, 122] as Pt,
     jar: [1092, 61] as Pt,
     out: [850, 370] as Pt,
+    bin: [652, 426] as Pt,
   };
   const W = 1200;
   const H = 520;
@@ -707,7 +741,8 @@ function wide(): Layout {
     foot(at.hops, BALE.foot) +
     foot(at.ferm, FERM.foot) +
     OUT.foot.map((fp) => foot(at.out, fp)).join("") +
-    foot(at.jar, JAR.foot);
+    foot(at.jar, JAR.foot) +
+    foot(at.bin, BIN.foot);
   return {
     id: "wide",
     box: [W, H],
@@ -833,6 +868,7 @@ function wide(): Layout {
     aim: { mash: [700, 250], kettle: [880, 252], ferm: [1006, 140] },
     room,
     hatch: hatchAll,
+    shovelRest: [182, 362.5],
     shelves: shelf(1084, 1150, 110),
     labels: [
       { key: "water", x: 50, y: 30 },
@@ -842,7 +878,7 @@ function wide(): Layout {
       { key: "germinate", x: 259, y: 398 },
       { key: "kiln", x: 406, y: 398 },
       { key: "mill", x: 550, y: 398 },
-      { key: "mash", x: 640, y: 412, anchor: "middle" },
+      { key: "mash", x: 606, y: 412, anchor: "middle" },
       { key: "runoff", x: 746, y: 414 },
       { key: "boil", x: 875, y: 398 },
       { key: "hops", x: 788, y: 494 },
