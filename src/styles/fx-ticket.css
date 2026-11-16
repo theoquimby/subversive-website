@@ -1,0 +1,60 @@
+/* ---------- Tear-off tickets (TicketTear.tsx, 2026-11-15) ---------- */
+/* While a ticket is being torn its link gives up its outline and paper (inline, from the
+   script) and each half carries its own: the same line in the same place, so nothing
+   moves until the physics moves it. The borders grow outward into the link's own border
+   (negative margins), so the words inside do not shift. The script writes only transform
+   and opacity after that. */
+.tix__t[data-tearing] .tix__stub,
+.tix__t[data-tearing] .tix__body {
+  background-color: var(--tear-bg, transparent);
+  /* each half keeps only its own side of the two punched notches */
+  clip-path: inset(0);
+  will-change: transform, opacity;
+}
+.tix__t[data-tearing] .tix__stub {
+  margin: calc(-1 * var(--tb)) 0 calc(-1 * var(--tb)) calc(-1 * var(--tb));
+  border-top: var(--tb) solid var(--tc);
+  border-bottom: var(--tb) solid var(--tc);
+  border-left: var(--tb) solid var(--tc);
+  border-top-left-radius: inherit;
+  border-bottom-left-radius: inherit;
+  /* the last bit of paper: the bottom of the perforation */
+  transform-origin: 100% 100%;
+}
+.tix__t[data-tearing] .tix__body {
+  position: relative;
+  margin: calc(-1 * var(--tb));
+  border: var(--tb) solid var(--tc);
+  /* its torn edge lies under the stub's until they part */
+  border-left-style: dashed;
+  border-top-right-radius: inherit;
+  border-bottom-right-radius: inherit;
+}
+/* the body's side of the notches, the twin of the stub's (home.css) */
+.tix__t[data-tearing] .tix__body::before,
+.tix__t[data-tearing] .tix__body::after {
+  content: "";
+  position: absolute;
+  left: calc(-0.5rem - var(--tb) / 2);
+  width: 1rem;
+  height: 1rem;
+  border: var(--tb) solid var(--tc);
+  border-radius: 50%;
+  background: var(--bg);
+}
+.tix__t[data-tearing] .tix__body::before {
+  top: calc(-0.5rem - var(--tb));
+  clip-path: inset(50% 0 0 0);
+}
+.tix__t[data-tearing] .tix__body::after {
+  bottom: calc(-0.5rem - var(--tb));
+  clip-path: inset(0 0 50% 0);
+}
+/* the lit ticket on the night pages: an ink perforation, notches in the night's colour */
+.events-page .tix__t--lit[data-tearing] .tix__body {
+  border-left-color: var(--ink);
+}
+.events-page .tix__t--lit[data-tearing] .tix__body::before,
+.events-page .tix__t--lit[data-tearing] .tix__body::after {
+  border-color: var(--bg);
+}

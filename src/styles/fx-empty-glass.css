@@ -1,0 +1,26 @@
+/* The 404 glass (components/graphics/EmptyGlass.tsx): the last drop as a bead of beer that
+   runs round the inside of the bowl. The strokes are .pen's own (home.css); here only the
+   bead's fill and the wet line it leaves. Positions are written by the script. */
+.pen .empty-glass__bead {
+  fill: var(--pils);
+}
+/* the wet line on the wall: shown and placed by the script, never there without it */
+.empty-glass__wet {
+  fill: none;
+  stroke: var(--pils);
+  stroke-width: 1.2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-dasharray: 0 400;
+  opacity: 0;
+  pointer-events: none;
+}
+/* the bead is filled as its outline is inked, not before */
+@media (scripting: enabled) and (prefers-reduced-motion: no-preference) {
+  .pen:not([data-draw="in"]) .empty-glass__bead {
+    fill-opacity: 0;
+  }
+  .pen[data-draw="in"] .empty-glass__bead {
+    transition: fill-opacity var(--d-3) var(--ease-out) calc(4 * 55ms + var(--d-2));
+  }
+}

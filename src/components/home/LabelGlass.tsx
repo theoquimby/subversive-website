@@ -59,6 +59,11 @@ const ONE_LINE = [
   "C97 306 82 309 54 314A46 6 0 0 0 100 320",
 ].join("");
 const TAP_LINE = "M4000 -58H132C112 -58 100 -54 100 -44V-34M92 -34H108";
+// Bare (the menu's item view): the same glass and tap with no landscape. The ground is a
+// short stroke that becomes the foot, the tap a short stroke in from the right, and the
+// frame is a little wider than the bowl so head that runs down the outside stays in it.
+const BARE_ONE_LINE = `M28 320${ONE_LINE.slice(ONE_LINE.indexOf("H100A46"))}`;
+const BARE_TAP_LINE = "M172 -58H132C112 -58 100 -54 100 -44V-34M92 -34H108";
 
 const N = 17; // surface springs
 const X0 = 36;
@@ -144,11 +149,14 @@ export function LabelGlass({
   beer,
   pour,
   className,
+  bare = false,
 }: {
   beer: GlassBeer;
   /** changes with every pour */
   pour: number;
   className?: string;
+  /** no ridge and no long lines: a short ground, the tap, the glass (the menu's item view) */
+  bare?: boolean;
 }) {
   const svg = useRef<SVGSVGElement>(null);
   const first = useRef(beer); // what the server drew; the model owns the colour after that
@@ -707,7 +715,7 @@ export function LabelGlass({
   return (
     <svg
       ref={svg}
-      viewBox="38 -92 124 413"
+      viewBox={bare ? "22 -92 156 414" : "38 -92 124 413"}
       className={className ? `lglass ${className}` : "lglass"}
       data-sim="wait"
       aria-hidden="true"
@@ -773,9 +781,9 @@ export function LabelGlass({
       </g>
 
       <g className="lglass__line">
-        <path d={GROUND_LINE} />
-        <path d={ONE_LINE} className="lglass__one" />
-        <path d={TAP_LINE} />
+        {bare ? null : <path d={GROUND_LINE} />}
+        <path d={bare ? BARE_ONE_LINE : ONE_LINE} className={bare ? undefined : "lglass__one"} />
+        <path d={bare ? BARE_TAP_LINE : TAP_LINE} />
         <g className="lglass__handle">
           <path d="M128 -58L135 -78" />
           <circle cx="136.4" cy="-82" r="4.2" className="lglass__knob" />

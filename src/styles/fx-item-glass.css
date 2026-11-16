@@ -1,0 +1,18 @@
+/* ---------- A pour in the item view (menu sheet) ----------
+   Home's glass, bare: the tap, the glass, a short ground line. The box is sized before
+   anything is drawn (height, and a width from the drawing's own proportion), so the sheet
+   does not shift; whatever the pour throws past the frame is cut at the box. */
+.item-glass {
+  block-size: min(20rem, 40dvh);
+  aspect-ratio: 156 / 414;
+  overflow: clip;
+  contain: layout paint;
+}
+/* the svg also answers to .glass (the glyph's class): its size and proportion are undone */
+.item .item-glass .lglass {
+  display: block;
+  width: 100%;
+  height: 100%;
+  aspect-ratio: auto;
+  overflow: hidden;
+}

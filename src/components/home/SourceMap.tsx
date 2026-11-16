@@ -20,6 +20,7 @@ import type { MapFeatures } from "@/lib/map/features";
 import { wobblePath } from "@/lib/map/wobble";
 import { BARLEY_VIEWBOX, KERNELS } from "../graphics/BarleyMark";
 import { NY_PATH, NY_PLACES, NY_VIEWBOX } from "../graphics/ny-map.generated";
+import { MapTruck } from "./MapTruck";
 
 /** A source as the page hands it over: already placed on the map, or statewide (null). */
 export interface Stop {
@@ -183,6 +184,8 @@ export function SourceMap({ stops, features }: { stops: Stop[]; features: MapFea
                 </g>
               ) : null,
             )}
+            {/* the delivery: a truck drives the road once it is drawn (under the names) */}
+            {sel.place ? <MapTruck key={`t-${sel.what}`} k={k} /> : null}
             {sel.place ? (
               <text
                 key={`l-${sel.what}`}

@@ -13,6 +13,8 @@ import { PageWipe } from "@/components/layout/PageWipe";
 import { SectionHead } from "@/components/layout/SectionHead";
 import { ExternalLink } from "@/components/ui/TextLink";
 import { AddressBlock } from "@/components/visit/AddressBlock";
+import { Fetch } from "@/components/visit/Fetch";
+import { Firepit } from "@/components/visit/Firepit";
 import { HoursCard } from "@/components/visit/HoursCard";
 import { hoursEvents, OpenNow } from "@/components/visit/OpenNow";
 import { getLiveSite } from "@/lib/site/ops";
@@ -30,7 +32,10 @@ export default async function VisitPage() {
   const site = await getLiveSite(today);
   const stops: {
     id?: string;
-    art: DoodleName;
+    /** the stop's drawing; the tent is heated, so its drawing is the fire */
+    art: DoodleName | "firepit";
+    /** something to do at this stop, under its words */
+    play?: React.ReactNode;
     label: string;
     text: string;
     tag?: string;
@@ -44,13 +49,19 @@ export default async function VisitPage() {
       text: site.visit.seating,
       photos: ["garden-day", "beer-garden-night"],
     },
-    { art: "tent", label: visitLabels.tent, text: site.visit.tent, photos: ["heated-tent", "tent-inside"] },
+    {
+      art: "firepit",
+      label: visitLabels.tent,
+      text: site.visit.tent,
+      photos: ["heated-tent", "tent-inside"],
+    },
     { art: "car", label: visitLabels.parking, text: site.visit.parking },
     {
       art: "dog",
       label: visitLabels.dogs,
       text: site.visit.dogs,
       tag: visitLabels.dogsTag,
+      play: <Fetch className="stop__play" />,
     },
     {
       id: "gift-cards",
@@ -103,13 +114,18 @@ export default async function VisitPage() {
           <ol className="walk__stops">
             {stops.map((stop, i) => (
               <li key={stop.label} id={stop.id} className="stop" data-photo={stop.photos ? "" : undefined}>
-                <Doodle name={stop.art} className="stop__art" />
+                {stop.art === "firepit" ? (
+                  <Firepit className="stop__art" />
+                ) : (
+                  <Doodle name={stop.art} className="stop__art" />
+                )}
                 <div className="stop__text">
                   <h3 className="stop__title">{stop.label}</h3>
                   {stop.tag ? <span className="tag-sky">{stop.tag}</span> : null}
                   <p>{stop.text}</p>
                   {stop.link}
                 </div>
+                {stop.play}
                 {stop.photos ? (
                   <div className="photo-pair stop__photo">
                     {stop.photos.map((id) => (

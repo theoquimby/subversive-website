@@ -1,0 +1,36 @@
+/* The fire pit (Firepit.tsx): a living pen drawing. Flat ink and flat fill only.
+   The motion is written by the component each frame; nothing here animates. */
+
+/* These strokes are not inked in stroke by stroke like the other .pen drawings: the
+   flame's shapes change every frame, so the dash that does the inking is switched off.
+   (svg + two classes: this must win over .pen's own rules wherever it lands in the bundle) */
+svg.pen.firepit path {
+  stroke-dasharray: none;
+  stroke-dashoffset: 0;
+  animation: none;
+}
+
+/* the flame: house yellow inside the pen line */
+svg.pen.firepit .firepit__flame {
+  fill: var(--pils);
+}
+
+/* its inner tongue: flat ember, no line of its own */
+svg.pen.firepit .firepit__core {
+  fill: var(--ember);
+  stroke: none;
+}
+
+/* logs and bowl stand in front of the flame, so they are filled with the page */
+svg.pen.firepit .firepit__solid {
+  fill: var(--bg);
+}
+
+/* smoke: a thinner pen; how faint it is comes from the component */
+svg.pen.firepit .firepit__smoke {
+  stroke-width: 1.4;
+}
+
+.firepit__ember {
+  fill: var(--ember);
+}

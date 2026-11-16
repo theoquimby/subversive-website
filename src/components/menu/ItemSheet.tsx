@@ -2,7 +2,7 @@
 
 // One menu item, looked at closely (Theo asked for it; review pass 2026-11-15). A tap on a
 // row opens a sheet with what the row says, set large: a photo when the item has one (no
-// placeholder when it has not), the glass in the beer's colour for a beer, the name on the
+// placeholder when it has not), the glass poured in the beer's colour for a beer, the name on the
 // ink line, the price by pour size, the whole description, the tags and the add-ons.
 // The address gains ?item=<id>, so Back closes the sheet and the link can be shared; the
 // left and right arrow keys step through the list. Nothing is sent to the browser twice:
@@ -11,8 +11,8 @@ import { menuLabels } from "@content/microcopy";
 import { Dialog } from "radix-ui";
 import { type KeyboardEvent, useCallback, useEffect, useState } from "react";
 import type { Show } from "@/lib/menu/filters";
-import { GlassGlyph } from "../graphics/GlassGlyph";
 import { Sheet } from "../ui/Sheet";
+import { ItemGlass } from "./ItemGlass";
 import { setShow } from "./show-store";
 
 interface Detail {
@@ -151,7 +151,7 @@ export function ItemSheet() {
             // biome-ignore lint/performance/noImgElement: the address is already an optimised one, written by the server on the row
             <img className="item__photo" src={item.photo.src} alt={item.photo.alt} width={828} height={621} />
           ) : item.color ? (
-            <GlassGlyph className="item__glass" color={item.color} hazy={item.hazy} fill={0.86} size="hero" />
+            <ItemGlass id={item.id} color={item.color} hazy={item.hazy} />
           ) : null}
           <div className="item__head">
             <Dialog.Title className="item__name">{item.name}</Dialog.Title>

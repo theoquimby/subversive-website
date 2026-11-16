@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Drawing } from "@/components/home/Ways";
+import { EmptyGlass } from "@/components/graphics/EmptyGlass";
 import { PageWipe } from "@/components/layout/PageWipe";
 import { Button } from "@/components/ui/Button";
 import { TextLink } from "@/components/ui/TextLink";
@@ -24,7 +24,7 @@ export default function NotFound() {
             <TextLink href="/">Home</TextLink>
           </div>
         </div>
-        <Drawing name="empty" className="not-found__art" />
+        <EmptyGlass className="not-found__art" />
       </div>
     </PageWipe>
   );

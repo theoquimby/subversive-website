@@ -1,0 +1,86 @@
+/* A delivery truck on the map (src/components/home/MapTruck.tsx). It is placed in map
+   units by its own animation loop and drawn at a constant size on screen: the drawing is
+   scaled back by --k (one over the zoom), like the dots and names in home.css. Transforms
+   and opacity only. */
+.smap {
+  /* the drawing is 28 units long; on a phone the map is small, so it is drawn larger */
+  --truck: 2.1;
+}
+@media (min-width: 64rem) {
+  .smap {
+    --truck: 1.5;
+  }
+}
+.smap__truck,
+.smap__puffs {
+  transform-origin: 0 0;
+  pointer-events: none;
+}
+.smap__truck-k {
+  transform-origin: 0 0;
+  scale: calc(var(--k, 1) * var(--truck, 2));
+}
+/* the box rocks on its springs about a point low between the axles */
+.smap__truck-box {
+  transform-origin: 0 -4px;
+}
+.smap__truck-box path {
+  /* paper, so the road does not show through */
+  fill: var(--bg);
+  stroke: var(--fg);
+  stroke-width: 1.3;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+.smap__truck-box .smap__truck-glass {
+  stroke-width: 0.9;
+}
+.smap__truck-wheel {
+  fill: var(--fg);
+  stroke: var(--bg);
+  stroke-width: 0.7;
+}
+.smap__puff {
+  fill: var(--bg);
+  stroke: var(--fg);
+  stroke-width: 0.9;
+  opacity: 0;
+  transform-box: fill-box;
+  transform-origin: 50% 50%;
+}
+@media (prefers-reduced-motion: no-preference) {
+  /* the truck turns up at the town as the road is nearly drawn; the loop sets it off */
+  .smap__truck:not([data-parked]) {
+    animation: truck-in var(--d-2) var(--ease-out) 1300ms both;
+  }
+  /* a road too short to drive: the truck is simply there once the road is */
+  .smap__truck[data-parked] {
+    animation: truck-in var(--d-2) var(--ease-out) 1600ms both;
+  }
+  .smap__puffs[data-go] .smap__puff {
+    animation: truck-puff var(--d-4) var(--ease-out) both;
+  }
+  .smap__puffs[data-go] .smap__puff + .smap__puff {
+    animation-delay: 160ms;
+  }
+}
+@keyframes truck-in {
+  from {
+    opacity: 0;
+  }
+}
+@keyframes truck-puff {
+  from {
+    opacity: 0;
+    scale: 0.3;
+    translate: 0 0;
+  }
+  25% {
+    opacity: 1;
+  }
+  to {
+    opacity: 0;
+    scale: 1.8;
+    translate: -7px -6px;
+  }
+}

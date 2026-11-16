@@ -5,6 +5,7 @@ import { fileMenuSource } from "./file";
 import { opsMenuSource } from "./ops";
 import type { Menu } from "./schema";
 import { squareMenuSource } from "./square";
+import { withSquarePrices } from "./square-prices";
 
 export interface MenuSource {
   getMenu(): Promise<Menu>;
@@ -12,5 +13,9 @@ export interface MenuSource {
 
 export function getMenu(): Promise<Menu> {
   const which = process.env.MENU_SOURCE;
-  return (which === "ops" ? opsMenuSource : which === "square" ? squareMenuSource : fileMenuSource).getMenu();
+  const menu = (
+    which === "ops" ? opsMenuSource : which === "square" ? squareMenuSource : fileMenuSource
+  ).getMenu();
+  // whichever source it is, the kitchen's prices are the ones in Square (square-prices.ts)
+  return menu.then(withSquarePrices);
 }

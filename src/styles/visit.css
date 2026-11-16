@@ -672,3 +672,22 @@
     width: min(100%, 30rem);
   }
 }
+
+/* something to do at a stop (fetch, under Dogs): the full width of the stop */
+.stop .stop__play {
+  grid-column: 1 / -1;
+  width: 100%;
+  max-width: 34rem;
+}
+@media (min-width: 64rem) {
+  .stop .stop__play {
+    grid-row: 2;
+    grid-column: 2 / -1;
+  }
+  .stop:nth-child(even) .stop__play {
+    grid-column: 3;
+  }
+  .stop:has(.stop__play) .stop__trail {
+    grid-row: 3;
+  }
+}

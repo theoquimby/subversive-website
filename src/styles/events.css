@@ -822,30 +822,14 @@
 .lights__bulb > path:last-child {
   fill: var(--pils);
 }
-/* a few bulbs breathe, each at its own pace; most simply glow */
-@media (prefers-reduced-motion: no-preference) {
-  .lights__unit:nth-child(3n + 1) .lights__bulb:nth-of-type(2) > path:last-child,
-  .lights__unit:nth-child(4n + 2) .lights__bulb:nth-of-type(1) > path:last-child,
-  .lights__unit:nth-child(5n + 3) .lights__bulb:nth-of-type(3) > path:last-child {
-    animation: bulb 4.6s var(--ease-in-out) infinite;
-  }
-  .lights__unit:nth-child(4n + 2) .lights__bulb:nth-of-type(1) > path:last-child {
-    animation-duration: 6.2s;
-    animation-delay: -2.1s;
-  }
-  .lights__unit:nth-child(5n + 3) .lights__bulb:nth-of-type(3) > path:last-child {
-    animation-duration: 5.3s;
-    animation-delay: -3.4s;
-  }
+/* each bulb swings from its point on the wire, and the wire leans about its hooks
+   (Lights.tsx writes the transforms; both origins are in the drawing's own units) */
+.lights__wire {
+  transform-box: view-box;
+  transform-origin: 0 7px;
 }
-@keyframes bulb {
-  0%,
-  100% {
-    opacity: 1;
-  }
-  48% {
-    opacity: 0.45;
-  }
+.lights__bulb {
+  transform-box: view-box;
 }
 /* one bulb in each stretch is out: the string is a real one */
 .lights__unit:nth-child(7n + 5) .lights__bulb:nth-of-type(2) > path:last-child {

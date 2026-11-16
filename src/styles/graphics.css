@@ -1013,47 +1013,48 @@ body::after {
 .mv {
   transform-box: view-box;
 }
+/* Each loop moves in a few held steps, like a flipbook, not sixty times a second: in
+   Safari's engine a smooth loop inside a drawing repainted the page around it on every
+   frame (Visit ran at about 21 frames a second with five of them on the page, 61 stepped).
+   It is also how a hand-drawn loop looks. */
 @media (scripting: enabled) and (prefers-reduced-motion: no-preference) {
   .pen[data-draw="in"] .mv--wag {
-    animation: mv-wag 0.42s var(--ease-in-out) 0.9s infinite alternate;
+    animation: mv-wag 0.48s steps(3, jump-none) 0.9s infinite alternate;
   }
   .pen[data-draw="in"] .mv--flutter {
-    animation: mv-flutter 1.5s var(--ease-in-out) 0.9s infinite alternate;
+    animation: mv-flutter 1.5s steps(4, jump-none) 0.9s infinite alternate;
   }
   .pen[data-draw="in"] .mv--clink {
-    animation: mv-clink 4.2s var(--ease-in-out) 1.2s infinite;
+    animation: mv-clink 4.2s steps(2, jump-none) 1.2s infinite;
   }
   .pen[data-draw="in"] .mv--twinkle {
-    animation: mv-twinkle 4.2s var(--ease-out) 1.2s infinite both;
+    animation: mv-twinkle 4.2s steps(1, jump-none) 1.2s infinite both;
   }
   .pen[data-draw="in"] .mv--putter {
-    animation: mv-putter 0.26s var(--ease-in-out) 0.9s infinite alternate;
+    animation: mv-putter 0.32s steps(2, jump-none) 0.9s infinite alternate;
   }
   .pen[data-draw="in"] .mv--puff {
-    animation: mv-puff 1.5s var(--ease-out) 0.9s infinite;
+    animation: mv-puff 1.5s steps(5, jump-none) 0.9s infinite;
   }
   .pen[data-draw="in"] .mv--bob {
-    animation: mv-bob 2.4s var(--ease-in-out) 0.9s infinite alternate;
-  }
-  .pen[data-draw="in"] .mv--bounce {
-    animation: mv-bounce 0.62s var(--ease-rise) 0.9s infinite alternate;
+    animation: mv-bob 2.4s steps(5, jump-none) 0.9s infinite alternate;
   }
   .pen[data-draw="in"] .mv--float {
-    animation: mv-float 3.4s var(--ease-out) 0.9s infinite;
+    animation: mv-float 3.4s steps(7, jump-none) 0.9s infinite;
   }
   .pen[data-draw="in"] .mv--sway {
-    animation: mv-sway 3.2s var(--ease-in-out) 0.9s infinite alternate;
+    animation: mv-sway 3.2s steps(6, jump-none) 0.9s infinite alternate;
   }
   .pen[data-draw="in"] .mv--drip {
-    animation: mv-drip 2.6s var(--ease-fall) 1.4s infinite;
+    animation: mv-drip 2.6s steps(8, jump-none) 1.4s infinite;
   }
   .pen--sway[data-draw="in"] {
     transform-origin: 50% 100%;
-    animation: pen-sway 4.2s var(--ease-in-out) 1s infinite alternate;
+    animation: pen-sway 4.2s steps(7, jump-none) 1s infinite alternate;
   }
   .pen--rock[data-draw="in"] {
     transform-origin: 50% 60%;
-    animation: pen-rock 3.6s var(--ease-in-out) 1s infinite alternate;
+    animation: pen-rock 3.6s steps(6, jump-none) 1s infinite alternate;
   }
 }
 @keyframes mv-wag {
@@ -1121,14 +1122,6 @@ body::after {
   }
   to {
     translate: 1.5px -1.6px;
-  }
-}
-@keyframes mv-bounce {
-  from {
-    translate: 0 0;
-  }
-  to {
-    translate: 0 -30px;
   }
 }
 @keyframes mv-float {

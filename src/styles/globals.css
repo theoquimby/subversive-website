@@ -6,6 +6,13 @@
 @import "./visit.css";
 @import "./events.css";
 @import "./home.css";
+/* living drawings, one file each (2026-11-15) */
+@import "./fx-item-glass.css";
+@import "./fx-ticket.css";
+@import "./fx-firepit.css";
+@import "./fx-empty-glass.css";
+@import "./fx-fetch.css";
+@import "./fx-truck.css";
 @import "./print.css";
 
 /*

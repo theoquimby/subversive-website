@@ -1,0 +1,66 @@
+/* Fetch (visit/Fetch.tsx): the long dog, a ground line and a ball to throw for it.
+   The pen strokes and the draw-on come from .pen (home.css); this file only adds what the
+   strip needs: the ball's fill, the hand's manners, and the idle wag that runs in CSS
+   while the animation loop is asleep ([data-rest]). */
+
+.fetch {
+  /* a sideways drag is the throw; an up-and-down one is still the page scrolling */
+  touch-action: pan-y;
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-touch-callout: none;
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* the whole strip takes a tap, not just the lines */
+.fetch__field {
+  fill: none;
+  stroke: none;
+  pointer-events: all;
+}
+
+.pen.fetch .fetch__ball-skin {
+  fill: var(--pils);
+}
+.pen.fetch .fetch__ball-seam {
+  stroke-width: 1.4;
+}
+
+.fetch__wag {
+  transform-box: fill-box;
+  transform-origin: 0% 100%; /* the root of the tail */
+}
+
+@media (scripting: enabled) and (prefers-reduced-motion: no-preference) {
+  .fetch__ball {
+    cursor: grab;
+  }
+  .fetch[data-held],
+  .fetch[data-held] .fetch__ball {
+    cursor: grabbing;
+  }
+  /* idle: nothing but a tail that now and then cannot help itself */
+  .fetch[data-draw="in"][data-rest] .fetch__wag {
+    animation: fetch-wag 5.6s steps(14, jump-none) 1.6s infinite;
+  }
+}
+
+@keyframes fetch-wag {
+  0%,
+  74%,
+  100% {
+    rotate: 0deg;
+  }
+  79% {
+    rotate: 13deg;
+  }
+  84% {
+    rotate: -8deg;
+  }
+  89% {
+    rotate: 13deg;
+  }
+  94% {
+    rotate: -6deg;
+  }
+}

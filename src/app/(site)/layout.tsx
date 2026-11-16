@@ -1,6 +1,7 @@
 import { Analytics } from "@vercel/analytics/next";
 import { SpeedInsights } from "@vercel/speed-insights/next";
 import type { ReactNode } from "react";
+import { TicketTear } from "@/components/events/TicketTear";
 import { Beacon } from "@/components/layout/Beacon";
 import { Curtain } from "@/components/layout/Curtain";
 import { Footer } from "@/components/layout/Footer";
@@ -27,6 +28,7 @@ export default function SiteLayout({ children }: { children: ReactNode }) {
       <div className="edge-top" aria-hidden="true" />
       <div className="edge-bottom" aria-hidden="true" />
       <Curtain />
+      <TicketTear />
       <Beacon orderHost={new URL(getSite().links.order).hostname} />
       <script
         type="application/ld+json"
