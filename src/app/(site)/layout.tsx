@@ -7,6 +7,7 @@ import { Curtain } from "@/components/layout/Curtain";
 import { Footer } from "@/components/layout/Footer";
 import { Header } from "@/components/layout/Header";
 import { StampIn } from "@/components/layout/StampIn";
+import { CartSheet } from "@/components/order/CartSheet";
 import { jsonLdText, placeJsonLd } from "@/lib/seo/jsonld";
 import { getSite } from "@/lib/site/site";
 
@@ -29,6 +30,8 @@ export default function SiteLayout({ children }: { children: ReactNode }) {
       <div className="edge-bottom" aria-hidden="true" />
       <Curtain />
       <TicketTear />
+      {/* the order sheet; renders nothing unless ordering is switched on */}
+      <CartSheet />
       <Beacon orderHost={new URL(getSite().links.order).hostname} />
       <script
         type="application/ld+json"

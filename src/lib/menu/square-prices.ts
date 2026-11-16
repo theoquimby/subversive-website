@@ -47,6 +47,11 @@ const ALIAS: Record<string, string> = {
 
 const norm = (name: string) => name.toLowerCase().replace(/[‘’]/g, "'").replace(/\s+/g, " ").trim();
 
+/** The key a menu item is matched by. */
+export const menuItemKey = (name: string) => norm(name);
+/** The same key for one of Square's items, which may carry a longer name. */
+export const squareItemKey = (name: string) => ALIAS[norm(name)] ?? norm(name);
+
 /** Menu name (normalised) → Square's price, for items with exactly one price. */
 export function squarePriceMap(raw: unknown): Map<string, number> {
   const out = new Map<string, number>();

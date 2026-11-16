@@ -42,6 +42,8 @@ jobs:
           # a stand-in Ops address: the inquiry form posts to it and the tests answer for it
           NEXT_PUBLIC_OPS_ORIGIN: "https://ops.test"
           SV_TEST_NOW: "2026-11-13T12:00:00-05:00"
+          # ordering built in, with no Square keys: its routes answer "off" and the tests stand in
+          NEXT_PUBLIC_ORDERING: "on"
 
       - name: Install Playwright browsers
         run: pnpm exec playwright install --with-deps chromium webkit

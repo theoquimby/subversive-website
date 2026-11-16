@@ -1,0 +1,199 @@
+/* Ordering from the site (2026-11-15): the Add block in an item's view and the order
+   sheet. Built from what is already here: the sheet, the choice shape, the form fields,
+   the one yellow button. */
+
+/* ---------- in the item's view ---------- */
+.order-add {
+  display: grid;
+  gap: var(--s-4);
+  justify-self: stretch;
+  padding-top: var(--s-4);
+  border-top: 1px solid var(--hair);
+}
+.order-add__group {
+  min-width: 0;
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+.order-add__group > legend {
+  padding: 0;
+}
+.order-add__choices {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--s-2);
+}
+.order-add__row {
+  display: flex;
+  align-items: center;
+  gap: var(--s-3);
+}
+.order-add__btn {
+  flex: 1;
+  cursor: pointer;
+}
+.order-add__note,
+.order-add__status {
+  margin: 0;
+  font-size: var(--t-small);
+}
+.order-add__status:empty {
+  display: none;
+}
+.order-add__view {
+  justify-self: start;
+  padding: 0;
+  border: 0;
+  background: none;
+  font: inherit;
+  cursor: pointer;
+}
+
+/* a quantity: minus, the number, plus, in the pen's hand */
+.stepper {
+  display: inline-flex;
+  flex: none;
+  align-items: center;
+  border: var(--stroke) solid var(--fg);
+  border-radius: 22px 235px 20px 255px / 245px 20px 225px 22px;
+}
+.stepper__btn {
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--fg);
+  font-family: var(--ff-utility);
+  font-size: 1.375rem;
+  font-weight: 700;
+  line-height: 1;
+  cursor: pointer;
+}
+.stepper__btn:disabled {
+  opacity: 0.35;
+  cursor: default;
+}
+.stepper__btn:focus-visible {
+  outline: 3px solid var(--focus);
+  outline-offset: -3px;
+}
+.stepper__n {
+  min-width: 1.75rem;
+  font-family: var(--ff-utility);
+  font-size: 1.125rem;
+  font-weight: 700;
+  text-align: center;
+}
+
+/* ---------- the order sheet ---------- */
+.cart__title {
+  margin: 0 0 var(--s-4);
+  font-family: var(--ff-display);
+  font-size: clamp(1.75rem, 1.5rem + 1.25vw, 2.25rem);
+  font-weight: 400;
+  line-height: 1.08;
+}
+.cart__test {
+  margin: 0 0 var(--s-4);
+  padding: var(--s-2) var(--s-3);
+  background: color-mix(in srgb, var(--pils) 38%, transparent);
+  font-size: var(--t-small);
+  font-weight: 600;
+}
+.cart {
+  display: grid;
+  gap: var(--s-5);
+}
+.cart__lines {
+  margin: 0;
+  padding: 0;
+  border-top: 1px solid var(--hair);
+  list-style: none;
+}
+.cart__line {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--s-3);
+  padding: var(--s-3) 0;
+  border-bottom: 1px solid var(--hair);
+}
+.cart__what {
+  display: grid;
+  gap: 2px;
+  min-width: 0;
+}
+.cart__name {
+  font-family: var(--ff-utility);
+  font-size: 1.25rem;
+  font-weight: 700;
+  line-height: 1.15;
+}
+.cart__mods {
+  color: color-mix(in srgb, var(--fg) 80%, transparent);
+  font-size: var(--t-small);
+}
+.cart__totals {
+  display: grid;
+  gap: var(--s-1);
+  margin: 0;
+}
+.cart__totals > div {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+}
+.cart__totals dd {
+  margin: 0;
+}
+.cart__total {
+  font-family: var(--ff-utility);
+  font-size: 1.5rem;
+  font-weight: 700;
+}
+.cart__pickup,
+.cart__closed,
+.cart__empty,
+.cart__done p {
+  margin: 0;
+}
+.cart__pickup {
+  font-size: var(--t-small);
+}
+/* Square draws its own fields in here; the box only keeps their room so nothing jumps */
+.cart__card {
+  min-height: 5.75rem;
+}
+.cart__pay {
+  width: 100%;
+  cursor: pointer;
+}
+.cart__pay:disabled {
+  opacity: 0.55;
+  cursor: default;
+}
+.cart__problem:empty {
+  display: none;
+}
+.cart__done {
+  display: grid;
+  gap: var(--s-3);
+}
+.cart__thanks {
+  font-family: var(--ff-display);
+  font-size: 1.5rem;
+  line-height: 1.15;
+}
+.cart__ref {
+  font-family: var(--ff-utility);
+  font-weight: 700;
+  letter-spacing: var(--track-label);
+  text-transform: uppercase;
+}
+button.site-header__order {
+  cursor: pointer;
+}

@@ -48,6 +48,13 @@ export default defineConfig({
     reuseExistingServer: !ci,
     timeout: 120_000,
     // the same frozen clock the test build used (see ci.yml), so a revalidated page agrees
-    env: { SV_E2E: "1", SV_TEST_NOW: "2026-11-13T12:00:00-05:00", OPS_EVENTS_URL: "" },
+    // ordering is built into the test build (the Order button, the card form's security
+    // settings) but has no Square keys, so its real routes answer "off"
+    env: {
+      SV_E2E: "1",
+      SV_TEST_NOW: "2026-11-13T12:00:00-05:00",
+      OPS_EVENTS_URL: "",
+      NEXT_PUBLIC_ORDERING: "on",
+    },
   },
 });

@@ -2,10 +2,11 @@
 // right (Order sits in the thumb's reach on the right edge). Desktop: inline links with the
 // active page marked by a solid kernel, Order at right. Holds still through page wipes
 // (view-transition-name). Scroll behaviour lives in the HeaderScroll leaf.
+
 import { getSite, NAV } from "@/lib/site/site";
 import { BarleyMark } from "../graphics/BarleyMark";
 import { Wordmark } from "../graphics/Wordmark";
-import { Button } from "../ui/Button";
+import { OrderEntry } from "../order/OrderEntry";
 import { Link } from "../ui/Link";
 import { OpenNow } from "../visit/OpenNow";
 import { HeaderScroll } from "./HeaderScroll";
@@ -25,9 +26,7 @@ export function Header() {
           <NavLinks items={NAV} />
         </nav>
         <div className="site-header__actions">
-          <Button href={site.links.order} external className="site-header__order">
-            Order
-          </Button>
+          <OrderEntry href={site.links.order} label="Order" />
           <MobileMenu
             nav={NAV}
             address={`${site.address.street}, ${site.address.city} ${site.address.state}`}

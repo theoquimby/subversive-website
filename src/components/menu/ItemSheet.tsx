@@ -11,6 +11,7 @@ import { menuLabels } from "@content/microcopy";
 import { Dialog } from "radix-ui";
 import { type KeyboardEvent, useCallback, useEffect, useState } from "react";
 import type { Show } from "@/lib/menu/filters";
+import { AddToOrder } from "../order/AddToOrder";
 import { Sheet } from "../ui/Sheet";
 import { ItemGlass } from "./ItemGlass";
 import { setShow } from "./show-store";
@@ -185,6 +186,8 @@ export function ItemSheet() {
           ) : null}
           {item.more ? <p className="item__more">{item.more}</p> : null}
           {item.addons ? <p className="item__more">{item.addons}</p> : null}
+          {/* nothing at all unless ordering is on and Square has this item */}
+          <AddToOrder itemId={item.id} name={item.name} />
         </article>
       ) : null}
     </Sheet>

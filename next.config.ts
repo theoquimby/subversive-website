@@ -10,16 +10,35 @@ const OPS_ORIGIN = process.env.NEXT_PUBLIC_OPS_ORIGIN ?? "";
 // still on every script file. No third-party origin is allowed anywhere.
 // No upgrade-insecure-requests: HSTS already forces https, and WebKit applies the
 // directive to http://localhost, which broke every asset in the CI WebKit runs.
-const scriptSrc = isDev ? "'self' 'unsafe-inline' 'unsafe-eval'" : "'self' 'unsafe-inline'";
+// Ordering (NEXT_PUBLIC_ORDERING=on) loads Square's card form: its script, its iframe, its
+// stylesheet and fonts, and its own calls home. The hosts are the ones Square documents
+// for the Web Payments SDK (checked 2026-11-15), sandbox or production by SQUARE_ENVIRONMENT.
+// With ordering off, no third-party origin is allowed anywhere, as before.
+const ORDERING = process.env.NEXT_PUBLIC_ORDERING === "on";
+const SQ_LIVE = process.env.SQUARE_ENVIRONMENT === "production";
+const SQ_WEB = ORDERING
+  ? SQ_LIVE
+    ? " https://web.squarecdn.com"
+    : " https://sandbox.web.squarecdn.com"
+  : "";
+const SQ_CONNECT = ORDERING
+  ? `${SQ_LIVE ? " https://pci-connect.squareup.com" : " https://pci-connect.squareupsandbox.com"} https://o160250.ingest.sentry.io`
+  : "";
+const SQ_FONTS = ORDERING
+  ? " https://square-fonts-production-f.squarecdn.com https://d1g145x70srn7h.cloudfront.net"
+  : "";
+
+const scriptSrc = isDev ? `'self' 'unsafe-inline' 'unsafe-eval'${SQ_WEB}` : `'self' 'unsafe-inline'${SQ_WEB}`;
 
 const csp = [
   "default-src 'self'",
   `script-src ${scriptSrc}`,
-  "style-src 'self' 'unsafe-inline'", // Motion writes inline styles
+  `style-src 'self' 'unsafe-inline'${SQ_WEB}`, // Motion writes inline styles
   "img-src 'self' data: blob:",
-  "font-src 'self'",
+  `font-src 'self'${SQ_FONTS}`,
   // the analytics beacon posts to Ops; allowed only when that origin is configured
-  `connect-src 'self'${OPS_ORIGIN ? ` ${OPS_ORIGIN}` : ""}${isDev ? " ws:" : ""}`,
+  `connect-src 'self'${OPS_ORIGIN ? ` ${OPS_ORIGIN}` : ""}${SQ_WEB}${SQ_CONNECT}${isDev ? " ws:" : ""}`,
+  ...(ORDERING ? [`frame-src${SQ_WEB}`] : []),
   "object-src 'none'",
   "base-uri 'self'",
   "form-action 'self'",
