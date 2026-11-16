@@ -1,235 +1,137 @@
-/* Holiday touches (src/lib/season/holidays.ts; components in src/components/season).
-   A few weeks before a holiday the barley mark wears a tiny hat or object, and a few small
-   pen drawings stand by the footer's ground line (and, on wide screens, in the margins).
+/* Holiday touches, second design (src/lib/season/holidays.ts; drawings in
+   src/components/season/season-draw.tsx). A few weeks before a holiday the wordmark's slash
+   becomes the holiday's object, and a small scene stands on the footer's ground line.
    Decorative only: no room taken, no pointer caught, still with reduced motion, not printed. */
 
-/* ---------- The logo touch ----------
-   Laid over the mark in the mark's own units: 1em is the mark's height (shell.css sets it
-   30 px, 36 px from 64rem) and the mark is 170 units tall, so the overlay's 120 × 100 unit
-   box starts 30 units left of the mark and 50 above its top. */
-.brand:has(> .season-mark) {
-  position: relative;
-}
-.season-mark {
-  position: absolute;
-  top: calc(50% - 0.5em - 50em / 170);
-  left: calc(-30em / 170);
-  width: calc(120em / 170);
-  height: calc(100em / 170);
-  font-size: 30px;
-  overflow: visible;
-  pointer-events: none;
-}
-@media (min-width: 64rem) {
-  .season-mark {
-    font-size: 36px;
-  }
-}
-.season-mark path {
+/* ---------- One pen ---------- */
+:is(.wordmark__slash, .site-footer__ground) .season-ink {
   stroke: var(--fg);
-  stroke-width: 1.6px;
+  stroke-width: 1.5px;
   stroke-linecap: round;
   stroke-linejoin: round;
   vector-effect: non-scaling-stroke;
 }
+:is(.wordmark__slash, .site-footer__ground) .season-bare {
+  stroke: none;
+}
+/* the slash is small: a finer pen */
+.wordmark__slash .season-ink {
+  stroke-width: 1px;
+}
 
-/* ---------- Colour, from the tokens, used sparingly ---------- */
-:is(.season-mark, .season-item) path.season-fill--none {
+/* ---------- The slash ---------- */
+.wordmark__slash--season {
+  pointer-events: none;
+}
+.wordmark__slash .season-cane {
   fill: none;
+  stroke-linejoin: round;
 }
-:is(.season-mark, .season-item) path.season-fill--bg {
-  fill: var(--bg);
+.wordmark__slash .season-cane--edge {
+  stroke: var(--fg);
+  stroke-width: 26;
+  stroke-linecap: round;
 }
-:is(.season-mark, .season-item) path.season-fill--card {
-  fill: var(--card);
+.wordmark__slash .season-cane--white {
+  stroke: var(--card);
+  stroke-width: 21;
+  stroke-linecap: round;
 }
-:is(.season-mark, .season-item) path.season-fill--fg {
-  fill: var(--fg);
-}
-:is(.season-mark, .season-item) path.season-fill--ember {
-  fill: var(--ember);
-}
-:is(.season-mark, .season-item) path.season-fill--pils {
-  fill: var(--pils);
-}
-:is(.season-mark, .season-item) path.season-fill--go {
-  fill: var(--go);
-}
-:is(.season-mark, .season-item) path.season-fill--sky {
-  fill: var(--sky);
-}
-:is(.season-mark, .season-item) path.season-fill--sky-deep {
-  fill: var(--sky-deep);
-}
-:is(.season-mark, .season-item) path.season-ink--ember {
+.wordmark__slash .season-cane--stripe {
   stroke: var(--ember);
+  stroke-width: 21;
+  stroke-dasharray: 8 8;
+}
+.wordmark__slash .season-kernels {
+  stroke-width: 0.75px;
+  stroke-opacity: 0.5;
+}
+.wordmark__slash .season-sparks {
+  stroke: var(--ember);
+  stroke-width: 1.4px;
 }
 
-/* ---------- The scattered drawings ----------
-   A line of no height between the page and the footer. The footer's top margin (--s-10)
-   is empty ground: the drawings stand in its lower part, just above the ground line. */
-.season-scatter {
-  position: relative;
-  flex: none;
-  height: 0;
-  pointer-events: none;
+/* ---------- The scene ---------- */
+.site-footer__ground {
+  overflow: visible;
 }
-.season-scatter .season-item {
-  position: absolute;
-  top: var(--s-8);
-  width: 2.25rem;
-  height: auto;
-  pointer-events: none;
-}
-.season-item--1 {
-  left: calc(var(--gutter) + 6%);
-  rotate: var(--rot-a);
-}
-.season-item--2 {
-  right: calc(var(--gutter) + 10%);
-  rotate: var(--rot-b);
-}
-.season-scatter .season-item--3,
-.season-scatter .season-item--4,
-.season-scatter .season-item--5 {
+.season-scene--wide {
   display: none;
 }
 @media (min-width: 48rem) {
-  .season-scatter .season-item--3 {
-    display: block;
-    left: 54%;
+  .season-scene--phone {
+    display: none;
+  }
+  .season-scene--wide {
+    display: inline;
   }
 }
-/* wide screens: two more in the side margins, beside the end of the page, where the
-   margin is wider than the drawing (90rem leaves 7.5rem each side of the content) */
-@media (min-width: 90rem) {
-  .season-scatter .season-item--4,
-  .season-scatter .season-item--5 {
-    display: block;
-    top: auto;
-    width: 2.75rem;
-  }
-  .season-scatter .season-item--4 {
-    bottom: var(--s-12);
-    left: calc(50% - var(--content-max) / 2 - var(--s-10));
-    rotate: var(--rot-b);
-  }
-  .season-scatter .season-item--5 {
-    /* low enough to stay clear of the sticky bars on a short page (the menu's section tabs) */
-    bottom: calc(var(--s-12) * 1.4);
-    right: calc(50% - var(--content-max) / 2 - var(--s-10));
-    rotate: var(--rot-a);
-  }
+.site-footer__ground .season-dim {
+  stroke-opacity: 0.35;
 }
-
-/* the colour comes in once the line has inked itself in */
-@media (scripting: enabled) and (prefers-reduced-motion: no-preference) {
-  .season-item:not([data-draw="in"]) path {
-    fill-opacity: 0;
-  }
-  .season-item[data-draw="in"] path {
-    transition: fill-opacity var(--d-3) var(--ease-out) var(--d-3);
-  }
+.site-footer__ground .season-stripes {
+  stroke: var(--ember);
+  stroke-width: 2.2px;
+}
+.site-footer__ground .season-rays {
+  stroke: var(--ember);
+}
+.site-footer__ground .season-dough {
+  fill: none;
+  stroke: var(--gold);
+  stroke-width: 4.2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+.site-footer__ground .season-dough--edge {
+  stroke: var(--fg);
+  stroke-width: 6.6;
 }
 
-/* ---------- One stepped loop each ----------
-   Held steps, like a flipbook (a smooth loop inside a drawing dropped Safari to about
-   21 frames a second; see graphics.css .mv). Turning parts turn about a point on the
-   48-unit sheet. */
-.season-loop {
-  transform-box: view-box;
-  transform-origin: 24px 24px;
+/* ---------- A little life: flames flicker, a burst twinkles (stepped, like the other
+   loops; none with reduced motion) ---------- */
+.season-flame,
+.season-burst {
+  transform-box: fill-box;
 }
-.season-loop--fall {
-  transform-origin: 24px 12px;
+.season-flame {
+  transform-origin: 50% 100%;
 }
-.season-loop--swing {
-  transform-origin: 24px 4px;
+.season-burst {
+  transform-origin: 50% 50%;
 }
-.season-loop--flutter {
-  transform-origin: 12px 8px;
-}
-@media (scripting: enabled) and (prefers-reduced-motion: no-preference) {
-  .season-item[data-draw="in"] .season-loop--fall {
-    animation: season-fall 3.6s steps(5, jump-none) 1s infinite alternate;
+@media (prefers-reduced-motion: no-preference) {
+  .season-flame {
+    animation: season-flicker 0.9s steps(3, jump-none) infinite alternate;
   }
-  .season-item[data-draw="in"] .season-loop--swing {
-    animation: season-swing 3s steps(5, jump-none) 1s infinite alternate;
+  .season-burst {
+    animation: season-twinkle 1.6s steps(4, jump-none) infinite alternate;
   }
-  .season-item[data-draw="in"] .season-loop--turn {
-    animation: season-turn 6s steps(6, jump-none) 1s infinite alternate;
-  }
-  .season-item[data-draw="in"] .season-loop--twinkle {
-    animation: season-twinkle 1.8s steps(3, jump-none) 1s infinite alternate;
-  }
-  .season-item[data-draw="in"] .season-loop--flutter {
-    animation: season-flutter 1.5s steps(4, jump-none) 1s infinite alternate;
-  }
-  .season-item[data-draw="in"] .season-loop--bob {
-    animation: season-bob 2.4s steps(5, jump-none) 1s infinite alternate;
-  }
-  :root[data-motion="paused"] .season-loop {
+  :root[data-motion="paused"] :is(.season-flame, .season-burst) {
     animation: none;
   }
 }
-@keyframes season-fall {
+@keyframes season-flicker {
   from {
-    rotate: -9deg;
-    translate: 0 -1px;
+    transform: scale(1, 1);
   }
   to {
-    rotate: 8deg;
-    translate: 0 1px;
-  }
-}
-@keyframes season-swing {
-  from {
-    rotate: -6deg;
-  }
-  to {
-    rotate: 6deg;
-  }
-}
-@keyframes season-turn {
-  from {
-    rotate: 0deg;
-  }
-  to {
-    rotate: 30deg;
+    transform: scale(0.88, 1.12);
   }
 }
 @keyframes season-twinkle {
   from {
-    opacity: 0.7;
-    scale: 0.86;
+    transform: scale(0.8);
+    opacity: 0.55;
   }
   to {
+    transform: scale(1.08);
     opacity: 1;
-    scale: 1;
-  }
-}
-@keyframes season-flutter {
-  from {
-    rotate: -3deg;
-    scale: 0.94 1;
-  }
-  to {
-    rotate: 4deg;
-    scale: 1 1.03;
-  }
-}
-@keyframes season-bob {
-  from {
-    translate: 0 1.2px;
-  }
-  to {
-    translate: 1.5px -1.6px;
   }
 }
 
 @media print {
-  .season-mark,
-  .season-scatter {
+  .season-scene {
     display: none;
   }
 }

@@ -3,34 +3,40 @@
 //              slash angle (the hero and footer version). Mixed case: Sub/ersive.
 //   heritage — thin geometric caps, wide tracking; used small (metadata, seal, small print).
 // Both are read as "Subversive" by assistive tech.
+import type { ReactNode } from "react";
 import { slashBand, toPoints } from "./slash";
 
 // Slash proportions in em, estimated against Caprasimo: it stands on the baseline and
 // reaches the ascender; its thickness matches the face's heavy stems.
 const SLASH = slashBand({ height: 100, thickness: 21 });
 const SLASH_W = 21 + (SLASH[3]?.[0] ?? 0);
+/** the slash's outline, for a holiday slash that paints the slash itself */
+export const SLASH_POINTS = toPoints(SLASH);
 
 export function Wordmark({
   variant = "loud",
   className,
   name = "Subversive",
+  slash,
 }: {
   variant?: "loud" | "heritage";
   className?: string;
   name?: string;
+  /** a holiday's slash in place of the plain one (src/components/season), same viewBox */
+  slash?: ReactNode;
 }) {
   if (variant === "heritage") return <HeritageWordmark className={className} name={name} />;
   return (
     <span className={["wordmark", className ?? ""].filter(Boolean).join(" ")} role="img" aria-label={name}>
       <span aria-hidden="true">Sub</span>
       <svg
-        className="wordmark__slash"
+        className={slash ? "wordmark__slash wordmark__slash--season" : "wordmark__slash"}
         viewBox={`0 0 ${SLASH_W.toFixed(2)} 100`}
         aria-hidden="true"
         focusable="false"
         shapeRendering="geometricPrecision"
       >
-        <polygon points={toPoints(SLASH)} />
+        {slash ?? <polygon points={SLASH_POINTS} />}
       </svg>
       <span aria-hidden="true">ersive</span>
     </span>

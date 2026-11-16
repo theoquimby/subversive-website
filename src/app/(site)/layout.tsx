@@ -9,7 +9,6 @@ import { Footer } from "@/components/layout/Footer";
 import { Header } from "@/components/layout/Header";
 import { StampIn } from "@/components/layout/StampIn";
 import { CartSheet } from "@/components/order/CartSheet";
-import { SeasonScatter } from "@/components/season/SeasonScatter";
 import { jsonLdText, placeJsonLd } from "@/lib/seo/jsonld";
 import { getSite } from "@/lib/site/site";
 
@@ -28,7 +27,6 @@ export default function SiteLayout({ children }: { children: ReactNode }) {
         {children}
       </main>
       {/* a holiday's few small drawings by the footer's ground line (nothing otherwise) */}
-      <SeasonScatter />
       <Footer />
       <StampIn />
       {/* iOS 26 Safari tints its bottom bar from a fixed element at that edge (shell.css) */}

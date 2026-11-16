@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest";
-import { SCATTER, scatterFor, TOUCHES } from "@/components/season/season-art";
+import { groundTilt, groundY } from "@/components/layout/ground";
+import { SCENES } from "@/components/season/season-draw";
 import {
   activeThemes,
   HANUKKAH,
@@ -152,20 +153,31 @@ describe("the switch", () => {
 });
 
 describe("the drawings", () => {
-  it("every theme has a logo touch and five items", () => {
+  it("every theme has a scene of two to four pieces, kept within the crest it stands on", () => {
     for (const id of THEME_IDS) {
-      expect(TOUCHES[id].parts.length).toBeGreaterThan(0);
-      expect(SCATTER[id]).toHaveLength(5);
+      const pieces = SCENES[id];
+      expect(pieces.length).toBeGreaterThanOrEqual(2);
+      expect(pieces.length).toBeLessThanOrEqual(4);
+      for (const p of pieces) expect(Math.abs(p.dx)).toBeLessThanOrEqual(45);
     }
   });
-  it("two themes take turns, the nearer one first", () => {
-    expect(scatterFor([])).toEqual([]);
-    expect(scatterFor(["hanukkah", "christmas"])).toEqual([
-      "candle",
-      "snowflake",
-      "dreidel",
-      "bauble",
-      "gelt",
-    ]);
+});
+
+describe("the footer's ground line", () => {
+  it("passes through the points the drawn path passes through", () => {
+    for (const [x, y] of [
+      [0, 44],
+      [200, 24],
+      [380, 40],
+      [600, 22],
+      [800, 38],
+      [1010, 26],
+      [1200, 40],
+    ] as const)
+      expect(groundY(x)).toBeCloseTo(y, 3);
+  });
+  it("is near level where the scenes stand", () => {
+    expect(Math.abs(groundTilt(182))).toBeLessThan(5);
+    expect(Math.abs(groundTilt(958))).toBeLessThan(5);
   });
 });

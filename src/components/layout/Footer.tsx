@@ -9,8 +9,10 @@ import { getSite } from "@/lib/site/site";
 import { Checker } from "../graphics/Checker";
 import { Seal } from "../graphics/Seal";
 import { Wordmark } from "../graphics/Wordmark";
+import { HolidayScene } from "../season/Holiday";
 import { Link } from "../ui/Link";
 import { OpenNow } from "../visit/OpenNow";
+import { GROUND_PATH } from "./ground";
 import { PauseMotion } from "./PauseMotion";
 
 export function Footer() {
@@ -27,7 +29,9 @@ export function Footer() {
         aria-hidden="true"
         focusable="false"
       >
-        <path d="M0 44C80 40 130 20 200 24S300 46 380 40S520 14 600 22S720 46 800 38S930 18 1010 26S1130 44 1200 40" />
+        <path d={GROUND_PATH} />
+        {/* a few weeks before a holiday, a small scene stands on the line */}
+        <HolidayScene />
       </svg>
       <div className="site-footer__inner">
         <Link href="/" className="site-footer__word">
