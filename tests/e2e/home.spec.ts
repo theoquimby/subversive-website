@@ -185,26 +185,8 @@ test("the On tap rows line up: every name starts at the same place in its column
   }
 });
 
-test("where it comes from: choosing a source moves the map; a click opens its detail view", async ({
-  page,
-}) => {
+test("Home does not carry the supplier map; it lives on Our beer", async ({ page }) => {
   await page.goto("/");
-  const rows = page.locator(".smap__row");
-  await expect(rows.first()).toBeVisible();
-  // a source with a town: its road is drawn and its town is named
-  await rows.filter({ hasText: "Indian Ladder" }).click();
-  await expect(page.locator(".smap__route")).toHaveCount(1);
-  await expect(page.locator(".smap__label").first()).toHaveText("Altamont");
-  // a statewide source lights the whole state and, having a photograph, opens a detail
-  const grain = rows.filter({ hasText: "100% New York" });
-  await grain.click();
-  await expect(page.locator(".smap__state")).toHaveAttribute("data-all", "");
-  await expect(grain).toHaveAttribute("aria-expanded", "true");
-  // the photograph really loads (it once stayed hidden waiting for a scroll reveal)
-  await page.locator(".smap__detail img").scrollIntoViewIfNeeded();
-  await expect
-    .poll(() => page.locator(".smap__detail img").evaluate((i) => (i as HTMLImageElement).naturalWidth))
-    .toBeGreaterThan(0);
-  await grain.click();
-  await expect(page.locator(".smap__detail")).toHaveCount(0);
+  await expect(page.locator(".smap")).toHaveCount(0);
+  await expect(page.locator("#where-title")).toHaveCount(0);
 });

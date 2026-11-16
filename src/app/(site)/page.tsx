@@ -13,7 +13,6 @@ import type { Metadata } from "next";
 import { PhotoFrame } from "@/components/graphics/PhotoFrame";
 import { Hero } from "@/components/home/Hero";
 import { Drawing } from "@/components/home/Ways";
-import { WhereFrom } from "@/components/home/WhereFrom";
 import { PageWipe } from "@/components/layout/PageWipe";
 import { SectionHead } from "@/components/layout/SectionHead";
 import { IntroBox } from "@/components/menu/IntroBox";
@@ -208,16 +207,6 @@ export default async function Home() {
               <TextLink href="/menu?show=food">{homeLabels.seeFood}</TextLink>
             </div>
           </div>
-        </section>
-
-        <section className="home-section band" aria-labelledby="where-title">
-          <Link href="/beer" className="band__art" aria-hidden="true" tabIndex={-1}>
-            <Drawing name="beer" />
-          </Link>
-          <SectionHead id="where-title">{homeLabels.whereFrom}</SectionHead>
-          <p className="home-lede">{site.sourcingLine}</p>
-          <WhereFrom sourcing={site.sourcing} />
-          <TextLink href="/beer">{homeLabels.ourBeer}</TextLink>
         </section>
       </div>
     </PageWipe>
