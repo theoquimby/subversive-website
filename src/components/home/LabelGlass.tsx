@@ -21,7 +21,11 @@
 // a spring, so the beer overshoots and settles); bubbles rise against gravity, not up the
 // screen. Bubbles leave from a few fixed points on the bowl in strings, as in a real
 // glass, and the stream drags a burst of them under where it lands. Head that goes over
-// the rim domes above it and runs down the outside as drips with tails, not loose dots.
+// the rim is the same foam, not a separate drawing: the head is free to rise past the rim,
+// where nothing holds its sides, so it slumps to a mound whose edge is as thick as the
+// sheet going over each lip; that sheet feeds a runnel down the outside of the bowl, which
+// necks and lets go as a drip when the head stops feeding it. One fill, one faint edge
+// line round whatever stands outside the glass; every quantity eases, so nothing pops.
 // iOS only gives the tilt after a tap and its own permission prompt: it is asked for on
 // the first tap in the hero.
 //
@@ -80,7 +84,22 @@ export interface GlassBeer {
 }
 
 /** The liquid's and the head's outlines for a level, a head thickness and a surface. */
-export function shapes(y: number, f: number, h: ArrayLike<number> | null, t: number) {
+/** Above the rim nothing holds the head's sides: it can stand only as high as the sheet
+    going over the nearer lip, plus a slope inward (foam's angle of repose). */
+export function overRim(x: number, cy: number, lipL: number, lipR: number): number {
+  if (cy >= RIM) return cy;
+  const allow = Math.min(lipL + Math.max(0, x - 47) * 0.5, lipR + Math.max(0, 153 - x) * 0.5);
+  return Math.max(cy, RIM - allow);
+}
+
+/** The liquid's and the head's outlines for a level, a head thickness and a surface. */
+export function shapes(
+  y: number,
+  f: number,
+  h: ArrayLike<number> | null,
+  t: number,
+  lip: { l: number; r: number } | null = null,
+) {
   const step = (X1 - X0) / (N - 1);
   const top: [number, number][] = [];
   for (let i = 0; i < N; i++) top.push([X0 + i * step, y + (h ? (h[i] ?? 0) : 0)]);
@@ -97,16 +116,19 @@ export function shapes(y: number, f: number, h: ArrayLike<number> | null, t: num
     return `${d}L${last[0].toFixed(1)} ${last[1].toFixed(1)}`;
   };
   const body = `M${curve(top)}V300H${X0}Z`;
-  if (f < 0.6) return { body, foam: "" };
+  if (f < 0.6) return { body, foam: "", line: "" };
   // the head: its underside follows the beer, its top is a row of soft crowns that drift
   const crown = top.map(([x, sy], i): [number, number] => {
     const bump = Math.abs(Math.sin(i * 1.05 + t * 0.9)) * Math.min(5, f * 0.3);
     const drift = Math.sin(i * 1.7 + t * 1.4) * Math.min(1.6, f * 0.08);
-    return [x, sy - f - bump - drift - (sy - y) * 0.45];
+    return [x, overRim(x, sy - f - bump - drift - (sy - y) * 0.45, lip?.l ?? 0, lip?.r ?? 0)];
   });
   const under = [...top].reverse();
   const foam = `M${curve(crown)}L${curve(under).replace(/^/, "")}Z`;
-  return { body, foam };
+  // the faint edge of whatever stands above the rim (inside the glass the head has none)
+  const above = crown.filter(([x, cy]) => cy < RIM - 0.35 && x > 44 && x < 156);
+  const line = above.length > 2 ? `M${curve(above)}` : "";
+  return { body, foam, line };
 }
 
 const REST = shapes(LEVEL, HEAD, null, 0);
@@ -145,7 +167,8 @@ export function LabelGlass({
     const handle = q<SVGGElement>(".lglass__handle");
     const bubbleEls = [...root.querySelectorAll<SVGCircleElement>(".lglass__bubbles circle")];
     const spillEls = [...root.querySelectorAll<SVGPathElement>(".lglass__spills path")];
-    const dome = q<SVGPathElement>(".lglass__dome");
+    const edgeEls = [...root.querySelectorAll<SVGPathElement>(".lglass__edges path")];
+    const crownLine = q<SVGPathElement>(".lglass__crownline");
     const still = window.matchMedia("(prefers-reduced-motion: reduce)");
 
     const h = new Float32Array(N);
@@ -167,11 +190,21 @@ export function LabelGlass({
       next: null as GlassBeer | null,
       bubbles: [] as { x: number; y: number; r: number; vx: number; vy: number; ph: number }[],
       // a drip: its leading end, where its tail still clings, its speed, its size
-      spills: [] as { y: number; top: number; vy: number; r: number; side: 1 | -1 }[],
+      // `fed`: still joined to the head at the lip, `w` thick there
+      spills: [] as {
+        y: number;
+        top: number;
+        vy: number;
+        r: number;
+        side: 1 | -1;
+        fed: boolean;
+        w: number;
+      }[],
       tilt: 0, // the beer's lean, radians; follows tiltTo as a spring
       tiltV: 0,
       tiltTo: 0,
-      dome: 0, // how far the head stands above the rim
+      lipL: 0, // the sheet of head going over each lip, in glass units
+      lipR: 0,
       drops: [] as { x: number; y: number; vx: number; vy: number; r: number }[],
     };
     let raf = 0;
@@ -197,7 +230,8 @@ export function LabelGlass({
     const edge = (y: number, side: 1 | -1) => 100 + side * (58.4 - (y - 14) * 0.086);
 
     const draw = () => {
-      const d = shapes(s.y, s.f, h, s.t);
+      const d = shapes(s.y, s.f, h, s.t, { l: s.lipL, r: s.lipR });
+      crownLine.setAttribute("d", d.line);
       body.setAttribute("d", d.body);
       haze.setAttribute("d", d.body);
       foam.setAttribute("d", d.foam);
@@ -242,7 +276,9 @@ export function LabelGlass({
         const hh = (h[lo] ?? 0) + ((h[lo + 1] ?? 0) - (h[lo] ?? 0)) * (at - lo);
         el.style.display = "";
         el.setAttribute("cx", (X0 + (at * (X1 - X0)) / (N - 1)).toFixed(1));
-        el.setAttribute("cy", (s.y + hh * 0.55 - s.f - 1 + Math.sin(s.t * 2.1 + k * 1.9) * 0.8).toFixed(1));
+        const hx = X0 + (at * (X1 - X0)) / (N - 1);
+        const hy = s.y + hh * 0.55 - s.f - 1 + Math.sin(s.t * 2.1 + k * 1.9) * 0.8;
+        el.setAttribute("cy", (overRim(hx, hy - 3, s.lipL, s.lipR) + 3).toFixed(1));
         el.setAttribute("r", (3.4 + ((k * 7) % 3) * 1.1 + Math.min(2, s.f * 0.04)).toFixed(2));
       });
       bubbleEls.forEach((el, i) => {
@@ -258,43 +294,50 @@ export function LabelGlass({
       });
       spillEls.forEach((el, i) => {
         const sp = s.spills[i];
+        const line = edgeEls[i];
         if (!sp) {
           el.style.display = "none";
+          if (line) line.style.display = "none";
           return;
         }
         el.style.display = "";
+        if (line) line.style.display = "";
         const r = sp.r;
-        if (sp.y < 212) {
-          // clinging to the bowl: a rounded leading end and a tail back up to where it left
-          const xi = edge(sp.y, sp.side);
-          const xo = xi + sp.side * r * 1.7;
-          const xt = edge(sp.top, sp.side);
-          el.setAttribute(
-            "d",
-            `M${xt.toFixed(1)} ${sp.top.toFixed(1)}L${xi.toFixed(1)} ${sp.y.toFixed(1)}` +
-              `A${(r * 0.75).toFixed(2)} ${r.toFixed(2)} 0 0 ${sp.side > 0 ? 0 : 1} ${xo.toFixed(1)} ${sp.y.toFixed(1)}` +
-              `L${(xt + sp.side * 2.6).toFixed(1)} ${sp.top.toFixed(1)}Z`,
-          );
-        } else {
+        const sd = sp.side;
+        const sweep = sd > 0 ? 1 : 0;
+        let fill: string;
+        let outline: string;
+        if (sp.y >= 212) {
           // off the bowl: a falling drop, pointed at the top
-          const x = 100 + sp.side * 42.5;
-          el.setAttribute(
-            "d",
+          const x = 100 + sd * 42.5;
+          fill =
             `M${x.toFixed(1)} ${(sp.y - r * 2.2).toFixed(1)}Q${(x + r * 1.1).toFixed(1)} ${sp.y.toFixed(1)} ${x.toFixed(1)} ${(sp.y + r).toFixed(1)}` +
-              `Q${(x - r * 1.1).toFixed(1)} ${sp.y.toFixed(1)} ${x.toFixed(1)} ${(sp.y - r * 2.2).toFixed(1)}Z`,
-          );
+            `Q${(x - r * 1.1).toFixed(1)} ${sp.y.toFixed(1)} ${x.toFixed(1)} ${(sp.y - r * 2.2).toFixed(1)}Z`;
+          outline = fill;
+        } else {
+          const xi = edge(sp.y, sd); // the glass at the leading end
+          const xo = xi + sd * r * 1.6; // the leading end's outer side
+          const tip = `L${xo.toFixed(1)} ${sp.y.toFixed(1)}A${(r * 0.8).toFixed(2)} ${r.toFixed(2)} 0 0 ${sweep} ${xi.toFixed(1)} ${sp.y.toFixed(1)}`;
+          if (sp.fed) {
+            // still part of the head: it starts inside the bowl at the sheet's height, rolls
+            // over the lip, and runs down the outside to its rounded leading end
+            const xr = edge(RIM, sd);
+            const inX = 100 + sd * 48;
+            const over =
+              `M${inX.toFixed(1)} ${(RIM - sp.w).toFixed(1)}` +
+              `Q${(xr + sd * sp.w * 0.5).toFixed(1)} ${(RIM - sp.w - 0.8).toFixed(1)} ${(xr + sd * (sp.w * 0.85 + 1.2)).toFixed(1)} ${(RIM + 2 + sp.w * 0.4).toFixed(1)}`;
+            fill = `${over}${tip}L${xr.toFixed(1)} ${(RIM + 1).toFixed(1)}L${inX.toFixed(1)} ${(RIM + 1).toFixed(1)}Z`;
+            outline = `${over}${tip}`;
+          } else {
+            // let go of the head: its tail thins behind it
+            const xt = edge(sp.top, sd);
+            fill = `M${(xt + sd * 1.1).toFixed(1)} ${sp.top.toFixed(1)}${tip}L${xt.toFixed(1)} ${sp.top.toFixed(1)}Z`;
+            outline = fill;
+          }
         }
+        el.setAttribute("d", fill);
+        line?.setAttribute("d", outline);
       });
-      // head standing above the rim, with a slow uneven crown
-      if (s.dome > 0.4) {
-        const a = s.dome;
-        const w = (k: number) => (15 - a * (1 + 0.16 * Math.sin(s.t * 1.7 + k * 2.1))).toFixed(1);
-        dome.setAttribute(
-          "d",
-          `M45.5 15.5Q57 ${w(0)} 72 ${w(1)}T100 ${(15 - a * 1.12).toFixed(1)}T128 ${w(2)}Q143 ${w(3)} 154.5 15.5Z`,
-        );
-        dome.style.display = "";
-      } else dome.style.display = "none";
     };
 
     const step = (dt: number) => {
@@ -375,27 +418,32 @@ export function LabelGlass({
       s.f -= lost;
       s.y = Math.max(LEVEL - 1, s.y - lost * 0.12);
 
-      // too much head: it stands above the rim, then runs down the outside of the glass.
-      // Each side is judged on its own, so a lean sends it over the low side.
-      const crestL = s.y + hAt(52) - s.f;
-      const crestR = s.y + hAt(148) - s.f;
-      const crest = Math.min(crestL, crestR);
-      const over = Math.max(0, RIM + 3 - crest);
-      // it stands a moment after the excess has gone, as foam does
-      const stand = Math.min(13, over * 2.4 + (s.spills.some((sp) => sp.y < 60) ? 5 : 0));
-      s.dome += (stand - s.dome) * Math.min(1, dt * (stand > s.dome ? 9 : 1.6));
-      if (crest < RIM + 1) {
-        s.f -= Math.min(s.f, 34 * dt + Math.max(0, RIM - 7 - crest));
-        if (s.spills.length < MAX_SPILLS && Math.random() < 11 * dt) {
-          const low =
-            Math.abs(crestL - crestR) < 1.5 ? (Math.random() < 0.5 ? -1 : 1) : crestL < crestR ? -1 : 1;
-          s.spills.push({
-            y: 17,
-            top: 14.5,
-            vy: 12 + Math.random() * 16,
-            r: 4.4 + Math.random() * 3,
-            side: low,
-          });
+      // too much head: it rises past the rim, where each side is judged on its own (a lean
+      // sends it over the low side). `ex` is how far the head would stand above each lip.
+      const exL = Math.max(0, RIM - (s.y + hAt(52) - s.f));
+      const exR = Math.max(0, RIM - (s.y + hAt(148) - s.f));
+      // the sheet going over each lip: quick to build, slow to thin, never a jump
+      const sheet = (now: number, ex: number) => {
+        const to = Math.min(7, ex * 0.9);
+        return now + (to - now) * Math.min(1, dt * (to > now ? 10 : 2.4));
+      };
+      s.lipL = sheet(s.lipL, exL);
+      s.lipR = sheet(s.lipR, exR);
+      // what goes over the lips leaves the head
+      if (exL + exR > 0) s.f = Math.max(0, s.f - ((exL + exR) * 2.6 + 4) * dt);
+      // each lip's sheet feeds one runnel down the outside; when the sheet thins, it lets go
+      for (const sd of [-1, 1] as const) {
+        const lipNow = sd < 0 ? s.lipL : s.lipR;
+        const run = s.spills.find((sp) => sp.fed && sp.side === sd);
+        if (run) {
+          run.w = lipNow;
+          run.r += (4.2 + lipNow * 0.8 - run.r) * Math.min(1, dt * 4);
+          if (lipNow < 0.8) {
+            run.fed = false;
+            run.top = RIM + 1;
+          }
+        } else if (lipNow > 1.6 && s.spills.length < MAX_SPILLS) {
+          s.spills.push({ y: RIM + 4, top: RIM, vy: 6, r: 3.6, side: sd, fed: true, w: lipNow });
         }
       }
 
@@ -488,11 +536,16 @@ export function LabelGlass({
         const sp = s.spills[i];
         if (!sp) continue;
         if (sp.y < 212) {
-          // creeping down the glass: slow to start, and the tail lets go behind it
-          sp.vy += (60 + sp.r * 26) * dt;
-          sp.vy = Math.min(sp.vy, 150);
-          sp.top += (sp.y - sp.top - 14 > 0 ? sp.vy * 0.8 : sp.vy * 0.25) * dt;
+          if (sp.fed) {
+            // fed from the lip: foam is thick, so it creeps; a thicker sheet pushes harder
+            sp.vy += (38 + sp.w * 16 - sp.vy * 1.6) * dt;
+          } else {
+            // on its own: it gathers speed and its tail lets go behind it
+            sp.vy = Math.min(150, sp.vy + (60 + sp.r * 26) * dt);
+            sp.top += (sp.y - sp.top - 14 > 0 ? sp.vy * 0.8 : sp.vy * 0.25) * dt;
+          }
         } else {
+          sp.fed = false;
           sp.vy += 900 * dt;
           sp.r *= 1 - 0.9 * dt;
         }
@@ -507,7 +560,8 @@ export function LabelGlass({
           s.spills.length > 0 ||
           s.bubbles.length > 0 ||
           s.drops.length > 0;
-        if (Math.abs(s.tiltTo - s.tilt) > 0.003 || Math.abs(s.tiltV) > 0.02 || s.dome > 0.4) moving = true;
+        if (Math.abs(s.tiltTo - s.tilt) > 0.003 || Math.abs(s.tiltV) > 0.02 || s.lipL > 0.15 || s.lipR > 0.15)
+          moving = true;
         for (let i = 0; i < N && !moving; i++)
           if (Math.abs((h[i] ?? 0) - level(i)) > 0.08 || Math.abs(v[i] ?? 0) > 0.4) moving = true;
         if (!moving && s.carb <= 0 && Math.abs(s.f - HEAD) < 1.5) s.phase = "idle";
@@ -544,7 +598,8 @@ export function LabelGlass({
         s.tilt = 0;
         s.tiltV = 0;
         s.tiltTo = 0;
-        s.dome = 0;
+        s.lipL = 0;
+        s.lipR = 0;
         h.fill(0);
         v.fill(0);
         draw();
@@ -645,6 +700,11 @@ export function LabelGlass({
         <clipPath id="lglass-inside">
           <path d={INSIDE} />
         </clipPath>
+        {/* the head's clip: the bowl, and open above the rim, where the head may stand */}
+        <clipPath id="lglass-head">
+          <path d={INSIDE} />
+          <path d="M43.4 -80H156.6V17.5H43.4Z" />
+        </clipPath>
       </defs>
 
       {/* the stream, from the spout to the surface */}
@@ -658,6 +718,8 @@ export function LabelGlass({
             <circle key={k} r="1" style={{ display: "none" }} />
           ))}
         </g>
+      </g>
+      <g clipPath="url(#lglass-head)" className="lglass__liquid">
         <path className="lglass__foam" d={REST.foam} />
         <g className="lglass__head">
           {Array.from({ length: HEAD_BUBBLES }, (_, i) => `h${i}`).map((k) => (
@@ -686,7 +748,12 @@ export function LabelGlass({
           <path key={k} d="" style={{ display: "none" }} />
         ))}
       </g>
-      <path className="lglass__dome" d="" style={{ display: "none" }} />
+      <path className="lglass__crownline" d="" />
+      <g className="lglass__edges">
+        {Array.from({ length: MAX_SPILLS }, (_, i) => `e${i}`).map((k) => (
+          <path key={k} d="" style={{ display: "none" }} />
+        ))}
+      </g>
 
       <g className="lglass__line">
         <path d={GROUND_LINE} />

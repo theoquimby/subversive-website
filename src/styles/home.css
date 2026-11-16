@@ -256,12 +256,18 @@
   stroke-width: 0.55;
   opacity: 0.85;
 }
-.lglass__spills path,
-.lglass__dome {
-  stroke-linejoin: round;
+/* head that has left the glass is the same foam: the same fill, no outline of its own.
+   One faint line runs round whatever stands outside the glass, so it reads on the paper */
+.lglass__spills path {
   fill: var(--card);
-  stroke: var(--fg);
+}
+.lglass__edges path,
+.lglass__crownline {
+  fill: none;
+  stroke: color-mix(in srgb, var(--fg) 34%, transparent);
   stroke-width: 1px;
+  stroke-linecap: round;
+  stroke-linejoin: round;
   vector-effect: non-scaling-stroke;
 }
 /* With scripting and motion the glass waits empty for its first pour; without either it
