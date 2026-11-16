@@ -33,7 +33,7 @@ export default function PrivateEventsPage() {
         {/* the spaces a party would have: the bar, the floor, the garden */}
         {/* biome-ignore lint/a11y/noNoninteractiveTabindex: a region that scrolls sideways must be reachable by keyboard */}
         <section className="reel" aria-label={visitLabels.photos} tabIndex={0}>
-          <PhotoFrame id="bar-stools" ratio="4/3" reveal={false} sizes="340px" />
+          <PhotoFrame id="taproom-inside" ratio="4/3" reveal={false} sizes="340px" />
           <PhotoFrame id="taproom-tables" ratio="4/3" reveal={false} sizes="340px" />
           <PhotoFrame id="garden-dusk" ratio="16/10" reveal={false} sizes="400px" />
         </section>
