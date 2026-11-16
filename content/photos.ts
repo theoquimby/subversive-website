@@ -22,6 +22,16 @@ import gardenDusk from "../public/photos/garden-dusk.webp";
 import giantPretzel from "../public/photos/giant-pretzel.webp";
 import grainInHands from "../public/photos/grain-in-hands.webp";
 import heatedTent from "../public/photos/heated-tent.webp";
+import itemBuffaloChickenSalad from "../public/photos/item-buffalo-chicken-salad.webp";
+import itemChickenTenders from "../public/photos/item-chicken-tenders.webp";
+import itemClassic from "../public/photos/item-classic.webp";
+// Dishes, from the brewery's own Square ordering page, 2026-11-15 (Theo asked). Only its
+// own photographs at a usable size: the supplier's promotional images, the clip-art
+// salads and the thumbnail-sized ones were left. Shown in the menu's item detail view.
+import itemFrites from "../public/photos/item-frites.webp";
+import itemPankoChicken from "../public/photos/item-panko-chicken.webp";
+import itemPretzelSticks from "../public/photos/item-pretzel-sticks.webp";
+import itemWings from "../public/photos/item-wings.webp";
 import kettleDark from "../public/photos/kettle-dark.webp";
 import lobsterRoll from "../public/photos/lobster-roll.webp";
 import patioPlate from "../public/photos/patio-plate.webp";
@@ -147,6 +157,41 @@ export const photos = {
     src: gardenDusk,
     alt: "The beer garden at dusk, full of people under strings of lights",
     focal: [45, 60],
+  },
+  "item-frites": {
+    src: itemFrites,
+    alt: "A paper cone of fries in a wire stand on the bar",
+    focal: [50, 50],
+  },
+  "item-pretzel-sticks": {
+    src: itemPretzelSticks,
+    alt: "Four pretzel sticks on checkered paper with beer cheese and mustard",
+    focal: [50, 50],
+  },
+  "item-classic": {
+    src: itemClassic,
+    alt: "A smash burger with two patties, melted American cheese, lettuce and pickles",
+    focal: [50, 50],
+  },
+  "item-panko-chicken": {
+    src: itemPankoChicken,
+    alt: "A fried chicken sandwich with coleslaw and pickles on a milk bun",
+    focal: [50, 50],
+  },
+  "item-buffalo-chicken-salad": {
+    src: itemBuffaloChickenSalad,
+    alt: "A bowl of salad topped with buffalo chicken and blue cheese",
+    focal: [50, 50],
+  },
+  "item-chicken-tenders": {
+    src: itemChickenTenders,
+    alt: "Chicken tenders and fries on checkered paper",
+    focal: [50, 50],
+  },
+  "item-wings": {
+    src: itemWings,
+    alt: "A hand lifting a buffalo wing from a paper-lined basket with carrots and celery",
+    focal: [50, 50],
   },
 } as const satisfies Record<string, Photo>;
 

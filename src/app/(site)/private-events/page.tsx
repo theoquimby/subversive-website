@@ -5,9 +5,10 @@
 //
 // TODO(Max): a sentence or two about private events (what can be booked, for how many).
 // None exists in the old site's content, so the page says nothing it was not given.
-import { inquiryLabels, microcopy } from "@content/microcopy";
+import { inquiryLabels, microcopy, visitLabels } from "@content/microcopy";
 import type { Metadata } from "next";
 import { InquiryForm } from "@/components/forms/InquiryForm";
+import { PhotoFrame } from "@/components/graphics/PhotoFrame";
 import { Drawing } from "@/components/home/Ways";
 import { PageWipe } from "@/components/layout/PageWipe";
 import { getSite } from "@/lib/site/site";
@@ -28,6 +29,14 @@ export default function PrivateEventsPage() {
           <h1 className="page__title">{inquiryLabels.title}</h1>
           <Drawing name="events" className="prose-head__art" />
         </header>
+
+        {/* the spaces a party would have: the bar, the floor, the garden */}
+        {/* biome-ignore lint/a11y/noNoninteractiveTabindex: a region that scrolls sideways must be reachable by keyboard */}
+        <section className="reel" aria-label={visitLabels.photos} tabIndex={0}>
+          <PhotoFrame id="bar-stools" ratio="4/3" reveal={false} sizes="340px" />
+          <PhotoFrame id="taproom-tables" ratio="4/3" reveal={false} sizes="340px" />
+          <PhotoFrame id="garden-dusk" ratio="16/10" reveal={false} sizes="400px" />
+        </section>
 
         <div className="inquiry-wrap">
           {ops ? <InquiryForm endpoint={`${ops}/api/public/inquiry`} /> : null}

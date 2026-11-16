@@ -204,11 +204,6 @@ export default async function Home() {
                 </figcaption>
               ) : null}
             </figure>
-            {/* two more plates, so the kitchen is seen and not only described */}
-            <div className="photo-pair home-kitchen__more">
-              <PhotoFrame id="giant-pretzel" ratio="4/3" sizes="(min-width: 1024px) 380px, 50vw" />
-              <PhotoFrame id="lobster-roll" ratio="4/3" sizes="(min-width: 1024px) 380px, 50vw" />
-            </div>
             <div className="home-kitchen__text">
               {burgers?.intro ? (
                 <IntroBox

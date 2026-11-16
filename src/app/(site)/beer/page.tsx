@@ -50,12 +50,16 @@ export default async function BeerPage() {
               <p key={p}>{p}</p>
             ))}
           </div>
-          <PhotoFrame
-            id="brewhouse-copper"
-            ratio="1/1"
-            reveal={false}
-            sizes="(min-width: 1024px) 480px, 100vw"
-          />
+          {/* where it is brewed: the copper brewhouse and the tanks */}
+          <div className="photo-pair beer-top__photos">
+            <PhotoFrame
+              id="brewhouse-copper"
+              ratio="4/5"
+              reveal={false}
+              sizes="(min-width: 1024px) 260px, 50vw"
+            />
+            <PhotoFrame id="tanks" ratio="4/5" reveal={false} sizes="(min-width: 1024px) 260px, 50vw" />
+          </div>
 
           {/* what is pouring now: every tap, as on Home, with the two pour sizes named once */}
           <section className="prose-section" aria-labelledby="tap-title">
@@ -70,18 +74,15 @@ export default async function BeerPage() {
           </section>
         </div>
 
-        {/* where it is made */}
-        <PhotoFrame id="tanks" ratio="16/10" className="beer-wide" sizes="(min-width: 1024px) 832px, 100vw" />
-
-        {/* what it looks like in the hand and where it starts */}
-        <div className="photo-pair">
-          <PhotoFrame id="can-in-hand" ratio="4/5" sizes="(min-width: 1024px) 420px, 50vw" />
-          <PhotoFrame id="grain-in-hands" ratio="4/5" sizes="(min-width: 1024px) 420px, 50vw" />
-        </div>
-
         <section className="prose-section" aria-labelledby="where-title">
           <SectionHead id="where-title">{homeLabels.whereFrom}</SectionHead>
           <WhereFrom sourcing={site.sourcing} />
+          <PhotoFrame
+            id="grain-in-hands"
+            ratio="16/10"
+            className="beer-wide"
+            sizes="(min-width: 1024px) 832px, 100vw"
+          />
           <p className="prose-links">
             <TextLink href="/menu">{homeLabels.fullMenu}</TextLink>
           </p>

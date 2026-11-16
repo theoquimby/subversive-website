@@ -657,3 +657,18 @@
     width: 4.5rem;
   }
 }
+
+/* photographs are placed on purpose (Theo, 2026-11-15): beside the address, the door and
+   the room behind it; at a stop, that very place seen two ways */
+.visit-doors {
+  margin-top: var(--s-2);
+}
+.stop .stop__photo {
+  margin-top: 0;
+  rotate: none;
+}
+@media (min-width: 64rem) {
+  .stop .stop__photo {
+    width: min(100%, 30rem);
+  }
+}

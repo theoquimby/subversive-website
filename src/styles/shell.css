@@ -1227,3 +1227,8 @@ html {
     display: none;
   }
 }
+
+/* Our beer: the two photographs of the brewery stand together beside the words */
+.beer-top__photos {
+  margin-top: 0;
+}

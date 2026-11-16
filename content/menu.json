@@ -127,7 +127,7 @@
       "intro": "Two smashed 3 oz patties of local grass-fed beef from Kilcoyne Farms (Hudson Falls, NY) on a See & Be Bakery (Cairo, NY) milk bun. Served with a side of fries or a house side salad.",
       "modifiers": "Add bacon +3, tomato +.50, or caramelized onions +.50. Sub GF bun +1.50, vegan bun +1, vegan cheese +1.",
       "items": [
-        { "name": "Classic", "description": "Lettuce, American cheese, house-made pickles, Subversive Sauce.", "price": 18 },
+        { "name": "Classic", "photo": "item-classic", "description": "Lettuce, American cheese, house-made pickles, Subversive Sauce.", "price": 18 },
         { "name": "Mushroom & Swiss", "description": "Arugula, Swiss cheese, sautéed cremini mushrooms, wild mushroom aioli.", "price": 20 },
         { "name": "Bacon Barbecue", "description": "Lettuce, bacon, cheddar, frizzled onions, house barbecue sauce.", "price": 20 }
       ]
@@ -148,7 +148,7 @@
       "title": "Chicken sandwiches",
       "intro": "Served with a side of fries or a house side salad.",
       "items": [
-        { "name": "Panko Fried Chicken", "description": "House-made pickles, coleslaw, Subversive Sauce on a See & Be milk bun.", "price": 18 },
+        { "name": "Panko Fried Chicken", "photo": "item-panko-chicken", "description": "House-made pickles, coleslaw, Subversive Sauce on a See & Be milk bun.", "price": 18 },
         { "name": "Buffalo Chicken", "description": "Panko breaded chicken breast, buffalo sauce, lettuce, tomato, onion and blue cheese on a See & Be milk bun.", "price": 18 },
         { "name": "Grilled Chicken", "description": "Arugula, tomato, red onion, garlic aioli on a See & Be milk bun.", "price": 16 }
       ]
@@ -158,10 +158,10 @@
       "title": "Small bites & shareables",
       "items": [
         { "name": "Lil’ Burger", "description": "One smashed 3 oz patty of local ground beef, pickles, Subversive Sauce, American cheese on a Martin’s potato roll.", "modifiers": "Sub Impossible plant-based meat +2. Add a side of fries or house side salad +4.", "price": 9, "tags": ["kid-friendly"] },
-        { "name": "Chicken Wings", "description": "(6) 24-hour house-brined jumbo wings tossed in the sauce of your choice: buffalo, barbecue, sweet Thai chili, lemon pepper or cajun. Served with carrots & celery and a side of house blue cheese or house ranch.", "price": 13 },
-        { "name": "Chicken Tenders", "description": "(4) lightly breaded chicken tenders served with fries and choice of any dipping sauce.", "price": 14, "tags": ["kid-friendly"] },
-        { "name": "Bavarian Pretzel Sticks", "description": "4 pretzel sticks with house beer cheese + spicy brown mustard.", "price": 13, "tags": ["vegetarian"] },
-        { "name": "Frites", "description": "Large cone of fries, choice of any 2 dipping sauces.", "price": 12, "tags": ["vegetarian"] }
+        { "name": "Chicken Wings", "photo": "item-wings", "description": "(6) 24-hour house-brined jumbo wings tossed in the sauce of your choice: buffalo, barbecue, sweet Thai chili, lemon pepper or cajun. Served with carrots & celery and a side of house blue cheese or house ranch.", "price": 13 },
+        { "name": "Chicken Tenders", "photo": "item-chicken-tenders", "description": "(4) lightly breaded chicken tenders served with fries and choice of any dipping sauce.", "price": 14, "tags": ["kid-friendly"] },
+        { "name": "Bavarian Pretzel Sticks", "photo": "item-pretzel-sticks", "description": "4 pretzel sticks with house beer cheese + spicy brown mustard.", "price": 13, "tags": ["vegetarian"] },
+        { "name": "Frites", "photo": "item-frites", "description": "Large cone of fries, choice of any 2 dipping sauces.", "price": 12, "tags": ["vegetarian"] }
       ]
     },
     {
@@ -170,7 +170,7 @@
       "items": [
         { "name": "House Salad", "description": "Mixed greens, cucumber, red onion, tomato, croutons, balsamic vinaigrette.", "modifiers": "Add grilled chicken +6 or bacon +3.", "price": 12, "tags": ["vegetarian"] },
         { "name": "Chicken Caesar Salad", "description": "Grilled chicken, romaine, grated parmesan, croutons, liberally tossed in house caesar dressing.*", "modifiers": "Sub crispy fried chicken +1.", "price": 17 },
-        { "name": "Buffalo Chicken Salad", "description": "Panko breaded buffalo chicken breast, romaine lettuce, tomato, red onion, gorgonzola crumbles, ranch dressing.", "price": 17 },
+        { "name": "Buffalo Chicken Salad", "photo": "item-buffalo-chicken-salad", "description": "Panko breaded buffalo chicken breast, romaine lettuce, tomato, red onion, gorgonzola crumbles, ranch dressing.", "price": 17 },
         { "name": "Greek Salad", "description": "Bell peppers, tomato, red onion, cucumber, olives, feta and pepperoncini over mixed greens with Greek vinaigrette. Served with toasted pita & a stuffed grape leaf.", "modifiers": "Add grilled chicken +6 or bacon +3.", "price": 16, "tags": ["vegetarian"] }
       ]
     },

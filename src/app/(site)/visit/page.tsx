@@ -34,18 +34,23 @@ export default async function VisitPage() {
     label: string;
     text: string;
     tag?: string;
-    photo?: PhotoId;
+    /** the stop itself, seen two ways (by day and by night; outside and inside) */
+    photos?: [PhotoId, PhotoId];
     link?: React.ReactNode;
   }[] = [
-    { art: "table", label: visitLabels.seating, text: site.visit.seating, photo: "beer-garden-night" },
-    { art: "tent", label: visitLabels.tent, text: site.visit.tent, photo: "heated-tent" },
+    {
+      art: "table",
+      label: visitLabels.seating,
+      text: site.visit.seating,
+      photos: ["garden-day", "beer-garden-night"],
+    },
+    { art: "tent", label: visitLabels.tent, text: site.visit.tent, photos: ["heated-tent", "tent-inside"] },
     { art: "car", label: visitLabels.parking, text: site.visit.parking },
     {
       art: "dog",
       label: visitLabels.dogs,
       text: site.visit.dogs,
       tag: visitLabels.dogsTag,
-      photo: "firepit-beers",
     },
     {
       id: "gift-cards",
@@ -69,13 +74,21 @@ export default async function VisitPage() {
         <div className="visit-grid">
           <div className="visit-left">
             <AddressBlock site={site} />
-            {/* the front door, so the place is recognised from the street */}
-            <PhotoFrame
-              id="exterior-dusk"
-              ratio="4/3"
-              reveal={false}
-              sizes="(min-width: 1024px) 560px, 100vw"
-            />
+            {/* the front door, so the place is recognised from the street, and the room behind it */}
+            <div className="photo-pair visit-doors">
+              <PhotoFrame
+                id="exterior-dusk"
+                ratio="4/5"
+                reveal={false}
+                sizes="(min-width: 1024px) 280px, 50vw"
+              />
+              <PhotoFrame
+                id="taproom-inside"
+                ratio="4/5"
+                reveal={false}
+                sizes="(min-width: 1024px) 280px, 50vw"
+              />
+            </div>
           </div>
           <section id="hours" className="visit-hours" aria-labelledby="hours-title">
             <SectionHead id="hours-title">{visitLabels.hours}</SectionHead>
@@ -83,24 +96,13 @@ export default async function VisitPage() {
           </section>
         </div>
 
-        {/* what it looks like: inside, the bar, the garden, the tent, the fire */}
-        {/* biome-ignore lint/a11y/noNoninteractiveTabindex: a region that scrolls sideways must be reachable by keyboard */}
-        <section className="reel" aria-label={visitLabels.photos} tabIndex={0}>
-          <PhotoFrame id="taproom-inside" ratio="4/3" reveal={false} sizes="340px" />
-          <PhotoFrame id="bar-stools" ratio="4/3" reveal={false} sizes="340px" />
-          <PhotoFrame id="tent-inside" ratio="4/5" reveal={false} sizes="220px" />
-          <PhotoFrame id="garden-day" ratio="4/3" reveal={false} sizes="340px" />
-          <PhotoFrame id="fire-table" ratio="1/1" reveal={false} sizes="270px" />
-          <PhotoFrame id="building-dusk" ratio="4/3" reveal={false} sizes="340px" />
-        </section>
-
         {/* a walk through the place: each thing worth knowing is a stop with its own
             drawing, the site's own sentence, and a photograph where there is one */}
         <section className="walk" aria-labelledby="know-title">
           <SectionHead id="know-title">{visitLabels.goodToKnow}</SectionHead>
           <ol className="walk__stops">
             {stops.map((stop, i) => (
-              <li key={stop.label} id={stop.id} className="stop" data-photo={stop.photo ? "" : undefined}>
+              <li key={stop.label} id={stop.id} className="stop" data-photo={stop.photos ? "" : undefined}>
                 <Doodle name={stop.art} className="stop__art" />
                 <div className="stop__text">
                   <h3 className="stop__title">{stop.label}</h3>
@@ -108,13 +110,12 @@ export default async function VisitPage() {
                   <p>{stop.text}</p>
                   {stop.link}
                 </div>
-                {stop.photo ? (
-                  <PhotoFrame
-                    id={stop.photo}
-                    ratio="3/2"
-                    className="stop__photo"
-                    sizes="(min-width: 1024px) 460px, 100vw"
-                  />
+                {stop.photos ? (
+                  <div className="photo-pair stop__photo">
+                    {stop.photos.map((id) => (
+                      <PhotoFrame key={id} id={id} ratio="4/5" sizes="(min-width: 1024px) 230px, 50vw" />
+                    ))}
+                  </div>
                 ) : null}
                 {i < stops.length - 1 ? <Doodle name="trail" className="stop__trail" /> : null}
               </li>
