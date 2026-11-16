@@ -577,8 +577,20 @@ export function LabelGlass({
       step(dt / 2);
       step(dt / 2);
       draw();
-      raf = s.phase === "idle" ? 0 : requestAnimationFrame(frame);
+      // nothing runs once the glass is still, or while it is off the screen
+      raf = s.phase === "idle" || !seen ? 0 : requestAnimationFrame(frame);
     };
+    // The model sleeps while the glass is scrolled out of view and picks up where it was
+    // when it returns (2026-11-15: it kept running under the page, which cost scrolling).
+    let seen = true;
+    const watcher = new IntersectionObserver(([entry]) => {
+      seen = entry?.isIntersecting ?? true;
+      if (seen && !raf && s.phase !== "idle" && !still.matches) {
+        last = performance.now();
+        raf = requestAnimationFrame(frame);
+      }
+    });
+    watcher.observe(root);
 
     const start = (b: GlassBeer, n: number) => {
       if (still.matches) {
@@ -622,9 +634,13 @@ export function LabelGlass({
       if (e.gamma === null || e.beta === null || still.matches) return;
       const turn = window.screen.orientation?.angle ?? 0;
       const deg = turn === 90 ? e.beta : turn === 270 ? -e.beta : e.gamma;
-      s.tiltTo = (Math.max(-TILT, Math.min(TILT, deg)) * Math.PI) / 180;
-      // wake the model if the glass was at rest and the lean is worth answering
-      if (!raf && Math.abs(s.tiltTo - s.tilt) > 0.012) {
+      const to = (Math.max(-TILT, Math.min(TILT, deg)) * Math.PI) / 180;
+      // a hand is never still: under about a degree and a half of change the beer does not
+      // answer, so holding the phone does not keep the model awake (it did, at 60 a second)
+      if (Math.abs(to - s.tiltTo) < 0.026) return;
+      s.tiltTo = to;
+      // wake the model if the glass was at rest, is on screen, and the lean is worth answering
+      if (!raf && seen && Math.abs(s.tiltTo - s.tilt) > 0.026) {
         if (s.phase === "idle") s.phase = "settle";
         last = performance.now();
         raf = requestAnimationFrame(frame);
@@ -661,6 +677,7 @@ export function LabelGlass({
       stop: () => {
         cancelAnimationFrame(raf);
         raf = 0;
+        watcher.disconnect();
         window.removeEventListener("deviceorientation", onTilt);
         hero.removeEventListener("click", ask);
       },

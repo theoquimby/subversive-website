@@ -696,6 +696,15 @@ body::after {
     content: none;
   }
 }
+/* No grain on phones and tablets (2026-11-15). In Safari's engine the tile cost every
+   animation on the page: pours ran at about 23 frames a second with it and 64 without,
+   however it was drawn (blended or not, over or under the content, or as the body's own
+   background), and Theo's iPhone was choppy. Wide screens keep it. */
+@media (max-width: 63.99rem) {
+  body::after {
+    content: none;
+  }
+}
 
 /* ---------- Photo frame (spec §3.7) ---------- */
 @property --sweep {
