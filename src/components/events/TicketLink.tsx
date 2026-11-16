@@ -7,6 +7,7 @@ import type { SiteEvent } from "@/lib/events/enrich";
 import { formatClock, weekdayLabel } from "@/lib/hours/format";
 import { weekdayOf } from "@/lib/time/ny";
 import { Link } from "../ui/Link";
+import { EventMark } from "./EventMark";
 
 const MONTHS = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
 
@@ -53,6 +54,7 @@ export function TicketLink({
         ) : e.startTime ? (
           <span className="tix__time tabular">{formatClock(e.startTime)}</span>
         ) : null}
+        <EventMark kind={e.kind} title={e.displayTitle} className="tix__mark" />
       </span>
     </Link>
   );

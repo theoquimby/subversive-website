@@ -8,7 +8,9 @@ import type { Metadata, Viewport } from "next";
 import { notFound, permanentRedirect } from "next/navigation";
 import { AddToCalendar } from "@/components/events/AddToCalendar";
 import { EventDescription } from "@/components/events/EventDescription";
+import { EventMark } from "@/components/events/EventMark";
 import { dateParts, detailLine } from "@/components/events/EventTicket";
+import { Lights } from "@/components/events/Lights";
 import { GameStrokes, TicketLink } from "@/components/events/TicketLink";
 import { Sticker } from "@/components/graphics/Sticker";
 import { PageWipe } from "@/components/layout/PageWipe";
@@ -101,17 +103,28 @@ export default async function EventPage({ params }: Params) {
   return (
     <PageWipe>
       <div className="events-page" data-page-skin="overtime">
+        <Lights />
         <div className="page event-page">
           <TextLink href="/events">{microcopy.allEvents}</TextLink>
-          <header className="event-head" data-game={e.kind === "GAME" ? "" : undefined}>
-            <h1 className="event-hero__title">{e.displayTitle}</h1>
-            {e.kind === "GAME" ? <GameStrokes className="event-head__game" /> : null}
-            <p className="event-head__date">
-              {p.weekdayLong}, {p.monthLong} {p.day}
-              {detailLine(e) ? <span className="tabular"> · {detailLine(e)}</span> : null}
-              {past ? <span> · {eventLabels.over}</span> : null}
-            </p>
-            <span className="event-head__rule" aria-hidden="true" />
+          {/* the head is the ticket that was tapped, large and lit: date on the stub, the
+              night's mark, the title, the time */}
+          <header className="event-head eticket" data-game={e.kind === "GAME" ? "" : undefined}>
+            <div className="eticket__stub">
+              <span className="eticket__day tabular">{p.day}</span>
+              <span className="eticket__when">
+                {p.weekdayLong.slice(0, 3)} · {p.monthLong.slice(0, 3)}
+              </span>
+            </div>
+            <div className="eticket__body">
+              <EventMark kind={e.kind} title={e.displayTitle} className="eticket__mark" />
+              <h1 className="event-hero__title">{e.displayTitle}</h1>
+              {e.kind === "GAME" ? <GameStrokes className="event-head__game" /> : null}
+              <p className="event-head__date">
+                {p.weekdayLong}, {p.monthLong} {p.day}
+                {detailLine(e) ? <span className="tabular"> · {detailLine(e)}</span> : null}
+                {past ? <span> · {eventLabels.over}</span> : null}
+              </p>
+            </div>
           </header>
           <EventDescription text={e.description} />
           {facts.length > 0 ? (

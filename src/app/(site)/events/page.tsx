@@ -4,6 +4,7 @@
 // ticker, scoreboard, starburst or filters. Events come read-only from the Ops feed.
 import { eventLabels, inquiryLabels, visitLabels } from "@content/microcopy";
 import type { Metadata, Viewport } from "next";
+import { Lights } from "@/components/events/Lights";
 import { TicketLink } from "@/components/events/TicketLink";
 import { Drawing } from "@/components/home/Ways";
 import { PageWipe } from "@/components/layout/PageWipe";
@@ -62,6 +63,7 @@ export default async function EventsPage() {
   return (
     <PageWipe>
       <div className="events-page" data-page-skin="overtime">
+        <Lights />
         <div className="page events-body">
           <header className="events-head">
             <h1 className="page__title">{eventLabels.title}</h1>
