@@ -1147,3 +1147,35 @@ a.mrow__box:active .mrow__name {
   font-weight: 700;
   line-height: 1.1;
 }
+
+/* ---------- Sheets on a real iPhone (2026-11-15) ----------
+   The sheet was cut off at the bottom: Safari's floating bar covers the lowest part of a
+   fixed element, the safe-area inset reads 0 in the browser, and 88dvh could be taller
+   than what is visible. Now: a column no taller than the small viewport, whose body
+   scrolls and ends with room to clear the bar. */
+.sheet {
+  display: flex;
+  flex-direction: column;
+  max-height: 86svh;
+}
+.sheet__top {
+  flex: none;
+}
+.sheet__body {
+  flex: 1 1 auto;
+  min-height: 0;
+  padding-bottom: max(5.5rem, calc(env(safe-area-inset-bottom) + var(--s-9)));
+  -webkit-overflow-scrolling: touch;
+}
+@media (min-width: 48rem) {
+  .sheet {
+    max-height: none;
+  }
+  .sheet__body {
+    padding-bottom: var(--s-9);
+  }
+}
+/* the menu's own offset already counts the header and its bar */
+html:has(.page--menu) {
+  scroll-padding-top: 0;
+}

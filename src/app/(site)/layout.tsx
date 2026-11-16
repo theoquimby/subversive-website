@@ -23,6 +23,8 @@ export default function SiteLayout({ children }: { children: ReactNode }) {
       </main>
       <Footer />
       <StampIn />
+      {/* iOS 26 Safari tints its bottom bar from a fixed element at that edge (shell.css) */}
+      <div className="edge-bottom" aria-hidden="true" />
       <Curtain />
       <Beacon orderHost={new URL(getSite().links.order).hostname} />
       <script

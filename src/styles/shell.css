@@ -1142,3 +1142,59 @@ textarea.field__input {
     grid-column: 1 / -1;
   }
 }
+
+/* ---------- Phone edges (2026-11-15, from Theo's iPhone) ----------
+   iOS 26 Safari paints the strip by the Dynamic Island and the strip behind its bottom bar
+   from the background colour of a fixed or sticky element touching that edge (it looks a
+   few pixels inside the edge, at the middle), and otherwise lets the page's own pixels
+   show there. Top: the header, which is always pinned now. Bottom: this strip. The root
+   also carries an opaque colour, which is what Safari falls back to. */
+html,
+body {
+  background-color: var(--bg);
+}
+.edge-bottom {
+  position: fixed;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  z-index: 45;
+  height: max(6px, env(safe-area-inset-bottom));
+  background-color: var(--bg);
+  pointer-events: none;
+}
+@media (min-width: 64rem), print {
+  .edge-bottom {
+    display: none;
+  }
+}
+/* the header never leaves, so nothing pinned beneath it ever sits at 0 */
+.site-header[data-hidden] {
+  translate: none;
+}
+/* a link to a place on a page lands below the pinned header, on every page */
+html {
+  scroll-padding-top: calc(var(--header-h) + var(--s-4));
+}
+
+/* ---------- Tap targets (phone sweep, 2026-11-15): nothing under 44 px ---------- */
+.brand,
+.site-footer .site-footer__cols a {
+  min-height: 44px;
+}
+.seg--text .seg__opt,
+.tap-hero__arrow {
+  min-width: 44px;
+}
+/* a text link keeps its size on the page; under a finger its target reaches 11 px above
+   and below the words */
+@media (pointer: coarse) {
+  .text-link {
+    position: relative;
+  }
+  .text-link::after {
+    content: "";
+    position: absolute;
+    inset: -11px -6px;
+  }
+}
