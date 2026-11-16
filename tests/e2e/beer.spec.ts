@@ -7,6 +7,13 @@ test("where it comes from: choosing a source moves the map; a click opens its de
   await page.goto("/beer");
   const rows = page.locator(".smap__row");
   await expect(rows.first()).toBeVisible();
+  // it opens on the top of the list: grain, the whole state
+  await expect(rows.first()).toHaveAttribute("aria-pressed", "true");
+  await expect(page.locator(".smap__state")).toHaveAttribute("data-all", "");
+  await expect(page.locator(".smap__route")).toHaveCount(0);
+  // moving a pointer over the list changes nothing: a choice is a click
+  await rows.filter({ hasText: "Indian Ladder" }).hover();
+  await expect(page.locator(".smap__route")).toHaveCount(0);
   // a source with a town: its road is drawn and its town is named
   await rows.filter({ hasText: "Indian Ladder" }).click();
   await expect(page.locator(".smap__route")).toHaveCount(1);

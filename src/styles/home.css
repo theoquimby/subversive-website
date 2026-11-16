@@ -1034,3 +1034,91 @@
 .tix__t[data-game] .tix__stub {
   padding-bottom: var(--s-3);
 }
+
+/* ---------- The map, refined (Theo, 2026-11-15) ---------- */
+/* --k (one over the zoom) glides with the camera, so dots, names and line weights keep
+   their size all the way in instead of jumping at the start */
+@property --k {
+  syntax: "<number>";
+  inherits: true;
+  initial-value: 1;
+}
+@media (prefers-reduced-motion: no-preference) {
+  .smap__cam {
+    transition:
+      transform 1000ms cubic-bezier(0.3, 0, 0.15, 1),
+      --k 1000ms cubic-bezier(0.3, 0, 0.15, 1);
+  }
+}
+/* the map is not pinned while the page scrolls (it covered the list and fought the
+   scroll on a phone); it sits above its list */
+@media (max-width: 63.99rem) {
+  .smap .smap__map {
+    position: static;
+    margin-inline: 0;
+    padding: 0;
+    border-bottom: 0;
+    background: none;
+  }
+  .smap .smap__svg {
+    max-height: none;
+  }
+}
+/* quieter landmarks: the roads recede behind the outline and the river */
+.smap__road {
+  stroke: color-mix(in srgb, var(--fg) 26%, transparent);
+  stroke-dasharray: 3 5;
+}
+.smap__decor path {
+  stroke: color-mix(in srgb, var(--fg) 70%, transparent);
+}
+/* names on the map */
+.smap__geo text {
+  fill: color-mix(in srgb, var(--fg) 72%, transparent);
+  font-family: var(--ff-utility);
+  font-size: calc(var(--label, 44px) * 0.62 * var(--k, 1));
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  paint-order: stroke;
+  stroke: var(--bg);
+  stroke-width: calc(var(--label, 44px) * 0.18 * var(--k, 1));
+  stroke-linejoin: round;
+}
+.smap__geo[data-kind="water"] text {
+  fill: var(--sky-deep);
+  font-style: italic;
+}
+.smap__city {
+  fill: var(--bg);
+  stroke: color-mix(in srgb, var(--fg) 72%, transparent);
+  stroke-width: 2.5;
+  transform-box: fill-box;
+  transform-origin: 50% 50%;
+  scale: var(--k, 1);
+}
+/* the pen ring round the chosen town */
+.smap__ring {
+  fill: none;
+  stroke: var(--fg);
+  stroke-width: calc(3.5px * var(--k, 1));
+  stroke-linecap: round;
+  stroke-dasharray: 1;
+}
+@media (prefers-reduced-motion: no-preference) {
+  /* in order: the camera sets off, the ring is drawn round the town, the road runs to
+     the taproom, the town is named */
+  .smap__ring {
+    animation: smap-draw 520ms cubic-bezier(0.45, 0, 0.3, 1) 380ms both;
+  }
+  .smap__route {
+    animation: smap-draw 900ms cubic-bezier(0.45, 0, 0.3, 1) 760ms both;
+  }
+  .smap__label:not(.smap__label--home) {
+    animation: smap-name var(--d-3) var(--ease-out) 900ms both;
+  }
+  /* the whole state: the yellow washes in like a marker, not a switch */
+  .smap__state {
+    transition: fill 700ms var(--ease-out);
+  }
+}

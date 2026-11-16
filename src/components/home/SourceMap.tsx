@@ -1,9 +1,10 @@
 "use client";
 
 // "Where it comes from": New York State in one ink line, and the things on the menu that
-// come from it. Pick a source (tap it in the list, tap its town on the map, or hover) and
-// the map goes there: it zooms in on the town and the taproom, and a wandering pen line
-// draws the road between them. The two statewide sources (grain, spirits) pull back to
+// come from it. The map opens on the first source in the list. Pick another (tap it in the
+// list or tap its town on the map) and the map goes there: the camera glides in on the
+// town and the taproom, a pen ring is drawn round the town, and a wandering pen line draws
+// the road between them. Nothing moves on hover: a choice is a click. The two statewide sources (grain, spirits) pull back to
 // the whole state and light it. Only one town is ever labelled at a time.
 //
 // The zoom is a transform on one group (the "camera"); everything drawn in map units is
@@ -73,21 +74,24 @@ function road(p: Place, k: number): string {
   return `M${at(0, 0)}Q${at(0.12, 0.1)} ${at(0.28, 0.07)}T${at(0.55, -0.05)}T${at(0.8, 0.045)}T${at(1, 0)}`;
 }
 
+/** A ring drawn by hand round a town: not quite round, and its ends overlap a little. */
+function ring(p: Place, r: number): string {
+  const at = (deg: number, f: number) => {
+    const a = (deg * Math.PI) / 180;
+    return `${(p.x + Math.cos(a) * r * f).toFixed(1)} ${(p.y + Math.sin(a) * r * f).toFixed(1)}`;
+  };
+  return `M${at(-100, 1)}Q${at(-45, 1.5)} ${at(0, 1.02)}T${at(90, 0.96)}T${at(180, 1.05)}T${at(275, 0.9)}`;
+}
+
 // Data-driven: the page gives a list of stops, each placed from its latitude and longitude
 // (src/lib/map/project.ts) or marked statewide. Nothing here knows any town by name, so a
 // new supplier needs no change to this file. Only this short list crosses to the browser,
 // never the whole site object (the no-malting test once caught that).
 export function SourceMap({ stops, features }: { stops: Stop[]; features: MapFeatures }) {
   const items = stops;
-  // start on the first source that has a town, so the map opens with a road on it
-  const [at, setAt] = useState(() =>
-    Math.max(
-      0,
-      items.findIndex((i) => i.place),
-    ),
-  );
-  // Which source's detail view is open. Hovering or tabbing through the list only moves
-  // the map; a detail opens on a click or tap, so the list never jumps under a pointer.
+  // start on the top of the list (grain: the whole state), so the map opens on all of New York
+  const [at, setAt] = useState(0);
+  // Which source's detail view is open (a second click on a source closes it).
   const [open, setOpen] = useState<number | null>(null);
   const sel = items[at];
   if (!sel) return null;
@@ -141,8 +145,30 @@ export function SourceMap({ stops, features }: { stops: Stop[]; features: MapFea
                 </g>
               ))}
             </g>
+            {/* names on the map: the country in small capitals, three cities as small rings */}
+            {features.labels.map((l) => (
+              <g key={l.text} className="smap__geo" data-kind={l.kind}>
+                {l.kind === "city" ? <circle cx={l.x} cy={l.y} r="5" className="smap__city" /> : null}
+                <text
+                  x={l.x + (l.kind === "city" ? (l.anchor === "end" ? -12 : 12) * k : 0)}
+                  y={l.y + (l.kind === "city" ? 6 * k : 0)}
+                  textAnchor={l.anchor}
+                >
+                  {l.text}
+                </text>
+              </g>
+            ))}
             {sel.place ? (
-              <path key={sel.what} d={road(sel.place, k)} className="smap__route" pathLength={1} />
+              <>
+                <path key={sel.what} d={road(sel.place, k)} className="smap__route" pathLength={1} />
+                {/* a pen ring round the chosen town, drawn as the camera arrives */}
+                <path
+                  key={`r-${sel.what}`}
+                  d={ring(sel.place, 30 * k)}
+                  className="smap__ring"
+                  pathLength={1}
+                />
+              </>
             ) : null}
             {items.map((it, i) =>
               it.place ? (
@@ -156,7 +182,6 @@ export function SourceMap({ stops, features }: { stops: Stop[]; features: MapFea
                     r={44 * k}
                     className="smap__hit"
                     onClick={() => setAt(i)}
-                    onPointerEnter={() => setAt(i)}
                   />
                 </g>
               ) : null,
@@ -204,10 +229,6 @@ export function SourceMap({ stops, features }: { stops: Stop[]; features: MapFea
                 setAt(i);
                 setOpen(open === i ? null : i);
               }}
-              onPointerEnter={(e) => {
-                if (e.pointerType === "mouse") setAt(i);
-              }}
-              onFocus={() => setAt(i)}
             >
               <span className="run__text">
                 <span className="run__what">{it.what}</span>

@@ -94,32 +94,57 @@ function line(points: LatLng[]): string {
 // Small pen drawings that sit where the real things are: the two mountain ranges, open
 // water, a boat on the river. Each is a kind and a place; SourceMap owns the drawings.
 const DECOR: { kind: "peaks" | "waves" | "boat" | "trees"; at: LatLng }[] = [
-  { kind: "peaks", at: [42.12, -74.35] }, // the Catskills
-  { kind: "peaks", at: [44.05, -74.25] }, // the Adirondacks
-  { kind: "peaks", at: [43.75, -74.75] },
-  { kind: "trees", at: [43.35, -75.3] }, // the Tug Hill and Mohawk country
-  { kind: "trees", at: [42.45, -76.5] }, // the Finger Lakes hills
-  { kind: "waves", at: [43.62, -77.6] }, // Lake Ontario
-  { kind: "waves", at: [43.72, -76.75] },
-  { kind: "waves", at: [40.62, -72.95] }, // the Atlantic, off Long Island
-  { kind: "waves", at: [42.72, -79.35] }, // Lake Erie
+  { kind: "peaks", at: [42.05, -74.5] }, // the Catskills
+  { kind: "peaks", at: [44.1, -74.35] }, // the Adirondacks
+  { kind: "trees", at: [42.5, -76.6] }, // the Finger Lakes hills
+  { kind: "waves", at: [43.62, -77.2] }, // Lake Ontario
+  { kind: "waves", at: [40.6, -72.9] }, // the Atlantic, off Long Island
   { kind: "boat", at: [41.62, -73.96] }, // on the Hudson, by Poughkeepsie
+];
+
+// Names written on the map, as a hand-drawn map has them: the country in small capitals,
+// three cities as small rings. `anchor` is the side of the point the name is written on.
+const LABELS: {
+  text: string;
+  at: LatLng;
+  kind: "land" | "water" | "city";
+  anchor: "start" | "middle" | "end";
+}[] = [
+  { text: "Adirondacks", at: [43.72, -74.35], kind: "land", anchor: "middle" },
+  { text: "Catskills", at: [41.78, -74.5], kind: "land", anchor: "middle" },
+  { text: "Finger Lakes", at: [42.2, -76.6], kind: "land", anchor: "middle" },
+  { text: "Lake Ontario", at: [43.42, -77.2], kind: "water", anchor: "middle" },
+  { text: "Hudson River", at: [41.3, -74.1], kind: "water", anchor: "end" },
+  { text: "Long Island", at: [40.92, -72.9], kind: "land", anchor: "middle" },
+  { text: "Albany", at: [42.65, -73.76], kind: "city", anchor: "start" },
+  { text: "Buffalo", at: [42.89, -78.86], kind: "city", anchor: "start" },
+  { text: "New York City", at: [40.72, -74.0], kind: "city", anchor: "end" },
 ];
 
 export interface MapFeatures {
   river: string;
   roads: string[];
   decor: { kind: "peaks" | "waves" | "boat" | "trees"; x: number; y: number }[];
+  labels: {
+    text: string;
+    kind: "land" | "water" | "city";
+    anchor: "start" | "middle" | "end";
+    x: number;
+    y: number;
+  }[];
 }
 
 export function mapFeatures(): MapFeatures {
   return {
     river: line(HUDSON),
     roads: ROADS.map((r) => line(r.points)),
-    decor: DECOR.map(({ kind, at }) => ({ kind, ...projectNY(at[0], at[1]) })).map(({ kind, x, y }) => ({
-      kind,
-      x,
-      y,
-    })),
+    decor: DECOR.map(({ kind, at }) => {
+      const { x, y } = projectNY(at[0], at[1]);
+      return { kind, x, y };
+    }),
+    labels: LABELS.map(({ text, kind, anchor, at }) => {
+      const { x, y } = projectNY(at[0], at[1]);
+      return { text, kind, anchor, x, y };
+    }),
   };
 }
