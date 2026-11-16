@@ -1,7 +1,7 @@
 // Photo frame (spec §3.7): a designed frame at a designed ratio. On Paper: radius 22 and the
-// one 2 px ink stroke; `bleed` drops the frame (heroes, Overtime). Below the first screen the
-// frame draws in (300 ms) and the photo is uncovered by a clip-path (420 ms) — set by
-// StampIn through data-pop; at rest, and without JS or motion, it is simply there.
+// one 2 px ink stroke; `bleed` drops the frame (heroes, Overtime). A photo is simply there:
+// it is fetched with the page (not when scrolled to) and never wipes or sweeps in (Theo,
+// 2026-11-16: "photos should be pre loaded, they should never do the weird scan in effect").
 // Hover scales the image 1.03 inside its fixed frame. Never past the files' 1500 px.
 import { type PhotoId, photos } from "@content/photos";
 import Image from "next/image";
@@ -14,7 +14,6 @@ export function PhotoFrame({
   sizes,
   bleed = false,
   priority = false,
-  reveal = !priority,
   className,
 }: {
   id: PhotoId;
@@ -23,6 +22,7 @@ export function PhotoFrame({
   sizes: string;
   bleed?: boolean;
   priority?: boolean;
+  /** no longer used: photos never animate in; kept so older call sites still compile */
   reveal?: boolean;
   className?: string;
 }) {
@@ -31,7 +31,6 @@ export function PhotoFrame({
     <figure
       className={["photo", bleed ? "photo--bleed" : "", className ?? ""].filter(Boolean).join(" ")}
       style={{ aspectRatio: ratio.replace("/", " / ") }}
-      data-pop={reveal ? "" : undefined}
     >
       <Image
         src={p.src}
@@ -40,6 +39,7 @@ export function PhotoFrame({
         fill
         placeholder="blur"
         priority={priority}
+        loading={priority ? undefined : "eager"}
         fetchPriority={priority ? "high" : undefined}
         style={{ objectFit: "cover", objectPosition: `${p.focal[0]}% ${p.focal[1]}%` }}
       />

@@ -118,7 +118,8 @@ export function MenuIndex({
   const go = (e: MouseEvent, id: string) => {
     e.preventDefault();
     setOpen(false);
-    document.getElementById(id)?.scrollIntoView({ block: "start" });
+    const calm = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    document.getElementById(id)?.scrollIntoView({ block: "start", behavior: calm ? "instant" : "smooth" });
   };
 
   const links = (list: Show, chips: Chip[]) => (

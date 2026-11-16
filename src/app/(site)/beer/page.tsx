@@ -15,6 +15,7 @@ import { PageWipe } from "@/components/layout/PageWipe";
 import { SectionHead } from "@/components/layout/SectionHead";
 import { MenuRow } from "@/components/menu/MenuRow";
 import { TextLink } from "@/components/ui/TextLink";
+import { isBeer } from "@/lib/menu/kinds";
 import { applySeasonal } from "@/lib/menu/seasonal";
 import { getMenu } from "@/lib/menu/source";
 import { buildMenuView, draftBeers } from "@/lib/menu/view";
@@ -34,6 +35,22 @@ export default async function BeerPage() {
   const site = getSite();
   const view = buildMenuView(applySeasonal(await getMenu(), nyParts(now()).date));
   const taps = draftBeers(view);
+  // the beers the brewing drawing can brew: what is on tap, in the menu's own words
+  const brews = taps.flatMap((t) =>
+    isBeer(t.item)
+      ? [
+          {
+            id: t.id,
+            name: t.item.name,
+            style: t.item.style,
+            description: t.item.description ?? "",
+            color: t.item.color,
+            ...(t.item.hazy ? { hazy: true } : {}),
+            ...(t.badge ? { badge: t.badge } : {}),
+          },
+        ]
+      : [],
+  );
   const title = NAV.find((n) => n.href === "/beer")?.label ?? "";
   const paragraphs = site.brewery.paragraphs.filter((p) => !DROPPED.test(p));
   return (
@@ -76,9 +93,9 @@ export default async function BeerPage() {
         </div>
 
         {/* how a batch is brewed, as a living drawing */}
-        <section className="prose-section brew-section" aria-labelledby="brew-title">
+        <section id="brew" className="prose-section brew-section" aria-labelledby="brew-title">
           <SectionHead id="brew-title">{brewLabels.title}</SectionHead>
-          <BrewProcess />
+          <BrewProcess beers={brews} />
         </section>
 
         <section className="prose-section" aria-labelledby="where-title">

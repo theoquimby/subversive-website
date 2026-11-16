@@ -67,11 +67,11 @@
     }
   },
   "visit": {
-    "seating": "Seating is first come, first served.",
-    "tent": "Heated tent.",
+    "seating": "Seating is first come, first served. Pick a picnic table out in the beer garden, a stool at the bar, or a high table inside; there is no need to book.",
+    "tent": "Our canvas tent out back is heated and strung with lights, with long picnic tables inside, so the beer garden stays open when the weather turns.",
     "parking": "We have 8 parking spots onsite. There is plenty of parking on West Bridge Street or around the corner on Division Street if the lot is full!",
     "dogs": "Leashed, well-behaved dogs are permitted outside and in our heated tent, however we reserve the right to ask anyone with a dog to leave if it causes issues with other customers. Please be a responsible dog owner and help us keep our outdoor area dog friendly!",
-    "giftCards": "Physical gift cards are always available to purchase in the taproom."
+    "giftCards": "Physical gift cards are always available to purchase in the taproom. Or send an eGift card straight to someone's inbox."
   },
   "sourcingLine": "All of our beers feature 100% locally sourced grains, and many feature locally sourced hops, fruits, and herbs as well.",
   "sourcing": [

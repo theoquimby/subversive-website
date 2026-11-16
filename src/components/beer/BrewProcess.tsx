@@ -1,58 +1,34 @@
 "use client";
 
-// How their beer is made, as one living pen drawing (2026-11-16): the grain, hops, water
-// and yeast; the mill; the mash tun and its paddle; the run-off; the kettle on its burner;
-// the conical fermenter; and the filler, where a keg and three cans ride a belt. Drawn
-// flat in the Home glass's hand; the motion is a small physics model (brew-model.ts).
+// How their beer is made, as one living pen drawing (2026-11-16), for whichever of the beers
+// on tap is chosen: the grain through the steep, the germination floor and the kiln; the
+// mill; the mash tun and its paddle; the run-off; the kettle on its burner, hops tossed in
+// from the bale; the conical fermenter, yeast poured from its jar; and the filler, where a
+// keg and three cans ride a belt. A beer's own extra inputs (fruit, citrus, brine, spice, a
+// second grain) and its cold rest come only from its menu style and description
+// (brew-recipe.ts). It all stands in a quiet pen drawing of the brewhouse. Drawn flat in
+// the Home glass's hand; the motion is a small physics model (brew-model.ts).
 //
-// It brews one batch on its own the first time it scrolls into view (about half a
-// minute), then rests on the filled keg and cans. A tap on a station brews again from
-// there; a tap on the paddle stirs; the phone's lean sloshes every vessel; "Brew another"
-// starts a new batch. The model writes straight to the SVG, one loop, which sleeps off
-// screen and at rest.
-//
-// Two drawings are sent: tall for phones, wide from 64rem; CSS shows one and the model
-// runs on that one. Without JavaScript, or with reduced motion, both are the still
-// picture: every vessel full and the keg and cans done.
+// It brews one batch on its own the first time it scrolls into view (about half a minute),
+// then rests on the filled keg and cans. Choosing a beer brews that one; a tap on a station
+// brews again from there; a tap on the paddle stirs; the phone's lean sloshes the vessels;
+// "Brew another" starts again. One loop writes straight to the SVG; it sleeps off screen
+// and at rest. Two drawings are sent, tall for phones and wide from 64rem; CSS shows one.
+// Without JavaScript, or with reduced motion, both are the still picture of the whole
+// process, and choosing a beer still changes its colours and extra inputs.
 import { brewLabels } from "@content/microcopy";
-import { type CSSProperties, type SVGProps, useEffect, useId, useRef } from "react";
+import { type CSSProperties, memo, useEffect, useId, useMemo, useRef, useState } from "react";
 import { createLoop } from "../../lib/motion/loop";
 import { onTilt } from "../../lib/motion/tilt";
-import {
-  BALE,
-  CONE,
-  FERM,
-  JAR,
-  JUG,
-  KETTLE,
-  type Layout,
-  MASH,
-  MILL,
-  OUT,
-  PHONE,
-  type Pt,
-  SACK,
-  type Stage,
-  WIDE,
-} from "./brew-layout";
-import {
-  createBrew,
-  lean,
-  moving,
-  POOLS,
-  paint,
-  relayout,
-  setStage,
-  step,
-  stillBrew,
-  stir,
-} from "./brew-model";
+import { type Layout, PHONE, type Stage, WIDE } from "./brew-layout";
+import { createBrew, lean, moving, paint, relayout, setStage, step, stillBrew, stir } from "./brew-model";
+import { type BrewBeer, defaultBeer, type Recipe, recipeOf } from "./brew-recipe";
+import { type Prim, scene } from "./brew-scene";
 
 type Attrs = Record<string, Record<string, string>>;
-
 function collect(L: Layout): Attrs {
   const out: Attrs = {};
-  paint(stillBrew(), L, (k, a, v) => {
+  paint(stillBrew(L), L, (k, a, v) => {
     const m = out[k] ?? {};
     m[a] = v;
     out[k] = m;
@@ -62,49 +38,63 @@ function collect(L: Layout): Attrs {
 // the still picture, worked out once: the server's drawing and the first client render agree
 const STILL: Record<Layout["id"], Attrs> = { phone: collect(PHONE), wide: collect(WIDE) };
 
-type El = SVGProps<SVGPathElement> & SVGProps<SVGCircleElement> & SVGProps<SVGGElement>;
-/** an element's painted attributes as React props, under its key */
-function at(P: Attrs, key: string): El & { "data-k": string } {
-  const m = P[key] ?? {};
-  const r: Record<string, unknown> = { "data-k": key };
+const CAMEL: Record<string, string> = {
+  "clip-path": "clipPath",
+  "text-anchor": "textAnchor",
+  dash: "strokeDasharray",
+  doff: "strokeDashoffset",
+};
+/** a scene element's attributes, with what the still picture paints on it, as React props */
+function props(p: Prim, P: Attrs): Record<string, unknown> {
+  const r: Record<string, unknown> = {};
   const style: CSSProperties = {};
-  for (const [a, v] of Object.entries(m)) {
+  const all = { ...(p.a ?? {}), ...(p.k ? (P[p.k] ?? {}) : {}) };
+  for (const [a, v] of Object.entries(all)) {
     if (a === "display") {
-      if (v) style.display = v;
-    } else if (a === "fill") style.fill = v;
-    else if (a === "dash") r.strokeDasharray = v;
-    else if (a === "doff") r.strokeDashoffset = v;
-    else r[a] = v;
+      if (v) style.display = String(v);
+    } else if (a === "fill") style.fill = String(v);
+    else if (a === "style") {
+      const m = /^fill:(.*)$/.exec(String(v));
+      if (m?.[1]) style.fill = m[1];
+    } else r[CAMEL[a] ?? a] = v;
   }
+  if (p.c) r.className = p.c;
+  if (p.k) r["data-k"] = p.k;
   if (Object.keys(style).length > 0) r.style = style;
-  return r as unknown as El & { "data-k": string };
+  return r;
+}
+function draw(p: Prim, P: Attrs, key: number): React.ReactNode {
+  const kids = p.kids?.map((c, i) => draw(c, P, i));
+  const r = props(p, P);
+  switch (p.el) {
+    case "g":
+      return (
+        <g key={key} {...r}>
+          {kids}
+        </g>
+      );
+    case "clipPath":
+      return (
+        <clipPath key={key} {...r}>
+          {kids}
+        </clipPath>
+      );
+    case "circle":
+      return <circle key={key} {...r} />;
+    case "text":
+      return (
+        <text key={key} {...r}>
+          {p.text}
+        </text>
+      );
+    default:
+      return <path key={key} {...r} />;
+  }
 }
 
-const keys = (pre: string, n: number) => Array.from({ length: n }, (_, i) => `${pre}${i}`);
-const tr = (p: Pt) => `translate(${p[0]} ${p[1]})`;
-const LIQUID_LINKS = [
-  { i: 2, tone: "water" },
-  { i: 3, tone: "wort" },
-  { i: 4, tone: "wort" },
-  { i: 5, tone: "beer" },
-] as const;
-
-function Cone() {
-  return (
-    <>
-      <path d={CONE.body} className="brew__hop" />
-      <path d={CONE.scales} />
-      <path d={CONE.stem} />
-    </>
-  );
-}
-
-function Scene({ L, uid }: { L: Layout; uid: string }) {
+const Scene = memo(function Scene({ L, uid, recipe }: { L: Layout; uid: string; recipe: Recipe }) {
   const P = STILL[L.id];
-  const a = (k: string) => at(P, k);
-  const clip = (name: string) => `${uid}-${L.id}-${name}`;
-  const url = (name: string) => `url(#${clip(name)})`;
-  const { at: A } = L;
+  const prims = scene(L, recipe, uid, brewLabels);
   return (
     <svg
       viewBox={`0 0 ${L.box[0]} ${L.box[1]}`}
@@ -113,219 +103,31 @@ function Scene({ L, uid }: { L: Layout; uid: string }) {
       aria-hidden="true"
       focusable="false"
     >
-      <defs>
-        <clipPath id={clip("jug")}>
-          <path d={JUG.inside} />
-        </clipPath>
-        <clipPath id={clip("jar")}>
-          <path d={JAR.inside} />
-        </clipPath>
-        <clipPath id={clip("mash")}>
-          <path d={MASH.inside} />
-        </clipPath>
-        <clipPath id={clip("ket")}>
-          <path d={KETTLE.inside} />
-        </clipPath>
-        <clipPath id={clip("fer")}>
-          <path d={FERM.inside} />
-        </clipPath>
-      </defs>
-
-      {/* pipes, under everything: an ink pipe with a hollow, and what runs in it */}
-      <g className="brew__pipes">
-        {LIQUID_LINKS.map(({ i, tone }) => {
-          const g = L.links[i];
-          if (!g) return null;
-          return (
-            <g key={i}>
-              <path d={g.d} className="brew__pipe-o" />
-              <path d={g.d} className="brew__pipe-i" />
-              <path d={g.d} pathLength={1} className={`brew__pipe-l brew--${tone}`} {...a(`l${i}.liq`)} />
-              <path d={g.d} pathLength={1} className="brew__fleck" {...a(`l${i}.fl`)} />
-            </g>
-          );
-        })}
-        <path d={L.trough} className="brew__trough" />
-      </g>
-      {LIQUID_LINKS.map(({ i, tone }) => (
-        <path key={i} className={`brew__stream brew--${tone}`} {...a(`l${i}.st`)} />
-      ))}
-
-      {/* the inputs */}
-      <g transform={tr(A.sack)} className="brew__ink">
-        <path d={SACK.back} className="brew__sack" />
-        <path d={SACK.front} className="brew__sack" />
-        <path d={SACK.tie} />
-        <path d={SACK.spill} className="brew__grainfill" />
-        <path d={SACK.ear} className="brew__thin" />
-        {SACK.kernels.map((d) => (
-          <path key={d} d={d} className="brew__inkfill" />
-        ))}
-      </g>
-      <g transform={tr(A.hops)} className="brew__ink">
-        <path d={BALE.body} className="brew__bale" />
-        <path d={BALE.straps} />
-        {BALE.cones.map(([x, y, r]) => (
-          <g key={x} transform={`translate(${x} ${y}) rotate(${r})`}>
-            <Cone />
-          </g>
-        ))}
-      </g>
-      <g transform={tr(A.jug)} className="brew__ink">
-        <g clipPath={url("jug")}>
-          <path className="brew__liq brew--water" {...a("jug.w")} />
-        </g>
-        <path d={JUG.body} />
-        <path d={JUG.neck} />
-        <path d={JUG.tap} />
-      </g>
-      <g transform={tr(A.jar)} className="brew__ink">
-        <g clipPath={url("jar")}>
-          <path className="brew__liq brew--yeast" {...a("jar.f")} />
-        </g>
-        <path d={JAR.body} />
-        <path d={JAR.lid} className="brew__paper2" />
-      </g>
-
-      {/* the mill */}
-      <g transform={tr(A.mill)} className="brew__ink">
-        <path className="brew__liq brew--grain" {...a("heap")} />
-        <path d={MILL.hopper} />
-        {MILL.rollers.map(([x, y], i) => (
-          <g key={x} {...a(i === 0 ? "rA" : "rB")}>
-            <circle cx={x} cy={y} r={9} className="brew__paper2" />
-            <path d={`M${x} ${y - 8}V${y + 8}M${x - 8} ${y}H${x + 8}`} className="brew__thin" />
-          </g>
-        ))}
-        <path d={MILL.housing} />
-        <path d={MILL.post} />
-        <g {...a("crank")}>
-          <path d={`M${MILL.crank[0]} ${MILL.crank[1]}V${MILL.crank[1] - 10}`} />
-          <circle cx={MILL.crank[0]} cy={MILL.crank[1] - 11} r={2.4} className="brew__inkfill" />
-        </g>
-        <circle cx={MILL.crank[0]} cy={MILL.crank[1]} r={2.6} className="brew__paper" />
-      </g>
-
-      {/* the mash tun */}
-      <g transform={tr(A.mash)} className="brew__ink">
-        <g clipPath={url("mash")}>
-          <path className="brew__liq" {...a("mash.b")} />
-          <path className="brew__liq brew--bed" {...a("mash.bed")} />
-        </g>
-        <path d={MASH.falseBottom} className="brew__dash" />
-        <g {...a("paddle")}>
-          <path d={MASH.paddle.blade} className="brew__paper2" />
-          <path d={MASH.paddle.holes} className="brew__thin" />
-          <path d={MASH.paddle.handle} />
-        </g>
-        <path d={MASH.walls} />
-        <path d={MASH.valve} className="brew__paper" />
-        <path d={MASH.handle} {...a("v3")} />
-        <path className="brew__steam" {...a("mash.s0")} />
-        <path className="brew__steam" {...a("mash.s1")} />
-      </g>
-
-      {/* the kettle on its burner */}
-      <g transform={tr(A.kettle)} className="brew__ink">
-        <g {...a("ket.fire")}>
-          {[0, 1, 2].map((i) => (
-            <path key={i} className="brew__flame" {...a(`ket.f${i}`)} />
-          ))}
-          <path className="brew__core" {...a("ket.f3")} />
-        </g>
-        <path d={KETTLE.burner} />
-        <g clipPath={url("ket")}>
-          <path className="brew__liq brew--wort" {...a("ket.b")} />
-          {keys("kb", POOLS.kb).map((k) => (
-            <circle key={k} className="brew__bubble" {...a(k)} />
-          ))}
-        </g>
-        {keys("hop", POOLS.hops).map((k) => (
-          <g key={k} {...a(k)}>
-            <Cone />
-          </g>
-        ))}
-        <path d={KETTLE.walls} />
-        <path d={KETTLE.valve} className="brew__paper" />
-        <path d={KETTLE.handle} {...a("v4")} />
-        {[0, 1, 2].map((i) => (
-          <path key={i} className="brew__steam" {...a(`ket.s${i}`)} />
-        ))}
-      </g>
-
-      {/* the fermenter */}
-      <g transform={tr(A.ferm)} className="brew__ink">
-        <g clipPath={url("fer")}>
-          <path className="brew__liq" {...a("fer.b")} />
-          <path className="brew__liq brew--foam" {...a("fer.foam")} />
-          {keys("cb", POOLS.cb).map((k) => (
-            <circle key={k} className="brew__bubble" {...a(k)} />
-          ))}
-          {keys("y", POOLS.yeast).map((k) => (
-            <circle key={k} className="brew__liq brew--yeast" {...a(k)} />
-          ))}
-        </g>
-        <path d={FERM.walls} />
-        <path d={FERM.legs} />
-        <path d={FERM.port} className="brew__paper" />
-        <path d={FERM.valve} className="brew__paper" />
-        <path d={FERM.handle} {...a("v5")} />
-        <path d={FERM.water} className="brew__liq brew--water" />
-        <circle cx={FERM.bulb[0]} cy={FERM.bulb[1]} r={7} />
-        <circle cx={FERM.bulb[0]} className="brew__bubble" {...a("blip")} />
-        <path d={FERM.airlock} />
-      </g>
-
-      {/* the filler, the belt, the keg and cans */}
-      <g transform={tr(A.out)} className="brew__ink">
-        <path d={OUT.belt} />
-        <path d={OUT.beltMid} className="brew__belt" {...a("belt")} />
-        {[0, 1, 2, 3].map((i) => (
-          <g key={i} {...a(`c${i}`)}>
-            <path className="brew__liq brew--beer" {...a(`c${i}.l`)} />
-            <path className="brew__liq brew--foam" {...a(`c${i}.f`)} />
-            {i === 0 ? (
-              <>
-                <path d={OUT.keg} />
-                <path d={OUT.kegRibs} />
-              </>
-            ) : (
-              <>
-                <path d={OUT.can} />
-                <g {...a(`lid${i - 1}`)}>
-                  <path d={OUT.lid} className="brew__paper2" />
-                </g>
-              </>
-            )}
-          </g>
-        ))}
-        <path d={OUT.tip} />
-        <path d={OUT.nozzle} className="brew__paper" />
-        <path d={OUT.capper} className="brew__paper" />
-      </g>
-
-      {/* grain on its way */}
-      {keys("gw", POOLS.whole).map((k) => (
-        <circle key={k} className="brew__grain" {...a(k)} />
-      ))}
-      {keys("gc", POOLS.cracked).map((k) => (
-        <circle key={k} className="brew__cracked" {...a(k)} />
-      ))}
-
-      {L.labels.map((l) => (
-        <text key={l.key} x={l.x} y={l.y} textAnchor={l.anchor ?? "middle"} className="brew__label">
-          {brewLabels[l.key]}
-        </text>
-      ))}
+      {prims.map((p, i) => draw(p, P, i))}
     </svg>
   );
+});
+
+interface Model {
+  brew: (st: Stage) => void;
+  recipe: (r: Recipe) => void;
 }
 
-export function BrewProcess({ className }: { className?: string }) {
+export function BrewProcess({ beers, className }: { beers: readonly BrewBeer[]; className?: string }) {
   const uid = useId().replace(/[^\w-]/g, "");
+  const [chosen, choose] = useState(() => defaultBeer(beers)?.id ?? "");
+  const beer = beers.find((b) => b.id === chosen) ?? defaultBeer(beers);
+  const recipe = useMemo(() => recipeOf(beer ?? { style: "", description: "" }), [beer]);
   const art = useRef<HTMLDivElement>(null);
   const again = useRef<HTMLButtonElement>(null);
-  const model = useRef<{ brew: (st: Stage) => void } | null>(null);
+  const model = useRef<Model | null>(null);
+  const first = useRef(recipe);
+
+  // a link from the menu (?brew=<beer>) chooses that beer
+  useEffect(() => {
+    const id = new URLSearchParams(window.location.search).get("brew");
+    if (id && beers.some((b) => b.id === id)) choose(id);
+  }, [beers]);
 
   useEffect(() => {
     const root = art.current;
@@ -337,12 +139,12 @@ export function BrewProcess({ className }: { className?: string }) {
       wide: root.querySelector<SVGSVGElement>('[data-layout="wide"]'),
     };
 
-    const s = createBrew();
-    setStage(s, "grain");
-    s.stage = "fresh"; // waits, empty, until it is seen
+    let L: Layout = wideQ.matches ? WIDE : PHONE;
+    const s = createBrew(first.current);
+    setStage(s, "grain", L);
+    s.stage = "fresh"; // waits, ready, until it is seen
 
     // the drawing in use, and a writer that touches the DOM only when a value changes
-    let L: Layout = PHONE;
     let svg: SVGSVGElement | null = null;
     let els = new Map<string, SVGElement>();
     const cache = new Map<string, string>();
@@ -381,25 +183,33 @@ export function BrewProcess({ className }: { className?: string }) {
       return moving(s);
     });
     const brew = (st: Stage) => {
-      setStage(s, st);
+      setStage(s, st, L);
       loop.wake();
     };
-    model.current = { brew };
+    model.current = {
+      brew,
+      recipe: (r) => {
+        s.recipe = r;
+        // the new beer's extra inputs are new elements: look again, then brew it
+        bind();
+        if (s.stage !== "fresh") brew("grain");
+      },
+    };
 
     // the first batch starts once the drawing is well into view
-    const first = new IntersectionObserver(
+    const seen = new IntersectionObserver(
       (entries) => {
         if (!entries.some((e) => e.isIntersecting)) return;
-        first.disconnect();
+        seen.disconnect();
         if (s.stage === "fresh") brew("grain");
       },
       { rootMargin: "0px 0px -25% 0px" },
     );
-    first.observe(root);
+    seen.observe(root);
 
     const onLayout = () => {
-      relayout(s);
       bind();
+      relayout(s, L);
       loop.wake();
     };
     wideQ.addEventListener("change", onLayout);
@@ -430,7 +240,7 @@ export function BrewProcess({ className }: { className?: string }) {
 
     return () => {
       offTilt();
-      first.disconnect();
+      seen.disconnect();
       wideQ.removeEventListener("change", onLayout);
       root.removeEventListener("click", onTap);
       loop.stop();
@@ -438,11 +248,53 @@ export function BrewProcess({ className }: { className?: string }) {
     };
   }, []);
 
+  // a new beer: after React has drawn its extra inputs, brew it
+  useEffect(() => {
+    model.current?.recipe(recipe);
+  }, [recipe]);
+
+  // on a phone the beers are one row you swipe: keep the chosen one in sight (the row
+  // scrolls, never the page)
+  const row = useRef<HTMLFieldSetElement>(null);
+  const pickedId = beer?.id;
+  useEffect(() => {
+    const el = row.current;
+    const on = el?.querySelector<HTMLElement>('[aria-pressed="true"]');
+    if (!el || !on || el.scrollWidth <= el.clientWidth || !pickedId) return;
+    const pad = Number.parseFloat(getComputedStyle(el).paddingLeft) || 0;
+    el.scrollTo({ left: on.offsetLeft - el.offsetLeft - pad, behavior: "instant" });
+  }, [pickedId]);
+
+  const color = beer?.color;
+  const look: CSSProperties = color
+    ? ({
+        "--brew-beer": color,
+        "--brew-beer-look": recipe.hazy ? `color-mix(in srgb, ${color} 78%, var(--bone))` : color,
+      } as CSSProperties)
+    : {};
+
   return (
-    <div className={className ? `brew ${className}` : "brew"}>
-      <div ref={art} className="brew__art" role="img" aria-label={brewLabels.aria}>
-        <Scene L={PHONE} uid={uid} />
-        <Scene L={WIDE} uid={uid} />
+    <div className={className ? `brew ${className}` : "brew"} style={look}>
+      {beers.length > 1 ? (
+        <fieldset ref={row} className="brew__beers">
+          <legend className="sr-only">{brewLabels.choose}</legend>
+          {beers.map((b) => (
+            <button
+              key={b.id}
+              type="button"
+              className="brew__beer"
+              aria-pressed={b.id === beer?.id}
+              onClick={() => choose(b.id)}
+            >
+              <span className="brew__swatch" style={{ background: b.color }} aria-hidden="true" />
+              {b.name}
+            </button>
+          ))}
+        </fieldset>
+      ) : null}
+      <div ref={art} className="brew__art" role="img" aria-label={brewLabels.aria(beer?.name ?? "our beer")}>
+        <Scene L={PHONE} uid={uid} recipe={recipe} />
+        <Scene L={WIDE} uid={uid} recipe={recipe} />
       </div>
       <p className="brew__foot">
         <button

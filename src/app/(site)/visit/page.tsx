@@ -13,7 +13,6 @@ import { PageWipe } from "@/components/layout/PageWipe";
 import { SectionHead } from "@/components/layout/SectionHead";
 import { ExternalLink } from "@/components/ui/TextLink";
 import { AddressBlock } from "@/components/visit/AddressBlock";
-import { Fetch } from "@/components/visit/Fetch";
 import { Firepit } from "@/components/visit/Firepit";
 import { HoursCard } from "@/components/visit/HoursCard";
 import { hoursEvents, OpenNow } from "@/components/visit/OpenNow";
@@ -67,7 +66,7 @@ export default async function VisitPage() {
       art: "dog",
       label: visitLabels.dogs,
       text: site.visit.dogs,
-      pic: { play: <Fetch /> },
+      pic: { pair: ["fire-table", "firepit-beers"] },
     },
     {
       id: "gift-cards",

@@ -157,14 +157,22 @@ export const homeLabels = {
   since: "2018",
 } as const;
 
-// Our beer: the drawing of how a batch is brewed (2026-11-16). Station names only.
+// Our beer: the drawing of how a batch is brewed (2026-11-16). Station names only. The
+// drawing shows malting at Theo's request (2026-11-16): those words appear in it and
+// nowhere else on the site (spec O10).
 export const brewLabels = {
   title: "How it's made",
-  aria: "How our beer is made, from New York grain to kegs and cans",
+  aria: (beer: string) =>
+    `How ${beer} is made, from New York grain through malting, mashing and the boil to kegs and cans`,
+  choose: "Choose a beer to brew",
   grain: "Grain",
   hops: "Hops",
   water: "Water",
   yeast: "Yeast",
+  malting: "Malting",
+  steep: "Steep",
+  germinate: "Germinate",
+  kiln: "Kiln",
   mill: "Mill",
   mash: "Mash",
   runoff: "Run-off",
@@ -172,6 +180,7 @@ export const brewLabels = {
   ferment: "Ferment",
   out: "Kegs & cans",
   again: "Brew another",
+  seeHow: "See how it's brewed",
 } as const;
 
 // Ordering from the site (2026-11-15). Interface labels and the messages the order sheet

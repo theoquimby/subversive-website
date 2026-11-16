@@ -8,7 +8,7 @@ Public site for Subversive, a farmhouse brewery, taproom and kitchen in Catskill
 2. The site must look designed by one hand from the brewery's own printed menu (`docs/source/food-menu-2026-10.png`), not assembled from a kit. Follow the tokens (spec §2), the graphic language (§3) and the craft rules (§3A) exactly.
 3. Every graphic is SVG or CSS. Photos are the only raster files.
 4. No filler copy, no invented facts, no slogans. All copy comes from `content/` or the microcopy list in spec §7. If something is missing, leave a `TODO(Max)` and omit the block.
-5. The brand is moving away from malting. Never mention malting, a malthouse or "Malting" in anything public (spec O10).
+5. The brand is moving away from malting. Never mention malting, a malthouse or "Malting" in anything public (spec O10). One exception, decided by Theo on 2026-11-16: the brewing-process drawing on /beer (the `.brew-section`) shows a malting stage and may use the word there, and only there. Max's sign-off on that is still to come; O10 itself stays open.
 6. No native browser widgets, no component library with its own look, no icon library.
 
 ## How to work

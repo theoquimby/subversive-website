@@ -1,0 +1,235 @@
+/* Holiday touches (src/lib/season/holidays.ts; components in src/components/season).
+   A few weeks before a holiday the barley mark wears a tiny hat or object, and a few small
+   pen drawings stand by the footer's ground line (and, on wide screens, in the margins).
+   Decorative only: no room taken, no pointer caught, still with reduced motion, not printed. */
+
+/* ---------- The logo touch ----------
+   Laid over the mark in the mark's own units: 1em is the mark's height (shell.css sets it
+   30 px, 36 px from 64rem) and the mark is 170 units tall, so the overlay's 120 × 100 unit
+   box starts 30 units left of the mark and 50 above its top. */
+.brand:has(> .season-mark) {
+  position: relative;
+}
+.season-mark {
+  position: absolute;
+  top: calc(50% - 0.5em - 50em / 170);
+  left: calc(-30em / 170);
+  width: calc(120em / 170);
+  height: calc(100em / 170);
+  font-size: 30px;
+  overflow: visible;
+  pointer-events: none;
+}
+@media (min-width: 64rem) {
+  .season-mark {
+    font-size: 36px;
+  }
+}
+.season-mark path {
+  stroke: var(--fg);
+  stroke-width: 1.6px;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  vector-effect: non-scaling-stroke;
+}
+
+/* ---------- Colour, from the tokens, used sparingly ---------- */
+:is(.season-mark, .season-item) path.season-fill--none {
+  fill: none;
+}
+:is(.season-mark, .season-item) path.season-fill--bg {
+  fill: var(--bg);
+}
+:is(.season-mark, .season-item) path.season-fill--card {
+  fill: var(--card);
+}
+:is(.season-mark, .season-item) path.season-fill--fg {
+  fill: var(--fg);
+}
+:is(.season-mark, .season-item) path.season-fill--ember {
+  fill: var(--ember);
+}
+:is(.season-mark, .season-item) path.season-fill--pils {
+  fill: var(--pils);
+}
+:is(.season-mark, .season-item) path.season-fill--go {
+  fill: var(--go);
+}
+:is(.season-mark, .season-item) path.season-fill--sky {
+  fill: var(--sky);
+}
+:is(.season-mark, .season-item) path.season-fill--sky-deep {
+  fill: var(--sky-deep);
+}
+:is(.season-mark, .season-item) path.season-ink--ember {
+  stroke: var(--ember);
+}
+
+/* ---------- The scattered drawings ----------
+   A line of no height between the page and the footer. The footer's top margin (--s-10)
+   is empty ground: the drawings stand in its lower part, just above the ground line. */
+.season-scatter {
+  position: relative;
+  flex: none;
+  height: 0;
+  pointer-events: none;
+}
+.season-scatter .season-item {
+  position: absolute;
+  top: var(--s-8);
+  width: 2.25rem;
+  height: auto;
+  pointer-events: none;
+}
+.season-item--1 {
+  left: calc(var(--gutter) + 6%);
+  rotate: var(--rot-a);
+}
+.season-item--2 {
+  right: calc(var(--gutter) + 10%);
+  rotate: var(--rot-b);
+}
+.season-scatter .season-item--3,
+.season-scatter .season-item--4,
+.season-scatter .season-item--5 {
+  display: none;
+}
+@media (min-width: 48rem) {
+  .season-scatter .season-item--3 {
+    display: block;
+    left: 54%;
+  }
+}
+/* wide screens: two more in the side margins, beside the end of the page, where the
+   margin is wider than the drawing (90rem leaves 7.5rem each side of the content) */
+@media (min-width: 90rem) {
+  .season-scatter .season-item--4,
+  .season-scatter .season-item--5 {
+    display: block;
+    top: auto;
+    width: 2.75rem;
+  }
+  .season-scatter .season-item--4 {
+    bottom: var(--s-12);
+    left: calc(50% - var(--content-max) / 2 - var(--s-10));
+    rotate: var(--rot-b);
+  }
+  .season-scatter .season-item--5 {
+    /* low enough to stay clear of the sticky bars on a short page (the menu's section tabs) */
+    bottom: calc(var(--s-12) * 1.4);
+    right: calc(50% - var(--content-max) / 2 - var(--s-10));
+    rotate: var(--rot-a);
+  }
+}
+
+/* the colour comes in once the line has inked itself in */
+@media (scripting: enabled) and (prefers-reduced-motion: no-preference) {
+  .season-item:not([data-draw="in"]) path {
+    fill-opacity: 0;
+  }
+  .season-item[data-draw="in"] path {
+    transition: fill-opacity var(--d-3) var(--ease-out) var(--d-3);
+  }
+}
+
+/* ---------- One stepped loop each ----------
+   Held steps, like a flipbook (a smooth loop inside a drawing dropped Safari to about
+   21 frames a second; see graphics.css .mv). Turning parts turn about a point on the
+   48-unit sheet. */
+.season-loop {
+  transform-box: view-box;
+  transform-origin: 24px 24px;
+}
+.season-loop--fall {
+  transform-origin: 24px 12px;
+}
+.season-loop--swing {
+  transform-origin: 24px 4px;
+}
+.season-loop--flutter {
+  transform-origin: 12px 8px;
+}
+@media (scripting: enabled) and (prefers-reduced-motion: no-preference) {
+  .season-item[data-draw="in"] .season-loop--fall {
+    animation: season-fall 3.6s steps(5, jump-none) 1s infinite alternate;
+  }
+  .season-item[data-draw="in"] .season-loop--swing {
+    animation: season-swing 3s steps(5, jump-none) 1s infinite alternate;
+  }
+  .season-item[data-draw="in"] .season-loop--turn {
+    animation: season-turn 6s steps(6, jump-none) 1s infinite alternate;
+  }
+  .season-item[data-draw="in"] .season-loop--twinkle {
+    animation: season-twinkle 1.8s steps(3, jump-none) 1s infinite alternate;
+  }
+  .season-item[data-draw="in"] .season-loop--flutter {
+    animation: season-flutter 1.5s steps(4, jump-none) 1s infinite alternate;
+  }
+  .season-item[data-draw="in"] .season-loop--bob {
+    animation: season-bob 2.4s steps(5, jump-none) 1s infinite alternate;
+  }
+  :root[data-motion="paused"] .season-loop {
+    animation: none;
+  }
+}
+@keyframes season-fall {
+  from {
+    rotate: -9deg;
+    translate: 0 -1px;
+  }
+  to {
+    rotate: 8deg;
+    translate: 0 1px;
+  }
+}
+@keyframes season-swing {
+  from {
+    rotate: -6deg;
+  }
+  to {
+    rotate: 6deg;
+  }
+}
+@keyframes season-turn {
+  from {
+    rotate: 0deg;
+  }
+  to {
+    rotate: 30deg;
+  }
+}
+@keyframes season-twinkle {
+  from {
+    opacity: 0.7;
+    scale: 0.86;
+  }
+  to {
+    opacity: 1;
+    scale: 1;
+  }
+}
+@keyframes season-flutter {
+  from {
+    rotate: -3deg;
+    scale: 0.94 1;
+  }
+  to {
+    rotate: 4deg;
+    scale: 1 1.03;
+  }
+}
+@keyframes season-bob {
+  from {
+    translate: 0 1.2px;
+  }
+  to {
+    translate: 1.5px -1.6px;
+  }
+}
+
+@media print {
+  .season-mark,
+  .season-scatter {
+    display: none;
+  }
+}

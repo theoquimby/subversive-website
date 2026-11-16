@@ -40,6 +40,10 @@ const RIM = 16;
 const LEVEL = 50; // a full pour's liquid line
 const HEAD = 17; // a settled head's thickness
 const FLOOR = 246;
+// An empty glass: the level just under the bowl's lowest point (243), so the first beer to
+// land shows at once. (It was 11 units lower, out of sight under the stem: the first of the
+// pour went in and vanished until the level climbed into view. Theo, 2026-11-16.)
+const EMPTY = 244;
 const SPOUT = -34;
 const GROUND = 318;
 
@@ -384,11 +388,11 @@ export function LabelGlass({
       s.t += dt;
       if (s.phase === "drain") {
         // the last beer goes down fast; its head thins as it falls
-        s.y += (FLOOR + 16 - s.y) * Math.min(1, dt * 7) + 70 * dt;
+        s.y += (EMPTY + 8 - s.y) * Math.min(1, dt * 7) + 70 * dt;
         s.f *= Math.exp(-dt * 7);
         s.bubbles.length = 0;
-        if (s.y >= FLOOR + 8) {
-          s.y = FLOOR + 8;
+        if (s.y >= EMPTY) {
+          s.y = EMPTY;
           s.f = 0;
           if (s.next) colour(s.next);
           s.phase = "fill";
@@ -430,11 +434,17 @@ export function LabelGlass({
       // once the stream has reached the beer, everything that left the tap lands, including
       // what is still falling after the tap has shut and the stream's tail has gone by
       let amount = 0;
-      if (s.reached && s.phase !== "drain") {
+      if (s.phase === "drain") {
+        // a new pour starts with nothing in the air
+        landed = poured;
+      } else if (s.reached) {
         const by = Math.max(landed, pouredBy(s.t - fall));
         amount = by - landed;
         landed = by;
-      } else landed = poured;
+      }
+      // (before the stream reaches the beer nothing has landed yet; that beer is still in the
+      // air and lands as soon as it arrives. It was once written off here, which made the
+      // first half second of every pour vanish.)
       // as a rate, for the splash and the bubbles
       const landing = amount / dt;
 
@@ -752,7 +762,7 @@ export function LabelGlass({
 
     // on arrival: an empty glass under the tap, and the first beer pours itself
     if (!still.matches) {
-      s.y = FLOOR + 8;
+      s.y = EMPTY;
       s.f = 0;
       draw();
       root.dataset.sim = "run";

@@ -9,11 +9,9 @@
 html:has(.page--menu) {
   scroll-padding-top: 0;
 }
-@media (prefers-reduced-motion: no-preference) {
-  html:has(.page--menu) {
-    scroll-behavior: smooth;
-  }
-}
+/* No smooth scrolling on the page itself (Theo, 2026-11-16): with it, arriving from Home
+   slid the menu up from wherever Home had been scrolled to. A jump to a section from the
+   menu's own index is smoothed where it happens (MenuIndex.tsx). */
 
 /* A fixed two-row layout: title and date on the first line, the status pill on its own
    line. As a wrapping flex row it re-wrapped when the fonts arrived or the status line

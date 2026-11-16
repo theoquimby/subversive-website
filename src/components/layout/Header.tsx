@@ -7,6 +7,7 @@ import { getSite, NAV } from "@/lib/site/site";
 import { BarleyMark } from "../graphics/BarleyMark";
 import { Wordmark } from "../graphics/Wordmark";
 import { OrderEntry } from "../order/OrderEntry";
+import { SeasonMark } from "../season/SeasonMark";
 import { Link } from "../ui/Link";
 import { OpenNow } from "../visit/OpenNow";
 import { HeaderScroll } from "./HeaderScroll";
@@ -20,6 +21,8 @@ export function Header() {
       <div className="site-header__inner">
         <Link href="/" className="brand">
           <BarleyMark className="brand__mark" />
+          {/* a holiday's tiny hat on the mark, a few weeks before it (nothing otherwise) */}
+          <SeasonMark />
           <Wordmark className="brand__word" name={site.name} />
         </Link>
         <nav className="site-nav" aria-label="Main">

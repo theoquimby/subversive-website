@@ -7,12 +7,13 @@
 // The address gains ?item=<id>, so Back closes the sheet and the link can be shared; the
 // left and right arrow keys step through the list. Nothing is sent to the browser twice:
 // the sheet reads the row that is already in the page.
-import { menuLabels } from "@content/microcopy";
+import { brewLabels, menuLabels } from "@content/microcopy";
 import { Dialog } from "radix-ui";
 import { type KeyboardEvent, useCallback, useEffect, useState } from "react";
 import type { Show } from "@/lib/menu/filters";
 import { AddToOrder } from "../order/AddToOrder";
 import { Sheet } from "../ui/Sheet";
+import { TextLink } from "../ui/TextLink";
 import { ItemGlass } from "./ItemGlass";
 import { setShow } from "./show-store";
 
@@ -175,6 +176,12 @@ export function ItemSheet() {
             </dl>
           ) : null}
           {item.desc ? <p className="item__desc">{item.desc}</p> : null}
+          {/* house beers (the only items with a colour): how this one is brewed, on Our beer */}
+          {item.color ? (
+            <p className="item__more">
+              <TextLink href={`/beer?brew=${encodeURIComponent(item.id)}#brew`}>{brewLabels.seeHow}</TextLink>
+            </p>
+          ) : null}
           {item.tags.length ? (
             <ul className="item__tags">
               {item.tags.map((t) => (

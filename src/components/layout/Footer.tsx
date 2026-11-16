@@ -1,7 +1,7 @@
 // Footer (second redesign 2026-11-16; Max: "some 2010 footer taking up a bunch of space").
-// No column heads over link lists. The ground line is its top edge; then the useful facts
-// set large in the display face (open now · address · phone); every other link as one
-// line of plain labels; a colophon (the wordmark, the small print, Pause motion); the seal
+// No column heads over link lists. The ground line is its top edge; then every link as one
+// line of plain labels, and under it the useful facts set large in the display face (open
+// now · address · phone); a colophon (the wordmark, the small print, Pause motion); the seal
 // as a small stamp; the printed menu's checker closes the page. Styles: fx-footer.css.
 // The goblin hatch joins in M7; the mailing list stays hidden until O6.
 import { aboutLabels, inquiryLabels, microcopy } from "@content/microcopy";

@@ -30,7 +30,7 @@ export function PhotoStrip({ ids }: { ids: readonly PhotoId[] }) {
                   sizes={i === 0 ? "(min-width: 64rem) 360px, 70vw" : "(min-width: 64rem) 180px, 70vw"}
                   fill
                   placeholder="blur"
-                  loading={i === 0 ? "eager" : "lazy"}
+                  loading="eager"
                   style={{ objectFit: "cover", objectPosition: `${p.focal[0]}% ${p.focal[1]}%` }}
                 />
               </button>

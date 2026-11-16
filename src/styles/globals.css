@@ -19,6 +19,7 @@
 @import "./fx-brew.css";
 /* the footer's redesign overrides the older footer rules in shell.css */
 @import "./fx-footer.css";
+@import "./fx-season.css";
 @import "./print.css";
 
 /*

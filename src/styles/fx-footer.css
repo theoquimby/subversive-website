@@ -193,3 +193,60 @@
     column-gap: var(--s-4);
   }
 }
+
+/* ---------- Roomier, links first (Theo, 2026-11-16: "a little cramped... the curved line is
+   a bit tight to the content... the link row, then the address below it with opening hours
+   and phone number") ---------- */
+.site-footer .site-footer__inner {
+  grid-template-areas:
+    "word  seal"
+    "links links"
+    "facts facts"
+    "rule  rule"
+    "small pause";
+  row-gap: var(--s-2);
+  /* clear air under the curved line: the line's highest crest sits about 1.4rem into it */
+  padding-top: var(--s-7);
+  padding-bottom: var(--s-7);
+}
+.site-footer .site-footer__links {
+  margin-top: var(--s-5);
+}
+.site-footer .site-footer__facts {
+  margin-top: var(--s-5);
+  padding-top: var(--s-5);
+  border-top: 1px solid var(--hair);
+  row-gap: var(--s-1);
+}
+.site-footer .site-footer__inner::after {
+  margin-top: var(--s-6);
+}
+.site-footer .site-footer__small,
+.site-footer .site-footer__pause {
+  margin-top: var(--s-4);
+}
+@media (min-width: 48rem) {
+  .site-footer .site-footer__inner {
+    grid-template-areas:
+      "links links seal"
+      "facts facts seal"
+      "rule  rule  rule"
+      "word  small pause";
+    column-gap: var(--s-8);
+    row-gap: var(--s-3);
+    padding-top: var(--s-9);
+    padding-bottom: var(--s-8);
+  }
+  .site-footer .site-footer__links {
+    margin-top: 0;
+    row-gap: var(--s-1);
+  }
+  .site-footer .site-footer__facts {
+    margin-top: var(--s-3);
+    padding-top: var(--s-4);
+    column-gap: var(--s-8);
+  }
+  .site-footer .site-footer__inner::after {
+    margin-top: var(--s-6);
+  }
+}
