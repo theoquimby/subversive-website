@@ -1,17 +1,15 @@
-// Menu row (spec §4.4): glass · name and badge · meta · description · tags, price at right
-// in a column that does not shift. A row with more to say (a long description or
-// modifiers) is a <details> (plan Q20): it opens with no JavaScript, and nothing of the
-// browser's look remains. Short rows are plain, so no tap opens nothing.
+// Menu row (spec §4.4; review pass 2026-11-15): name and badge, meta, the whole
+// description, tags, and the price at right in a column that does not shift. One kind of
+// row for everything, sauces included. On the menu page the whole row is a link that opens
+// the item's detail view (ItemSheet reads the row, so nothing is sent twice); elsewhere it
+// is plain. The small glass left the row: the glass is in the detail view.
 import { menuLabels } from "@content/microcopy";
+import { type PhotoId, photos } from "@content/photos";
 import type { CSSProperties } from "react";
 import { isBeer } from "@/lib/menu/kinds";
 import { formatPair, formatPrice } from "@/lib/menu/price";
 import type { ItemView } from "@/lib/menu/view";
 import { Badge } from "../graphics/Badge";
-import { GlassGlyph } from "../graphics/GlassGlyph";
-
-/** Above this a description can run past two lines on a phone; the client refines it. */
-const LONG = 80;
 
 export function rowPrice(row: ItemView): string | undefined {
   const { item } = row;
@@ -19,14 +17,23 @@ export function rowPrice(row: ItemView): string | undefined {
   return item.price === undefined ? undefined : formatPrice(item.price);
 }
 
+/** The photo's address through the image optimiser, at the detail view's width. */
+function photoOf(id: string | undefined) {
+  if (!id || !(id in photos)) return undefined;
+  const p = photos[id as PhotoId];
+  const src = typeof p.src === "string" ? p.src : p.src.src;
+  return { src: `/_next/image?url=${encodeURIComponent(src)}&w=828&q=75`, alt: p.alt };
+}
+
 export function MenuRow({
   row,
   index,
-  disclosure = true,
+  detail = false,
 }: {
   row: ItemView;
   index: number;
-  disclosure?: boolean;
+  /** the row opens the item's detail view (the menu page only) */
+  detail?: boolean;
 }) {
   const { item } = row;
   const beer = isBeer(item);
@@ -34,35 +41,33 @@ export function MenuRow({
     ? `${item.style} · ${item.abv.toFixed(1)}%`
     : [item.producer, item.origin].filter(Boolean).join(" · ");
   const price = rowPrice(row);
-  const opens = disclosure && (!!item.modifiers || (item.description?.length ?? 0) > LONG);
+  const photo = detail ? photoOf(item.photo) : undefined;
 
-  const body = (
+  const inner = (
     <>
-      {beer ? (
-        <span className="mrow__glass">
-          <GlassGlyph color={item.color} fill={0.78} hazy={item.hazy} />
+      <span className="mrow__sum">
+        <span className="mrow__main">
+          <span className="mrow__name">{item.name}</span>
+          {meta || row.badge ? (
+            <span className="mrow__line">
+              {meta ? <span className="mrow__meta">{meta}</span> : null}
+              {row.badge ? <Badge>{row.badge}</Badge> : null}
+            </span>
+          ) : null}
+          {item.description ? <span className="mrow__desc">{item.description}</span> : null}
+          {item.tags?.length ? (
+            <span className="mrow__tags">
+              {item.tags.map((t) => (
+                <span key={t} className="mtag">
+                  {menuLabels.tags[t]}
+                </span>
+              ))}
+            </span>
+          ) : null}
         </span>
-      ) : null}
-      <span className="mrow__main">
-        <span className="mrow__name">{item.name}</span>
-        {meta || row.badge ? (
-          <span className="mrow__line">
-            {meta ? <span className="mrow__meta">{meta}</span> : null}
-            {row.badge ? <Badge>{row.badge}</Badge> : null}
-          </span>
-        ) : null}
-        {item.description ? <span className="mrow__desc">{item.description}</span> : null}
-        {item.tags?.length ? (
-          <span className="mrow__tags">
-            {item.tags.map((t) => (
-              <span key={t} className="mtag">
-                {menuLabels.tags[t]}
-              </span>
-            ))}
-          </span>
-        ) : null}
+        {price ? <span className="mrow__price">{price}</span> : null}
       </span>
-      {price ? <span className="mrow__price">{price}</span> : null}
+      {item.modifiers ? <span className="mrow__more">{item.modifiers}</span> : null}
     </>
   );
 
@@ -70,21 +75,19 @@ export function MenuRow({
     <li
       className="mrow"
       data-row={row.id}
-      data-pour={beer ? "" : undefined}
+      data-color={detail && beer ? item.color : undefined}
+      data-hazy={detail && beer && item.hazy ? "" : undefined}
+      data-photo={photo?.src}
+      data-photo-alt={photo?.alt}
       style={{ "--i": Math.min(index, 8) } as CSSProperties}
     >
-      {opens ? (
-        <details id={row.id} className="mrow__box">
-          <summary className="mrow__sum">
-            {body}
-            <span className="mrow__toggle" aria-hidden="true" />
-          </summary>
-          {item.modifiers ? <p className="mrow__more">{item.modifiers}</p> : null}
-        </details>
+      {detail ? (
+        <a id={row.id} className="mrow__box" href={`?item=${encodeURIComponent(row.id)}`} data-item={row.id}>
+          {inner}
+        </a>
       ) : (
         <div id={row.id} className="mrow__box">
-          <div className="mrow__sum">{body}</div>
-          {item.modifiers ? <p className="mrow__more">{item.modifiers}</p> : null}
+          {inner}
         </div>
       )}
     </li>

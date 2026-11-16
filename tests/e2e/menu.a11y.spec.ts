@@ -1,7 +1,7 @@
 import AxeBuilder from "@axe-core/playwright";
 import { expect, type Page, test } from "@playwright/test";
 
-// Plan M3: axe on both tabs, filters open and closed.
+// Plan M3: axe on both tabs, with the index sheet open and with an item's detail view.
 // Rows dimmed by a filter are a deliberate "not matching" state (plan Q6), excluded by name.
 async function axe(page: Page) {
   await page.evaluate(() => document.fonts.ready);
@@ -19,11 +19,18 @@ for (const show of ["drinks", "food"]) {
     expect(await axe(page)).toEqual([]);
   });
 
-  test(`axe: /menu ${show}, filters on`, async ({ page }) => {
+  test(`axe: /menu ${show}, the index open with a filter on`, async ({ page }) => {
     await page.goto(`/menu?show=${show}`, { waitUntil: "networkidle" });
-    const pill = page.locator(".fpill");
-    if (await pill.isVisible()) await pill.click();
-    await page.locator(".fchip").first().click();
+    await page.locator(".mbar-index").click();
+    await page.locator(".choice").first().click();
+    expect(await axe(page)).toEqual([]);
+  });
+}
+
+for (const item of ["new-york-nectar", "house-salad"]) {
+  test(`axe: /menu with the detail view of ${item}`, async ({ page }) => {
+    await page.goto(`/menu?item=${item}`, { waitUntil: "networkidle" });
+    await expect(page.getByRole("dialog")).toBeVisible();
     expect(await axe(page)).toEqual([]);
   });
 }

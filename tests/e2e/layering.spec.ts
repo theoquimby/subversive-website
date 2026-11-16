@@ -90,12 +90,13 @@ test("nothing but the header is pinned on /events", async ({ page }) => {
   expect(pinned).toEqual([]);
 });
 
-test("the menu's section chips are there after an in-site navigation", async ({ page }) => {
+test("the menu's list controls are there after an in-site navigation", async ({ page }) => {
   await page.goto("/");
   await page.getByRole("link", { name: "See the menu" }).click();
   await expect(page).toHaveURL(/\/menu$/);
   await expect(page.locator("[data-menu]")).toHaveAttribute("data-show", "drinks");
-  await expect(page.locator('.chips[data-for="drinks"]')).toBeVisible();
+  await expect(page.locator(".mbar-index")).toBeVisible();
+  await expect(page.getByRole("radio", { name: "Drinks" })).toBeVisible();
   await expect(page.locator('[data-list="food"]')).toBeHidden();
 });
 

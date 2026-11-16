@@ -1,6 +1,6 @@
 // @vitest-environment happy-dom
 import raw from "@content/menu.json";
-import { cleanup, fireEvent, render } from "@testing-library/react";
+import { cleanup, render } from "@testing-library/react";
 import { afterEach, describe, expect, it } from "vitest";
 import { MenuRow } from "@/components/menu/MenuRow";
 import { parseMenu } from "@/lib/menu/schema";
@@ -13,62 +13,52 @@ const row = (id: string) => {
   if (!r) throw new Error(id);
   return r;
 };
-const mount = (id: string) =>
+const mount = (id: string, detail = false) =>
   render(
     <ul>
-      <MenuRow row={row(id)} index={0} />
+      <MenuRow row={row(id)} index={0} detail={detail} />
     </ul>,
   ).container;
 
-describe("MenuRow (spec §4.4)", () => {
-  it("a long row is a closed disclosure with name and price in the summary", () => {
+describe("MenuRow (spec §4.4; review pass 2026-11-15)", () => {
+  it("nothing folds: the whole description and the price are simply there", () => {
     const c = mount("chinga-la-migra");
-    const details = c.querySelector("details");
-    expect(details).not.toBeNull();
-    expect(details?.open).toBe(false);
-    const summary = c.querySelector("summary");
-    expect(summary?.textContent).toContain("¡Chinga La Migra!");
-    expect(summary?.querySelector(".mrow__price")?.textContent).toBe("5 / 8");
-  });
-
-  it("opens on click and on Enter", () => {
-    const c = mount("chinga-la-migra");
-    const details = c.querySelector("details") as HTMLDetailsElement;
-    const summary = c.querySelector("summary") as HTMLElement;
-    fireEvent.click(summary);
-    expect(details.open).toBe(true);
-    fireEvent.click(summary);
-    expect(details.open).toBe(false);
-    // a summary is a native button: Enter activates it as a click
-    summary.focus();
-    fireEvent.keyDown(summary, { key: "Enter" });
-    fireEvent.click(summary);
-    expect(details.open).toBe(true);
-  });
-
-  it("the long description is clamped by CSS only while closed (no truncation in the DOM)", () => {
-    const c = mount("chinga-la-migra");
-    expect(c.querySelector(".mrow__desc")?.textContent).toContain("go directly to CCSM");
-  });
-
-  it("modifiers sit outside the summary, revealed on open", () => {
-    const c = mount("house-salad");
-    expect(c.querySelector("summary .mrow__more")).toBeNull();
-    expect(c.querySelector("details > .mrow__more")?.textContent).toContain("grilled chicken +6");
-  });
-
-  it("a short row is not a disclosure", () => {
-    const c = mount("puff-puff-pils");
     expect(c.querySelector("details")).toBeNull();
-    expect(c.querySelector("#puff-puff-pils")).not.toBeNull();
+    expect(c.querySelector(".mrow__name")?.textContent).toBe("¡Chinga La Migra!");
+    expect(c.querySelector(".mrow__desc")?.textContent).toContain("go directly to CCSM");
+    // the two pours are set with thin spaces around the stroke
+    expect(c.querySelector(".mrow__price")?.textContent).toMatch(/^5\s\/\s8$/);
   });
 
-  it("one badge at most; beers get the glass, food does not", () => {
-    expect(mount("new-york-nectar").querySelectorAll(".badge")).toHaveLength(1);
-    cleanup();
-    expect(mount("new-york-nectar").querySelector("svg.glass")).not.toBeNull();
-    cleanup();
-    expect(mount("classic").querySelector("svg.glass")).toBeNull();
+  it("modifiers follow the row", () => {
+    const c = mount("house-salad");
+    expect(c.querySelector(".mrow__sum .mrow__more")).toBeNull();
+    expect(c.querySelector(".mrow__box > .mrow__more")?.textContent).toContain("grilled chicken +6");
+  });
+
+  it("on the menu the whole row is one link to the item's detail view, carrying the beer's colour", () => {
+    const c = mount("puff-puff-pils", true);
+    const a = c.querySelector("a.mrow__box");
+    expect(a?.id).toBe("puff-puff-pils");
+    expect(a?.getAttribute("href")).toBe("?item=puff-puff-pils");
+    expect(a?.getAttribute("data-item")).toBe("puff-puff-pils");
+    expect(a?.querySelector(".mrow__price")).not.toBeNull();
+    expect(c.querySelector("li")?.getAttribute("data-color")).toMatch(/^#/);
+    // no photo named: no photo attribute, so the detail view shows no placeholder
+    expect(c.querySelector("li")?.hasAttribute("data-photo")).toBe(false);
+  });
+
+  it("elsewhere a row is plain: no link, nothing for the detail view", () => {
+    const c = mount("puff-puff-pils");
+    expect(c.querySelector("a")).toBeNull();
+    expect(c.querySelector("div#puff-puff-pils")).not.toBeNull();
+    expect(c.querySelector("li")?.hasAttribute("data-color")).toBe(false);
+  });
+
+  it("one badge at most; no glass in a row (it is in the detail view)", () => {
+    const c = mount("new-york-nectar");
+    expect(c.querySelectorAll(".badge")).toHaveLength(1);
+    expect(c.querySelector("svg")).toBeNull();
   });
 
   it("Mushroom & Swiss shows 20", () => {

@@ -41,6 +41,8 @@ const itemBase = {
   modifiers: z.string().optional(),
   tags: z.array(tag).optional(),
   badge: z.string().optional(),
+  /** a photo id from content/photos, shown in the item's detail view */
+  photo: z.string().optional(),
   availability: availability.optional(),
 };
 

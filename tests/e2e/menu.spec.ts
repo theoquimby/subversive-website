@@ -39,10 +39,20 @@ test("arrow keys move the switch", async ({ page, isMobile }) => {
   await expect(food(page)).toBeVisible();
 });
 
-test("a chip lands its section heading below the sticky stack", async ({ page }) => {
+const wideIndex = (page: Page) => page.locator('.mbar-links[data-for="food"]').isVisible();
+
+test("a section link lands its heading below the sticky bar and becomes the current one", async ({
+  page,
+}) => {
   await page.goto("/menu?show=food");
-  const chip = page.locator('.chips[data-for="food"] a', { hasText: "Salads" });
-  await chip.click();
+  const wide = await wideIndex(page);
+  if (wide) await page.locator('.mbar-links[data-for="food"] a', { hasText: "Salads" }).click();
+  else {
+    // a phone: the bar names the section being read; its sheet lists them all
+    await page.locator(".mbar-index").click();
+    await page.getByRole("dialog").getByRole("link", { name: "Salads" }).click();
+    await expect(page.getByRole("dialog")).toBeHidden();
+  }
   const heading = page.locator("#salads-title");
   await expect(heading).toBeInViewport();
   await expect
@@ -52,18 +62,33 @@ test("a chip lands its section heading below the sticky stack", async ({ page })
       return !!bar && !!h && h.y >= bar.y + bar.height - 1;
     })
     .toBe(true);
-  await expect(chip).toHaveAttribute("aria-current", "true");
+  if (wide)
+    await expect(page.locator('.mbar-links[data-for="food"] a', { hasText: "Salads" })).toHaveAttribute(
+      "aria-current",
+      "true",
+    );
+  else await expect(page.locator('.mbar-index__here[data-for="food"]')).toHaveText("Salads");
+});
+
+test("the bar is one row, 48 px tall, with nothing else pinned", async ({ page }) => {
+  await page.goto("/menu");
+  const bar = await page.locator(".menu-bar").boundingBox();
+  expect(bar?.height).toBeLessThanOrEqual(49);
+  await expect(page.locator(".order-bar, .chips, .fpill")).toHaveCount(0);
 });
 
 test("filters dim non-matching rows and announce the count", async ({ page }) => {
   await page.goto("/menu");
-  const pill = page.locator(".fpill");
-  if (await pill.isVisible()) await pill.click();
+  await page.locator(".mbar-index").click();
   await page.getByRole("button", { name: "Light" }).click();
   await page.getByRole("button", { name: "Sour" }).click();
-  await expect(page.locator(".filters__count")).toHaveText("4 beers match");
+  await expect(page.locator(".index-count")).toHaveText("4 beers match");
   await expect(page.locator('[data-row="new-york-nectar"]')).toHaveAttribute("data-dim", "");
   await expect(page.locator('[data-row="cheap-dills"]')).not.toHaveAttribute("data-dim", "");
+  // the choice holds after the sheet is closed, and the bar says how many are on
+  await page.getByRole("button", { name: "Close" }).click();
+  await expect(page.locator(".mbar-index__n")).toHaveText("2");
+  await expect(page.locator('[data-row="new-york-nectar"]')).toHaveAttribute("data-dim", "");
 });
 
 test("/menu#cheap-dills scrolls the row into view; every description is shown whole", async ({ page }) => {
@@ -82,37 +107,57 @@ test("/menu#cheap-dills scrolls the row into view; every description is shown wh
   expect(clipped).toBe(0);
 });
 
-const pastFirstSection = (page: Page) =>
-  page.evaluate(() => {
-    const first = document.querySelector('[data-list="drinks"] [data-section]') as HTMLElement;
-    const bottom = first.getBoundingClientRect().bottom + window.scrollY;
-    window.scrollTo({ top: bottom + 200, behavior: "instant" });
-  });
-
-test("the order bar appears after the first section and links to Square", async ({ page }) => {
-  test.skip((page.viewportSize()?.width ?? 0) >= 768, "phone only");
+test("a row opens its item's detail view; Back closes it", async ({ page }) => {
   await page.goto("/menu");
-  const bar = page.locator(".order-bar");
-  await expect(bar).not.toHaveAttribute("data-visible", "");
-  await pastFirstSection(page);
-  await expect(bar).toHaveAttribute("data-visible", "");
-  const order = bar.getByRole("link", { name: /Order pickup/ });
-  await expect(order).toHaveAttribute("rel", "noopener");
-  await expect(order).toHaveAttribute("href", /square/);
+  await page.locator('a[data-item="new-york-nectar"]').click();
+  const sheet = page.getByRole("dialog");
+  await expect(sheet.getByRole("heading", { name: "New York Nectar" })).toBeVisible();
+  await expect(page).toHaveURL(/[?&]item=new-york-nectar/);
+  // a beer: the glass, and a price for each pour size
+  await expect(sheet.locator("svg.glass")).toBeVisible();
+  await expect(sheet.locator(".item__prices dt")).toHaveText(["9 oz", "16 oz"]);
+  await expect(sheet.locator(".item__prices dd")).toHaveText(["5", "8"]);
+  await expect(sheet.locator(".item__photo")).toHaveCount(0);
+  await page.goBack();
+  await expect(sheet).toBeHidden();
+  await expect(page).not.toHaveURL(/item=/);
+  await expect(page).toHaveURL(/\/menu/);
 });
 
-test("share falls back to copy with a toast", async ({ page, context, browserName }) => {
-  test.skip((page.viewportSize()?.width ?? 0) >= 768, "the share button lives in the phone order bar");
-  test.skip(browserName === "webkit", "WebKit has a share sheet; the fallback is Chromium's path");
-  await context.grantPermissions(["clipboard-read", "clipboard-write"]);
-  await page.addInitScript(() => {
-    Object.defineProperty(navigator, "share", { value: undefined });
-  });
+test("a shared item link opens on its item, in its own list; Close clears the address", async ({ page }) => {
+  await page.goto("/menu?item=mushroom-and-swiss");
+  await expect(food(page)).toBeVisible();
+  const sheet = page.getByRole("dialog");
+  await expect(sheet.getByRole("heading", { name: "Mushroom & Swiss" })).toBeVisible();
+  await expect(sheet.locator(".item__prices dd")).toHaveText("20");
+  await expect(sheet.locator(".item__desc")).toContainText("Swiss cheese");
+  // the section's add-ons come along
+  await expect(sheet.locator(".item__more")).toContainText("bacon");
+  await sheet.getByRole("button", { name: "Close" }).click();
+  await expect(sheet).toBeHidden();
+  await expect(page).not.toHaveURL(/item=/);
+});
+
+test("an item with a photo shows it; the arrow keys step through the list", async ({ page, isMobile }) => {
   await page.goto("/menu");
-  await pastFirstSection(page);
-  await expect(page.locator(".order-bar")).toHaveAttribute("data-visible", "");
-  await page.getByRole("button", { name: "Share" }).click();
-  await expect(page.getByRole("status").filter({ hasText: "Link copied" })).toBeVisible();
+  // no item has a photo yet (they come from Max): give one row an address as the server would
+  await page.locator('[data-row="puff-puff-pils"]').evaluate((li) => {
+    li.setAttribute("data-photo", "/photo-test.jpg");
+    li.setAttribute("data-photo-alt", "A glass of pilsner");
+  });
+  await page.locator('a[data-item="puff-puff-pils"]').click();
+  const sheet = page.getByRole("dialog");
+  await expect(sheet.locator("img.item__photo")).toHaveAttribute("src", "/photo-test.jpg");
+  await expect(sheet.locator("img.item__photo")).toHaveAttribute("alt", "A glass of pilsner");
+  await expect(sheet.locator("svg.glass")).toHaveCount(0);
+  test.skip(isMobile, "no physical keyboard on phones");
+  await page.keyboard.press("ArrowRight");
+  await expect(sheet.getByRole("heading", { name: "¡Chinga La Migra!" })).toBeVisible();
+  await expect(page).toHaveURL(/item=chinga-la-migra/);
+  await page.keyboard.press("ArrowLeft");
+  await expect(sheet.getByRole("heading", { name: "Puff Puff Pils" })).toBeVisible();
+  await page.keyboard.press("Escape");
+  await expect(sheet).toBeHidden();
 });
 
 test("Mushroom & Swiss shows 20, two taps from home", async ({ page, isMobile }) => {
@@ -140,12 +185,13 @@ test.describe("without JavaScript", () => {
   });
 });
 
-test("open filters keep the bar inside a 320 px screen", async ({ page }) => {
+test("the bar and its sheet stay inside a 320 px screen", async ({ page }) => {
   await page.setViewportSize({ width: 320, height: 640 });
-  await page.goto("/menu");
-  await page.locator(".fpill").click();
-  await page.getByRole("button", { name: "Hoppy" }).click();
-  await expect(page.locator(".fpill")).toBeInViewport({ ratio: 1 });
+  await page.goto("/menu?show=food");
+  await expect(page.locator(".mbar-index")).toBeInViewport({ ratio: 1 });
+  await page.locator(".mbar-index").click();
+  await page.locator(".choice").first().click();
+  await expect(page.getByRole("button", { name: "Close" })).toBeInViewport({ ratio: 1 });
   const overflow = await page.evaluate(() => document.documentElement.scrollWidth - window.innerWidth);
   expect(overflow).toBeLessThanOrEqual(0);
 });

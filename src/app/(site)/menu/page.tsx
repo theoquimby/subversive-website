@@ -4,13 +4,12 @@
 import { menuLabels } from "@content/microcopy";
 import type { Metadata } from "next";
 import { PageWipe } from "@/components/layout/PageWipe";
+import { ItemSheet } from "@/components/menu/ItemSheet";
 import { MenuEnhancer } from "@/components/menu/MenuEnhancer";
+import { type Chip, MenuIndex } from "@/components/menu/MenuIndex";
 import { MenuSection } from "@/components/menu/MenuSection";
 import { MenuTabs } from "@/components/menu/MenuTabs";
 import { menuBootScript } from "@/components/menu/menu-boot";
-import { OrderBar } from "@/components/menu/OrderBar";
-import { PourLine } from "@/components/menu/PourLine";
-import { type Chip, SectionChips } from "@/components/menu/SectionChips";
 import { TodayFeatures } from "@/components/menu/TodayFeatures";
 import { Under21Note } from "@/components/menu/Under21Note";
 import { OpenNow } from "@/components/visit/OpenNow";
@@ -79,14 +78,17 @@ export default async function MenuPage() {
           />
           <span className="menu-bar-sentinel" aria-hidden="true" />
           <nav className="menu-bar" aria-label={menuLabels.sections}>
-            <div className="menu-bar__row">
-              <MenuTabs beers={draftBeers(view).map(slim)} dishes={dishes} />
-              <p className="menu-bar__nojs">
-                <a href="#drinks">{menuLabels.drinks}</a>
-                <a href="#food">{menuLabels.food}</a>
-              </p>
-            </div>
-            <SectionChips drinks={chipsFor(view.drinks)} food={chipsFor(view.food)} />
+            <MenuTabs />
+            <p className="menu-bar__nojs">
+              <a href="#drinks">{menuLabels.drinks}</a>
+              <a href="#food">{menuLabels.food}</a>
+            </p>
+            <MenuIndex
+              drinks={chipsFor(view.drinks)}
+              food={chipsFor(view.food)}
+              beers={draftBeers(view).map(slim)}
+              dishes={dishes}
+            />
           </nav>
 
           <section id="drinks" className="menu-list" data-list="drinks" aria-labelledby="drinks-title">
@@ -125,8 +127,7 @@ export default async function MenuPage() {
           </footer>
         </div>
       </div>
-      <OrderBar orderUrl={site.links.order} />
-      <PourLine drinks={view.drinks.map((s) => s.id)} food={view.food.map((s) => s.id)} />
+      <ItemSheet />
       <MenuEnhancer />
     </PageWipe>
   );

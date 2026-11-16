@@ -4,7 +4,7 @@ import { expect, test } from "@playwright/test";
 test("print shows a clean two-column menu", async ({ page }) => {
   await page.goto("/menu");
   await page.emulateMedia({ media: "print" });
-  for (const sel of [".site-header", ".site-footer", ".menu-bar", ".order-bar", ".pour-line"]) {
+  for (const sel of [".site-header", ".site-footer", ".menu-bar"]) {
     await expect(page.locator(sel).first()).toBeHidden();
   }
   await expect(page.locator('[data-list="drinks"]')).toBeVisible();

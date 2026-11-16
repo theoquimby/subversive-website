@@ -1,14 +1,10 @@
-// One menu section (spec §6.2): its pill, the beer legend, the intro box, then groups of
-// rows — or the burger columns, the sauce list, or the week's features by day.
+// One menu section (spec §6.2): its name on the ink line, the beer legend, the intro, then
+// groups of rows, or the week's features by day. Every item is the same kind of row.
 import type { FeatureGroup } from "@/lib/menu/features";
 import type { SectionView } from "@/lib/menu/view";
 import { SectionHead } from "../layout/SectionHead";
-import { BurgerColumns } from "./BurgerColumns";
 import { IntroBox } from "./IntroBox";
 import { MenuRow } from "./MenuRow";
-import { SauceList } from "./SauceList";
-
-const BURGERS = new Set(["smash-burgers", "impossible-burgers"]);
 
 export function MenuSection({
   section: s,
@@ -22,13 +18,8 @@ export function MenuSection({
   features?: FeatureGroup[];
   producers: readonly string[];
 }) {
-  const items = s.groups.flatMap((g) => g.items);
   let body: React.ReactNode;
-  if (BURGERS.has(s.id)) {
-    body = <BurgerColumns items={items} />;
-  } else if (s.id === "sauces") {
-    body = <SauceList items={items} />;
-  } else if (features) {
+  if (features) {
     body = features.map((f) => (
       <div key={f.title} className="mgroup">
         <h4 className="mgroup__head">
@@ -37,7 +28,7 @@ export function MenuSection({
         </h4>
         <ul className="mlist">
           {f.items.map((row, i) => (
-            <MenuRow key={row.id} row={row} index={i} disclosure={false} />
+            <MenuRow key={row.id} row={row} index={i} detail />
           ))}
         </ul>
       </div>
@@ -57,7 +48,7 @@ export function MenuSection({
         ) : null}
         <ul className="mlist">
           {g.items.map((row, i) => (
-            <MenuRow key={row.id} row={row} index={i} disclosure={false} />
+            <MenuRow key={row.id} row={row} index={i} detail />
           ))}
         </ul>
       </div>
@@ -67,9 +58,7 @@ export function MenuSection({
   return (
     <section
       id={s.id}
-      className={["msec", BURGERS.has(s.id) ? "msec--burgers" : "", legend ? "msec--pours" : ""]
-        .filter(Boolean)
-        .join(" ")}
+      className={legend ? "msec msec--pours" : "msec"}
       aria-labelledby={`${s.id}-title`}
       data-section={s.id}
     >

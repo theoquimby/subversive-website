@@ -5,9 +5,8 @@
 // Toast joins when a second toast needs swipe and stacking (plan Q3 budget).
 import { menuLabels } from "@content/microcopy";
 import { useEffect, useRef, useState } from "react";
-import { Icon } from "../graphics/Icon";
 
-export function ShareButton({ text = false }: { text?: boolean }) {
+export function ShareButton() {
   const [toast, setToast] = useState("");
   const timer = useRef<number | undefined>(undefined);
   useEffect(() => () => window.clearTimeout(timer.current), []);
@@ -34,16 +33,9 @@ export function ShareButton({ text = false }: { text?: boolean }) {
 
   return (
     <>
-      {text ? (
-        <button type="button" className="btn btn--quiet" onClick={share}>
-          <span className="btn__label">{menuLabels.share}</span>
-        </button>
-      ) : (
-        <button type="button" className="icon-btn" onClick={share}>
-          <Icon name="share" className="icon-btn__icon" />
-          <span className="sr-only">{menuLabels.share}</span>
-        </button>
-      )}
+      <button type="button" className="btn btn--quiet" onClick={share}>
+        <span className="btn__label">{menuLabels.share}</span>
+      </button>
       <p className="toast" role="status" data-visible={toast ? "" : undefined}>
         {toast}
       </p>

@@ -2,11 +2,9 @@
 
 // Drinks | Food (spec §6.2): both lists are in the HTML; this switches data-show on the
 // wrapper (CSS hides the other list), remembers the choice per device and keeps ?show= in
-// step. The filters for the active list sit beside it.
+// step. Set as two words with a short ink stroke under the one that is showing.
 import { menuLabels } from "@content/microcopy";
-import type { ItemView } from "@/lib/menu/view";
 import { Segmented } from "../ui/Segmented";
-import { FilterChips } from "./FilterChips";
 import { setShow, useShow } from "./show-store";
 
 const OPTIONS = [
@@ -14,7 +12,7 @@ const OPTIONS = [
   { value: "food", label: menuLabels.food },
 ] as const;
 
-export function MenuTabs({ beers, dishes }: { beers: ItemView[]; dishes: ItemView[] }) {
+export function MenuTabs() {
   const show = useShow();
   const change = (next: "drinks" | "food") => {
     setShow(next);
@@ -27,9 +25,12 @@ export function MenuTabs({ beers, dishes }: { beers: ItemView[]; dishes: ItemVie
     }
   };
   return (
-    <>
-      <Segmented label={menuLabels.switchList} options={OPTIONS} value={show} onValueChange={change} />
-      <FilterChips show={show} beers={beers} dishes={dishes} />
-    </>
+    <Segmented
+      className="seg--text"
+      label={menuLabels.switchList}
+      options={OPTIONS}
+      value={show}
+      onValueChange={change}
+    />
   );
 }

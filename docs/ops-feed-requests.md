@@ -137,3 +137,10 @@ Three more optional fields per supplier: `about` (a few sentences, Max's words),
 the website's repo. For photographs uploaded in Ops, the website needs to know where they
 are served from (one image host to allow in its content-security policy and image
 settings); that is a decision for Theo before any code.
+
+## Menu item photos (2026-11-15)
+
+The menu now has a detail view for each item, which shows a photo when the item has one.
+For the Ops menu feed: an optional `photo` on each item (an image address, 4:3, at least
+828 px wide, with `photoAlt` text). Until then a photo can be named in `content/menu.json`
+by its id in `content/photos`.

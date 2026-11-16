@@ -60,7 +60,7 @@ export default async function BeerPage() {
           </SectionHead>
           <ul className="mlist home-tap">
             {taps.map((row, i) => (
-              <MenuRow key={row.id} row={row} index={i} disclosure={false} />
+              <MenuRow key={row.id} row={row} index={i} />
             ))}
           </ul>
         </section>

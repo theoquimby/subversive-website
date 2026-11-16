@@ -139,7 +139,7 @@ export default async function EventPage({ params }: Params) {
               <Button href={site.links.map} external variant="quiet">
                 {microcopy.directions}
               </Button>
-              <ShareButton text />
+              <ShareButton />
             </div>
           </div>
           {prev || next ? (

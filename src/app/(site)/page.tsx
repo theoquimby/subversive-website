@@ -176,7 +176,7 @@ export default async function Home() {
           </SectionHead>
           <ul className="mlist home-tap">
             {featured.map((row, i) => (
-              <MenuRow key={row.id} row={row} index={i} disclosure={false} />
+              <MenuRow key={row.id} row={row} index={i} />
             ))}
           </ul>
           <TextLink href="/menu">{homeLabels.fullMenu}</TextLink>
