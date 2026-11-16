@@ -971,3 +971,20 @@ body::after {
     text-underline-offset: 4px;
   }
 }
+
+/* ---------- Review pass 2026-11-15: one hairline, one head size, drawings left of heads ---------- */
+:root {
+  /* the one light rule on the site; the head's line is the only heavier one */
+  --hair: color-mix(in srgb, var(--fg) 26%, transparent);
+}
+/* inner-page titles no longer outshout Home's first screen */
+.page__title {
+  font-size: clamp(2.75rem, 2rem + 3.6vw, 4.5rem);
+  line-height: 1.02;
+}
+/* a head without a note: its line runs to the gutter on a phone */
+@media (max-width: 47.99rem) {
+  .sec-head__rule:last-child {
+    grid-column: 1 / -1;
+  }
+}

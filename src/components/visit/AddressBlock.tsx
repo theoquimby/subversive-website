@@ -20,7 +20,7 @@ export function AddressBlock({ site }: { site: Site }) {
           google={site.links.map}
           query={`${site.name}, ${address.street}, ${address.city}, ${address.state} ${address.zip}`}
         />
-        <a className="btn btn--quiet visit-actions__btn" href={`tel:${phone.tel}`}>
+        <a className="btn btn--secondary visit-actions__btn" href={`tel:${phone.tel}`}>
           <Icon name="phone" className="btn__icon" />
           <span className="btn__label tabular">{visitLabels.call(phone.display)}</span>
         </a>

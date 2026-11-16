@@ -24,7 +24,7 @@ export default function AboutPage() {
       <div className="page prose-page">
         <header className="prose-head">
           <h1 className="page__title">{aboutLabels.title}</h1>
-          <Drawing name="visit" className="prose-head__art" />
+          <Drawing name="barn" className="prose-head__art" />
         </header>
 
         <div className="prose-split">
@@ -45,7 +45,12 @@ export default function AboutPage() {
               ))}
             </p>
           </div>
-          <PhotoFrame id="founders-doorway" ratio="4/5" sizes="(min-width: 1024px) 420px, 100vw" />
+          <PhotoFrame
+            id="founders-doorway"
+            ratio="4/5"
+            reveal={false}
+            sizes="(min-width: 1024px) 420px, 100vw"
+          />
         </div>
       </div>
     </PageWipe>

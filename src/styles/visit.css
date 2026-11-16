@@ -445,3 +445,53 @@
     align-items: start;
   }
 }
+
+/* ---------- Review pass 2026-11-15 (these override the rules above) ---------- */
+.visit-head {
+  grid-template-columns: auto minmax(0, 1fr);
+}
+.visit-head .page__title {
+  grid-column: 2;
+}
+.visit-head .visit-head__art {
+  grid-column: 1;
+}
+.visit-left {
+  display: grid;
+  gap: var(--s-7);
+  align-content: start;
+}
+/* the two actions are buttons of their own width, as on Home, not full-width slabs */
+.visit-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--s-3);
+}
+.visit-actions__btn {
+  width: auto;
+}
+.visit-actions__note {
+  flex-basis: 100%;
+}
+/* today's row: Home's pale highlight, not solid yellow */
+.hours__row[data-today] {
+  background: color-mix(in srgb, var(--pils) 38%, transparent);
+}
+/* good to know: no second rule under the head; hairlines; labels on the first baseline */
+.ledger {
+  max-width: 52rem;
+  margin-top: 0;
+  border-top: 0;
+}
+.ledger__row {
+  align-items: start;
+  border-bottom: 1px solid var(--hair);
+}
+.ledger__label {
+  align-items: flex-start;
+  padding-top: 0.2em;
+}
+.visit-note {
+  margin-top: var(--s-8);
+  color: var(--fg);
+}

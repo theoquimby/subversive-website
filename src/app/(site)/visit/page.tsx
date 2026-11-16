@@ -35,11 +35,19 @@ export default async function VisitPage() {
             <h1 className="page__title">{visitLabels.title}</h1>
             <OpenNow />
           </div>
-          <Drawing name="visit" className="visit-head__art" />
+          <Drawing name="street" className="visit-head__art" />
         </header>
 
         <div className="visit-grid">
-          <AddressBlock site={site} />
+          <div className="visit-left">
+            <AddressBlock site={site} />
+            <PhotoFrame
+              id="firepit-beers"
+              ratio="3/2"
+              reveal={false}
+              sizes="(min-width: 1024px) 440px, 100vw"
+            />
+          </div>
           <section id="hours" className="visit-hours" aria-labelledby="hours-title">
             <SectionHead id="hours-title">{visitLabels.hours}</SectionHead>
             <HoursCard hours={site.hours} events={await hoursEvents()} today={today} />
@@ -48,10 +56,7 @@ export default async function VisitPage() {
 
         <section className="visit-section" aria-labelledby="know-title">
           <SectionHead id="know-title">{visitLabels.goodToKnow}</SectionHead>
-          <div className="visit-know">
-            <GoodToKnow visit={site.visit} />
-            <PhotoFrame id="firepit-beers" ratio="4/5" sizes="(min-width: 1024px) 420px, 100vw" />
-          </div>
+          <GoodToKnow visit={site.visit} />
         </section>
 
         <p id="gift-cards" className="visit-note">

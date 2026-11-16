@@ -12,8 +12,14 @@ import { Drawing } from "@/components/home/Ways";
 import { WhereFrom } from "@/components/home/WhereFrom";
 import { PageWipe } from "@/components/layout/PageWipe";
 import { SectionHead } from "@/components/layout/SectionHead";
+import { MenuRow } from "@/components/menu/MenuRow";
 import { TextLink } from "@/components/ui/TextLink";
+import { applySeasonal } from "@/lib/menu/seasonal";
+import { getMenu } from "@/lib/menu/source";
+import { buildMenuView, draftBeers } from "@/lib/menu/view";
 import { getSite, NAV } from "@/lib/site/site";
+import { now } from "@/lib/time/now";
+import { nyParts } from "@/lib/time/ny";
 
 export const revalidate = 3600;
 export const metadata: Metadata = {
@@ -23,8 +29,10 @@ export const metadata: Metadata = {
 
 const DROPPED = /malt/i;
 
-export default function BeerPage() {
+export default async function BeerPage() {
   const site = getSite();
+  const view = buildMenuView(applySeasonal(await getMenu(), nyParts(now()).date));
+  const taps = draftBeers(view);
   const title = NAV.find((n) => n.href === "/beer")?.label ?? "";
   const paragraphs = site.brewery.paragraphs.filter((p) => !DROPPED.test(p));
   return (
@@ -41,14 +49,28 @@ export default function BeerPage() {
             {paragraphs.map((p) => (
               <p key={p}>{p}</p>
             ))}
-            <TextLink href="/menu">{homeLabels.fullMenu}</TextLink>
           </div>
-          <PhotoFrame id="kettle-dark" ratio="4/5" sizes="(min-width: 1024px) 420px, 100vw" />
+          <PhotoFrame id="kettle-dark" ratio="3/2" reveal={false} sizes="(min-width: 1024px) 480px, 100vw" />
         </div>
+
+        {/* what is pouring now: every tap, as on Home, with the two pour sizes named once */}
+        <section className="prose-section" aria-labelledby="tap-title">
+          <SectionHead id="tap-title" note={`${view.pourSizes.half} / ${view.pourSizes.full}`}>
+            {homeLabels.onTap}
+          </SectionHead>
+          <ul className="mlist home-tap">
+            {taps.map((row, i) => (
+              <MenuRow key={row.id} row={row} index={i} disclosure={false} />
+            ))}
+          </ul>
+        </section>
 
         <section className="prose-section" aria-labelledby="where-title">
           <SectionHead id="where-title">{homeLabels.whereFrom}</SectionHead>
           <WhereFrom sourcing={site.sourcing} />
+          <p className="prose-links">
+            <TextLink href="/menu">{homeLabels.fullMenu}</TextLink>
+          </p>
         </section>
       </div>
     </PageWipe>

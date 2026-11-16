@@ -4,7 +4,7 @@
 // printed menu's checker closes the page. About half its old height on a phone.
 // the global "Pause motion" control (§9.2). The open-now pill and hours summary arrive with
 // lib/hours in M4; the goblin hatch with M7; the mailing list stays hidden until O6.
-import { inquiryLabels, microcopy } from "@content/microcopy";
+import { aboutLabels, inquiryLabels, microcopy } from "@content/microcopy";
 import { getSite } from "@/lib/site/site";
 import { Checker } from "../graphics/Checker";
 import { Seal } from "../graphics/Seal";
@@ -22,7 +22,7 @@ export function Footer() {
       {/* the ground line again, as on Home's first screen: the page ends where it began */}
       <svg
         viewBox="0 0 1200 60"
-        preserveAspectRatio="none"
+        preserveAspectRatio="xMinYMid slice"
         className="site-footer__ground"
         aria-hidden="true"
         focusable="false"
@@ -50,6 +50,7 @@ export function Footer() {
               {site.phone.display}
             </a>
             <a href={`mailto:${site.email}`}>{microcopy.emailUs}</a>
+            <Link href="/about">{aboutLabels.title}</Link>
           </section>
           <section aria-labelledby="f-do">
             <h2 id="f-do" className="site-footer__head">
@@ -85,10 +86,7 @@ export function Footer() {
             <span>
               © {new Date().getFullYear()} {site.name}
             </span>{" "}
-            <span>
-              · {site.address.street}, {site.address.city} {site.address.state}
-            </span>{" "}
-            <span>· Please drink responsibly.</span>
+            <span>Please drink responsibly.</span>
           </p>
           <PauseMotion />
           {/* TODO(M7): the goblin hatch ("do not press" stamp) sits here. */}

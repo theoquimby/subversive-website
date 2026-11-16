@@ -1017,3 +1017,43 @@ textarea.field__input {
 .events-private + .events-bands {
   margin-top: var(--s-4);
 }
+
+/* ---------- Review pass 2026-11-15 (these override the rules above) ---------- */
+/* inner-page heads: the drawing sits left of the title, as Home's sit beside their heads,
+   at Home's size and line weight (it no longer scales up to 200 px with a 4 px line) */
+.prose-head,
+.events-head {
+  grid-template-columns: auto minmax(0, 1fr);
+  align-items: end;
+  column-gap: var(--s-4);
+}
+.prose-head .prose-head__art,
+.events-head .events-head__art,
+.visit-head .visit-head__art {
+  order: -1;
+  width: clamp(4.75rem, 14vw, 8.25rem);
+}
+.prose-facts {
+  border-top: 1px solid var(--hair);
+}
+/* header: a hairline when scrolled, in both skins; the menu button in the pen's hand */
+.site-header[data-solid] {
+  box-shadow: 0 1px 0 var(--hair);
+}
+.menu-glyph {
+  stroke-width: 2.5;
+  stroke-linecap: round;
+}
+:root:has([data-page-skin="overtime"]) .site-header__order {
+  border-color: transparent;
+}
+/* footer: the ground line keeps its own proportions on a phone instead of being squeezed
+   into even humps; one clause to a line */
+.site-footer__ground {
+  height: 3.25rem;
+}
+@media (max-width: 47.99rem) {
+  .site-footer__small span {
+    display: block;
+  }
+}
