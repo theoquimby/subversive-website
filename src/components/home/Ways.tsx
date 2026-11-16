@@ -73,18 +73,42 @@ const DRAWINGS = {
 
 export type WayKey = keyof typeof DRAWINGS;
 
+// One living part in a drawing (2026-11-15): which stroke moves, how, and about which
+// point. The loops are in graphics.css (.mv); they are small and stop with reduced motion.
+const MOVES: Partial<Record<WayKey, Record<number, { move: string; at?: [number, number] }>>> = {
+  visit: { 5: { move: "float" } }, // smoke from the fire
+  empty: { 4: { move: "drip" } }, // the last drop
+  street: { 3: { move: "sway", at: [38, 30] } }, // the string of lights
+  barn: { 5: { move: "bob" } }, // the two birds
+};
+// a whole drawing that moves: the barley in a breeze, the ticket rocking a little
+const WHOLE: Partial<Record<WayKey, string>> = { beer: "pen--sway", events: "pen--rock" };
+
 export function Drawing({ name, className }: { name: WayKey; className?: string }) {
+  const moves = MOVES[name] ?? {};
   return (
     <svg
       viewBox="0 0 120 90"
-      className={className ? `pen ${className}` : "pen"}
+      className={["pen", WHOLE[name] ?? "", className ?? ""].filter(Boolean).join(" ")}
       data-draw=""
       aria-hidden="true"
       focusable="false"
     >
-      {DRAWINGS[name].map((d, i) => (
-        <path key={d} d={d} pathLength={1} style={{ "--i": i } as CSSProperties} />
-      ))}
+      {DRAWINGS[name].map((d, i) => {
+        const m = moves[i];
+        const path = <path key="line" d={d} pathLength={1} style={{ "--i": i } as CSSProperties} />;
+        return m ? (
+          <g
+            key={d}
+            className={`mv mv--${m.move}`}
+            style={m.at ? { transformOrigin: `${m.at[0]}px ${m.at[1]}px` } : undefined}
+          >
+            {path}
+          </g>
+        ) : (
+          <g key={d}>{path}</g>
+        );
+      })}
     </svg>
   );
 }

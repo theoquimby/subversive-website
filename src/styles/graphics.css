@@ -1005,3 +1005,202 @@ body::after {
     grid-column: 1 / -1;
   }
 }
+
+/* ---------- Living drawings (2026-11-15) ----------
+   One small loop in a drawing: a tail, a flag, a puff of smoke. They start once the
+   drawing has drawn itself in, move only by turning or shifting a few units, and stop with
+   reduced motion. A turning part turns about a point given in the drawing's own units. */
+.mv {
+  transform-box: view-box;
+}
+@media (scripting: enabled) and (prefers-reduced-motion: no-preference) {
+  .pen[data-draw="in"] .mv--wag {
+    animation: mv-wag 0.42s var(--ease-in-out) 0.9s infinite alternate;
+  }
+  .pen[data-draw="in"] .mv--flutter {
+    animation: mv-flutter 1.5s var(--ease-in-out) 0.9s infinite alternate;
+  }
+  .pen[data-draw="in"] .mv--clink {
+    animation: mv-clink 4.2s var(--ease-in-out) 1.2s infinite;
+  }
+  .pen[data-draw="in"] .mv--twinkle {
+    animation: mv-twinkle 4.2s var(--ease-out) 1.2s infinite both;
+  }
+  .pen[data-draw="in"] .mv--putter {
+    animation: mv-putter 0.26s var(--ease-in-out) 0.9s infinite alternate;
+  }
+  .pen[data-draw="in"] .mv--puff {
+    animation: mv-puff 1.5s var(--ease-out) 0.9s infinite;
+  }
+  .pen[data-draw="in"] .mv--bob {
+    animation: mv-bob 2.4s var(--ease-in-out) 0.9s infinite alternate;
+  }
+  .pen[data-draw="in"] .mv--bounce {
+    animation: mv-bounce 0.62s var(--ease-rise) 0.9s infinite alternate;
+  }
+  .pen[data-draw="in"] .mv--float {
+    animation: mv-float 3.4s var(--ease-out) 0.9s infinite;
+  }
+  .pen[data-draw="in"] .mv--sway {
+    animation: mv-sway 3.2s var(--ease-in-out) 0.9s infinite alternate;
+  }
+  .pen[data-draw="in"] .mv--drip {
+    animation: mv-drip 2.6s var(--ease-fall) 1.4s infinite;
+  }
+  .pen--sway[data-draw="in"] {
+    transform-origin: 50% 100%;
+    animation: pen-sway 4.2s var(--ease-in-out) 1s infinite alternate;
+  }
+  .pen--rock[data-draw="in"] {
+    transform-origin: 50% 60%;
+    animation: pen-rock 3.6s var(--ease-in-out) 1s infinite alternate;
+  }
+}
+@keyframes mv-wag {
+  from {
+    rotate: -10deg;
+  }
+  to {
+    rotate: 14deg;
+  }
+}
+@keyframes mv-flutter {
+  from {
+    rotate: -5deg;
+    scale: 1 1;
+  }
+  to {
+    rotate: 6deg;
+    scale: 0.9 1.06;
+  }
+}
+@keyframes mv-clink {
+  0%,
+  78%,
+  100% {
+    rotate: 0deg;
+  }
+  86% {
+    rotate: -11deg;
+  }
+  92% {
+    rotate: -4deg;
+  }
+}
+@keyframes mv-twinkle {
+  0%,
+  82%,
+  100% {
+    opacity: 0;
+  }
+  88% {
+    opacity: 1;
+  }
+}
+@keyframes mv-putter {
+  from {
+    translate: 0 0;
+  }
+  to {
+    translate: 0 -0.9px;
+  }
+}
+@keyframes mv-puff {
+  from {
+    opacity: 0.9;
+    translate: 0 0;
+  }
+  to {
+    opacity: 0;
+    translate: -11px -5px;
+  }
+}
+@keyframes mv-bob {
+  from {
+    translate: 0 1.2px;
+  }
+  to {
+    translate: 1.5px -1.6px;
+  }
+}
+@keyframes mv-bounce {
+  from {
+    translate: 0 0;
+  }
+  to {
+    translate: 0 -30px;
+  }
+}
+@keyframes mv-float {
+  from {
+    opacity: 0;
+    translate: 0 4px;
+  }
+  25% {
+    opacity: 1;
+  }
+  to {
+    opacity: 0;
+    translate: 3px -9px;
+  }
+}
+@keyframes mv-sway {
+  from {
+    rotate: -1.6deg;
+  }
+  to {
+    rotate: 1.8deg;
+  }
+}
+@keyframes mv-drip {
+  0%,
+  35% {
+    opacity: 1;
+    translate: 0 0;
+  }
+  80% {
+    opacity: 1;
+    translate: 0 17px;
+  }
+  100% {
+    opacity: 0;
+    translate: 0 17px;
+  }
+}
+@keyframes pen-sway {
+  from {
+    rotate: -2.2deg;
+  }
+  to {
+    rotate: 2.4deg;
+  }
+}
+@keyframes pen-rock {
+  from {
+    rotate: -1.4deg;
+  }
+  to {
+    rotate: 1.2deg;
+  }
+}
+
+/* two photographs side by side, hand-cut like the tickets and a little off square */
+.photo-pair {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--s-3);
+  margin-top: var(--s-6);
+}
+.photo-pair > .photo:first-child {
+  rotate: -0.7deg;
+}
+.photo-pair > .photo:last-child {
+  rotate: 0.6deg;
+  translate: 0 var(--s-3);
+}
+@media (min-width: 48rem) {
+  .photo-pair {
+    gap: var(--s-6);
+    max-width: 52rem;
+  }
+}

@@ -1050,3 +1050,12 @@
 .event-page > .eticket {
   margin-bottom: var(--s-2);
 }
+
+/* a night at the taproom, drawn across the page above the closing lines */
+.events-scene {
+  width: min(100%, 34rem);
+  margin-top: var(--s-9);
+}
+.events-scene + .events-close {
+  margin-top: var(--s-2);
+}

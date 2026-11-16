@@ -50,7 +50,12 @@ export default async function BeerPage() {
               <p key={p}>{p}</p>
             ))}
           </div>
-          <PhotoFrame id="kettle-dark" ratio="3/2" reveal={false} sizes="(min-width: 1024px) 480px, 100vw" />
+          <PhotoFrame
+            id="brewhouse-copper"
+            ratio="1/1"
+            reveal={false}
+            sizes="(min-width: 1024px) 480px, 100vw"
+          />
 
           {/* what is pouring now: every tap, as on Home, with the two pour sizes named once */}
           <section className="prose-section" aria-labelledby="tap-title">
@@ -63,6 +68,12 @@ export default async function BeerPage() {
               ))}
             </ul>
           </section>
+        </div>
+
+        {/* what it looks like in the hand and where it starts */}
+        <div className="photo-pair">
+          <PhotoFrame id="can-in-hand" ratio="4/5" sizes="(min-width: 1024px) 420px, 50vw" />
+          <PhotoFrame id="grain-in-hands" ratio="4/5" sizes="(min-width: 1024px) 420px, 50vw" />
         </div>
 
         <section className="prose-section" aria-labelledby="where-title">
