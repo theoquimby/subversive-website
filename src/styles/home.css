@@ -820,11 +820,8 @@
   vector-effect: non-scaling-stroke;
   transition: fill var(--d-2) var(--ease-out);
 }
-/* the geography is put through a small wobble, so an accurate outline reads as drawn by
-   hand; the little drawings (mountains, water, a boat) sit where the real ones are */
-.smap__land {
-  filter: url(#smap-wobble);
-}
+/* the little drawings (mountains, water, a boat) sit where the real ones are; the pen's
+   wobble is drawn into the outline itself (src/lib/map/wobble.ts), never filtered live */
 .smap__decor path {
   fill: none;
   stroke: var(--fg);

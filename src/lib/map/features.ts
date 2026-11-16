@@ -3,6 +3,7 @@
 // well-known places, then projected and smoothed into one pen line. Illustrative, like the
 // rest of the drawing: good for "which side of the river", not for navigation.
 import { projectNY } from "./project";
+import { nudge } from "./wobble";
 
 type LatLng = readonly [number, number];
 
@@ -77,7 +78,13 @@ const ROADS: { name: string; points: LatLng[] }[] = [
 
 /** A smooth pen line through the projected points (quadratic curves through midpoints). */
 function line(points: LatLng[]): string {
-  const p = points.map(([lat, lng]) => projectNY(lat, lng));
+  // each point takes the same small nudge as the state's outline (wobble.ts), so the lines
+  // agree with it and nothing needs a live filter
+  const p = points.map(([lat, lng]) => {
+    const at = projectNY(lat, lng);
+    const [x, y] = nudge(at.x, at.y, 3.2);
+    return { x: Math.round(x * 10) / 10, y: Math.round(y * 10) / 10 };
+  });
   const first = p[0];
   const last = p[p.length - 1];
   if (!first || !last) return "";

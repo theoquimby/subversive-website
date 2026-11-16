@@ -58,6 +58,19 @@ test("a strip in the page's colour is fixed at the bottom edge on phones and tab
     const onLink = (x: number, y: number) =>
       page.evaluate((at) => !!document.elementFromPoint(at.x, at.y)?.closest("a"), { x, y });
     expect(await onLink((brand?.x ?? 0) + 20, (brand?.y ?? 0) + (brand?.height ?? 0) / 2)).toBe(true);
+    // ...and it does not overlap the Order button or the logo (it once cut Order's top edge)
+    const topStrip = await page.locator(".edge-top").boundingBox();
+    for (const sel of [
+      "#site-header .site-header__order",
+      "#site-header .brand",
+      "#site-header .menu-button",
+    ]) {
+      const b = await page.locator(sel).boundingBox();
+      if (b)
+        expect(b.y, `${sel} clears the top strip`).toBeGreaterThanOrEqual(
+          (topStrip?.height ?? 0) + (topStrip?.y ?? 0),
+        );
+    }
   }
 });
 

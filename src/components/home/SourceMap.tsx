@@ -17,6 +17,7 @@
 // is hidden from assistive tech.
 import { type CSSProperties, useState } from "react";
 import type { MapFeatures } from "@/lib/map/features";
+import { wobblePath } from "@/lib/map/wobble";
 import { BARLEY_VIEWBOX, KERNELS } from "../graphics/BarleyMark";
 import { NY_PATH, NY_PLACES, NY_VIEWBOX } from "../graphics/ny-map.generated";
 
@@ -40,6 +41,9 @@ const DECOR: Record<string, string[]> = {
     "M-3 12V7M-3 7L-8 8L-3 -3L2 8Z",
   ],
 };
+
+// the accurate outline, redrawn once as a pen would draw it (no live filter: see wobble.ts)
+const STATE = wobblePath(NY_PATH);
 
 const W = 1000;
 const H = 774;
@@ -112,18 +116,12 @@ export function SourceMap({ stops, features }: { stops: Stop[]; features: MapFea
               } as CSSProperties
             }
           >
-            {/* the pen's wobble: one small displacement over everything drawn as geography,
-                so the accurate outline reads as drawn by hand */}
-            <filter id="smap-wobble" x="-5%" y="-5%" width="110%" height="110%">
-              <feTurbulence type="fractalNoise" baseFrequency="0.022" numOctaves="2" seed="7" />
-              <feDisplacementMap in="SourceGraphic" scale="9" />
-            </filter>
             <g className="smap__land">
-              <path d={NY_PATH} className="smap__state" data-all={sel.place ? undefined : ""} />
+              <path d={STATE} className="smap__state" data-all={sel.place ? undefined : ""} />
               {/* landmarks, kept inside the state's outline: the main roads, thin and dashed,
                 and the Hudson */}
               <clipPath id="smap-ny">
-                <path d={NY_PATH} />
+                <path d={STATE} />
               </clipPath>
               <g clipPath="url(#smap-ny)">
                 {features.roads.map((d) => (

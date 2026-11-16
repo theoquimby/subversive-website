@@ -1217,7 +1217,9 @@ html {
   right: 0;
   left: 0;
   z-index: 51;
-  height: max(10px, env(safe-area-inset-top));
+  /* 6 px: enough to be found 4 px inside the edge, and clear of the Order button, whose
+     top edge is 7 px down (at 10 px it cut the button's outline) */
+  height: max(6px, env(safe-area-inset-top));
   background-color: var(--bg);
 }
 @media (min-width: 64rem), print {
