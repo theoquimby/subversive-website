@@ -7,13 +7,15 @@
 // the road between them. Nothing moves on hover: a choice is a click. The two statewide sources (grain, spirits) pull back to
 // the whole state and light it. Only one town is ever labelled at a time.
 //
-// The zoom is a transform on one group (the "camera"); everything drawn in map units is
-// scaled back down by the same factor, so dots, names and the road keep their size on
-// screen however far in the map is.
+// The zoom is a transform on one group (the "camera"), given to CSS as three numbers (the
+// scale and the shift). CSS glides those numbers and derives both the transform and its
+// inverse from the same scale at every frame, so dots, names and the road keep their size
+// on screen all the way in (they used to swell mid-glide, when the scale and its inverse
+// were eased separately).
 //
 // Every word comes from site.json. The list alone carries all the information; the map
 // is hidden from assistive tech.
-import { type CSSProperties, type ReactNode, useState } from "react";
+import { type CSSProperties, useState } from "react";
 import type { MapFeatures } from "@/lib/map/features";
 import { BARLEY_VIEWBOX, KERNELS } from "../graphics/BarleyMark";
 import { NY_PATH, NY_PLACES, NY_VIEWBOX } from "../graphics/ny-map.generated";
@@ -24,8 +26,6 @@ export interface Stop {
   who: string;
   where: string;
   place: { label: string; x: number; y: number } | null;
-  /** the detail view (a photograph, a few sentences, a link), rendered by the page */
-  detail?: ReactNode;
 }
 type Place = { x: number; y: number };
 
@@ -91,8 +91,6 @@ export function SourceMap({ stops, features }: { stops: Stop[]; features: MapFea
   const items = stops;
   // start on the top of the list (grain: the whole state), so the map opens on all of New York
   const [at, setAt] = useState(0);
-  // Which source's detail view is open (a second click on a source closes it).
-  const [open, setOpen] = useState<number | null>(null);
   const sel = items[at];
   if (!sel) return null;
   const cam = camera(sel.place);
@@ -108,8 +106,9 @@ export function SourceMap({ stops, features }: { stops: Stop[]; features: MapFea
             className="smap__cam"
             style={
               {
-                transform: `translate(${cam.x.toFixed(1)}px, ${cam.y.toFixed(1)}px) scale(${cam.s.toFixed(3)})`,
-                "--k": k.toFixed(4),
+                "--cs": cam.s.toFixed(3),
+                "--cx": cam.x.toFixed(1),
+                "--cy": cam.y.toFixed(1),
               } as CSSProperties
             }
           >
@@ -220,24 +219,13 @@ export function SourceMap({ stops, features }: { stops: Stop[]; features: MapFea
       <ul className="smap__list">
         {items.map((it, i) => (
           <li key={it.what}>
-            <button
-              type="button"
-              className="smap__row"
-              aria-pressed={i === at}
-              aria-expanded={it.detail ? i === open : undefined}
-              onClick={() => {
-                setAt(i);
-                setOpen(open === i ? null : i);
-              }}
-            >
+            <button type="button" className="smap__row" aria-pressed={i === at} onClick={() => setAt(i)}>
               <span className="run__text">
                 <span className="run__what">{it.what}</span>
                 <span className="run__who">{it.who}</span>
                 <span className="run__where">{it.where}</span>
               </span>
             </button>
-            {/* the detail view: opens under the chosen source, when it has one */}
-            {it.detail && i === open ? <div className="smap__detail">{it.detail}</div> : null}
           </li>
         ))}
       </ul>
