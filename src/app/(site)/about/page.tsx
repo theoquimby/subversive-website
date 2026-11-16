@@ -52,6 +52,12 @@ export default function AboutPage() {
             sizes="(min-width: 1024px) 420px, 100vw"
           />
         </div>
+        <PhotoFrame
+          id="taproom-tables"
+          ratio="16/10"
+          className="beer-wide"
+          sizes="(min-width: 1024px) 832px, 100vw"
+        />
       </div>
     </PageWipe>
   );

@@ -61,6 +61,7 @@ export const visitLabels = {
   kitchenTil: (t: string) => `kitchen til ${t}`,
   call: (display: string) => `Call ${display}`,
   goodToKnow: "Good to know",
+  photos: "Photos of the taproom",
   seating: "Seating",
   tent: "The tent",
   parking: "Parking",

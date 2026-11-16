@@ -70,6 +70,9 @@ export default async function BeerPage() {
           </section>
         </div>
 
+        {/* where it is made */}
+        <PhotoFrame id="tanks" ratio="16/10" className="beer-wide" sizes="(min-width: 1024px) 832px, 100vw" />
+
         {/* what it looks like in the hand and where it starts */}
         <div className="photo-pair">
           <PhotoFrame id="can-in-hand" ratio="4/5" sizes="(min-width: 1024px) 420px, 50vw" />

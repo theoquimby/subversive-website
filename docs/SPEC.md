@@ -20,6 +20,7 @@ This document is the brief for whoever plans and builds the site. It is opiniona
 | `content/site.json` | Name, address, phone, hours, visit policies, links, sourcing facts, About and Brewery copy (verbatim). The old Malthouse page copy is kept under `_archived` for reference only and is not published. |
 | `content/events.seed.json` | Upcoming events in the exact shape of the Ops feed. Fallback and test fixture. |
 | `public/photos/*.webp` | 15 photographs from the current site, 1500 px wide. |
+| `public/photos/` (added 2026-11-15) | 10 more photographs of the place, from the brewery's own uploads to its Google listing ("By owner"), taken with Theo's go-ahead. Listed in `content/photos.ts`. |
 | `public/brand/*.svg` | First-pass vector redraws made for this spec: `barley-mark.svg`, `barley-mark-solid.svg`, `wordmark-heritage.svg`, `sticker-burst.svg`, `checker-tile.svg`, `favicon.svg`. Starting points to refine, not final art. |
 | `public/brand/*.webp` | Legacy raster wordmark, lockup and barley mark (low-res, reference only) and the Oktoberfest badge. |
 | `docs/source/` | The two menu PDFs, PNG renders of them, and the full list of Squarespace image URLs (append `?format=2500w` for larger files). |

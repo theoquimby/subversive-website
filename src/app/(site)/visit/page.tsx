@@ -83,6 +83,17 @@ export default async function VisitPage() {
           </section>
         </div>
 
+        {/* what it looks like: inside, the bar, the garden, the tent, the fire */}
+        {/* biome-ignore lint/a11y/noNoninteractiveTabindex: a region that scrolls sideways must be reachable by keyboard */}
+        <section className="reel" aria-label={visitLabels.photos} tabIndex={0}>
+          <PhotoFrame id="taproom-inside" ratio="4/3" reveal={false} sizes="340px" />
+          <PhotoFrame id="bar-stools" ratio="4/3" reveal={false} sizes="340px" />
+          <PhotoFrame id="tent-inside" ratio="4/5" reveal={false} sizes="220px" />
+          <PhotoFrame id="garden-day" ratio="4/3" reveal={false} sizes="340px" />
+          <PhotoFrame id="fire-table" ratio="1/1" reveal={false} sizes="270px" />
+          <PhotoFrame id="building-dusk" ratio="4/3" reveal={false} sizes="340px" />
+        </section>
+
         {/* a walk through the place: each thing worth knowing is a stop with its own
             drawing, the site's own sentence, and a photograph where there is one */}
         <section className="walk" aria-labelledby="know-title">

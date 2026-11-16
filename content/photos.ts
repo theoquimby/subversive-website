@@ -3,20 +3,32 @@
 // dish so a caption prints only while that dish is on the menu (plan Q19).
 // Not here: malt-raking (the malting floor, spec O10), kept in docs/source/legacy.
 import type { StaticImageData } from "next/image";
+// From the brewery's own uploads to its Google listing ("By owner"), 2026-11-15, with
+// Theo's go-ahead. None shows the old "Malting" name.
+import barStools from "../public/photos/bar-stools.webp";
 import beerGardenNight from "../public/photos/beer-garden-night.webp";
 import brewhouseCopper from "../public/photos/brewhouse-copper.webp";
+import buildingDusk from "../public/photos/building-dusk.webp";
 import burgerAndBeer from "../public/photos/burger-and-beer.webp";
 import burgerAndBeerWide from "../public/photos/burger-and-beer-wide.webp";
 import canInHand from "../public/photos/can-in-hand.webp";
 import exteriorDusk from "../public/photos/exterior-dusk.webp";
+import fireTable from "../public/photos/fire-table.webp";
 import firepitBeers from "../public/photos/firepit-beers.webp";
 import foundersDoorway from "../public/photos/founders-doorway.webp";
+import frontDay from "../public/photos/front-day.webp";
+import gardenDay from "../public/photos/garden-day.webp";
+import gardenDusk from "../public/photos/garden-dusk.webp";
 import giantPretzel from "../public/photos/giant-pretzel.webp";
 import grainInHands from "../public/photos/grain-in-hands.webp";
 import heatedTent from "../public/photos/heated-tent.webp";
 import kettleDark from "../public/photos/kettle-dark.webp";
 import lobsterRoll from "../public/photos/lobster-roll.webp";
 import patioPlate from "../public/photos/patio-plate.webp";
+import tanks from "../public/photos/tanks.webp";
+import taproomInside from "../public/photos/taproom-inside.webp";
+import taproomTables from "../public/photos/taproom-tables.webp";
+import tentInside from "../public/photos/tent-inside.webp";
 
 export interface Photo {
   src: StaticImageData;
@@ -85,6 +97,56 @@ export const photos = {
     src: canInHand,
     alt: "A hand holding a can of Hoppy Lager against a blue sky and hop vines",
     focal: [45, 40],
+  },
+  "taproom-inside": {
+    src: taproomInside,
+    alt: "Inside the taproom: tall tables and stools, hanging plants, the barley mark on the wall",
+    focal: [50, 55],
+  },
+  "bar-stools": {
+    src: barStools,
+    alt: "The bar, with stools along a high table and the roll-up doors open behind",
+    focal: [45, 55],
+  },
+  "taproom-tables": {
+    src: taproomTables,
+    alt: "The taproom floor: high tables, a fridge of cans, the brewing tanks at the back",
+    focal: [50, 55],
+  },
+  tanks: {
+    src: tanks,
+    alt: "Steel brewing tanks and oak barrels on the brewery floor",
+    focal: [55, 55],
+  },
+  "front-day": {
+    src: frontDay,
+    alt: "The front of the taproom by day, with striped umbrellas over picnic tables",
+    focal: [50, 50],
+  },
+  "garden-day": {
+    src: gardenDay,
+    alt: "The beer garden on a summer day: picnic tables, red chairs and planters on gravel",
+    focal: [50, 55],
+  },
+  "tent-inside": {
+    src: tentInside,
+    alt: "Inside the canvas tent: picnic tables under a string of lights",
+    focal: [50, 60],
+  },
+  "building-dusk": {
+    src: buildingDusk,
+    alt: "The taproom building at dusk, strung with lights",
+    focal: [50, 50],
+  },
+  "fire-table": {
+    src: fireTable,
+    alt: "A glass of beer in front of the fire table, picnic tables behind",
+    focal: [50, 55],
+  },
+  "garden-dusk": {
+    src: gardenDusk,
+    alt: "The beer garden at dusk, full of people under strings of lights",
+    focal: [45, 60],
   },
 } as const satisfies Record<string, Photo>;
 

@@ -7,6 +7,7 @@ import type { Metadata, Viewport } from "next";
 import { Lights } from "@/components/events/Lights";
 import { TicketLink } from "@/components/events/TicketLink";
 import { Doodle } from "@/components/graphics/Doodle";
+import { PhotoFrame } from "@/components/graphics/PhotoFrame";
 import { Drawing } from "@/components/home/Ways";
 import { PageWipe } from "@/components/layout/PageWipe";
 import { SectionHead } from "@/components/layout/SectionHead";
@@ -103,6 +104,12 @@ export default async function EventsPage() {
             </p>
           ) : null}
 
+          <PhotoFrame
+            id="garden-dusk"
+            ratio="16/10"
+            className="events-photo"
+            sizes="(min-width: 1024px) 720px, 100vw"
+          />
           <Doodle name="night" className="events-scene" />
           <div className="events-close">
             <p className="events-private">

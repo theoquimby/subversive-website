@@ -1204,3 +1204,51 @@ body::after {
     max-width: 52rem;
   }
 }
+
+/* ---------- More photographs of the place (2026-11-15) ---------- */
+/* a reel: photographs side by side at one height, pushed along with a finger */
+.reel {
+  display: flex;
+  gap: var(--s-3);
+  margin: var(--s-8) calc(-1 * var(--gutter)) 0;
+  padding: var(--s-2) var(--gutter) var(--s-4);
+  overflow-x: auto;
+  overscroll-behavior-x: contain;
+  scroll-snap-type: x proximity;
+  scrollbar-width: none;
+}
+.reel::-webkit-scrollbar {
+  display: none;
+}
+.reel:focus-visible {
+  outline: 3px solid var(--focus);
+  outline-offset: -3px;
+}
+.reel > .photo {
+  flex: none;
+  width: auto;
+  height: 13.5rem;
+  scroll-snap-align: center;
+}
+.reel > .photo:nth-child(odd) {
+  rotate: -0.6deg;
+}
+.reel > .photo:nth-child(even) {
+  rotate: 0.5deg;
+}
+@media (min-width: 64rem) {
+  .reel > .photo {
+    height: 17rem;
+  }
+}
+/* one wide photograph in a column of text */
+.beer-wide,
+.home-visit__photo,
+.events-photo {
+  max-width: 52rem;
+  margin-top: var(--s-8);
+  rotate: -0.4deg;
+}
+.home-visit__photo {
+  margin-top: var(--s-5);
+}

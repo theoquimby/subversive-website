@@ -130,6 +130,13 @@ export default async function Home() {
               </dd>
             </div>
           </dl>
+          {/* the front of the place, so a first-time visitor knows what to look for */}
+          <PhotoFrame
+            id="front-day"
+            ratio="16/10"
+            className="home-visit__photo"
+            sizes="(min-width: 1024px) 720px, 100vw"
+          />
         </section>
 
         {coming.length > 0 ? (
