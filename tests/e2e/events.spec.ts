@@ -67,3 +67,23 @@ test("add to calendar opens its menu", async ({ page }) => {
     "/api/events/seed-2026-12-10-trivia/ics",
   );
 });
+
+test("the first and last events leave no empty slot where a neighbour would be", async ({ page }) => {
+  await page.emulateMedia({ reducedMotion: "reduce" });
+  await page.goto("/events");
+  const all = page.locator("a[data-ticket]");
+  const hrefs = [await all.first().getAttribute("href"), await all.last().getAttribute("href")];
+  for (const href of hrefs) {
+    await page.goto(href ?? "/events");
+    const nav = page.locator(".event-prevnext");
+    await expect(nav).toBeVisible();
+    // every slot in the row holds a ticket, and the first one starts at the row's left edge
+    const slots = nav.locator(":scope > *");
+    const n = await slots.count();
+    expect(n).toBeGreaterThan(0);
+    for (let i = 0; i < n; i++) await expect(slots.nth(i).locator("a[data-ticket]")).toBeVisible();
+    const row = await nav.boundingBox();
+    const first = await slots.first().boundingBox();
+    expect(Math.round(first?.x ?? -1)).toBe(Math.round(row?.x ?? 0));
+  }
+});

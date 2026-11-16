@@ -160,9 +160,7 @@ export default async function EventPage({ params }: Params) {
                   <p className="event-prevnext__label">{eventLabels.previous}</p>
                   <TicketLink event={prev} />
                 </div>
-              ) : (
-                <span />
-              )}
+              ) : null}
               {next ? (
                 <div>
                   <p className="event-prevnext__label">{eventLabels.next}</p>
