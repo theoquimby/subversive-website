@@ -9,6 +9,11 @@
 //   lager, pils     in the style or description: a cold rest, frost on the tank
 //   IPA, pale ale, hoppy: a second handful of hops into the fermenter
 // Hops go into the kettle for every beer.
+//
+// What turns the liquid into the beer's own look (2026-11-18): the drawing shows what is in
+// the vessel, so a colour never arrives before its cause. A fruit beer is an ordinary
+// golden wort and beer until the fruit goes in; a hazy beer clouds when its dry hops go in
+// (or, with none, as it ferments); every other beer is its own colour from the mash on.
 
 export interface BrewBeer {
   id: string;
@@ -36,6 +41,9 @@ export interface Recipe {
   hazy: boolean;
   /** at most two, in the order the description names them */
   extras: Extra[];
+  /** what turns the plain liquid into this beer's final look; null: nothing does, it is
+      its own colour throughout */
+  turn: "fruit" | "dryhop" | "ferment" | null;
 }
 
 const FRUIT =
@@ -75,11 +83,15 @@ export function recipeOf(beer: Pick<BrewBeer, "style" | "description" | "hazy">)
   scan(GRAIN, "grain", "mash");
   // a style that names the fruit and a description that names it again: keep one
   found.sort((a, b) => a.at - b.at);
+  const extras = found.slice(0, 2).map((f) => f.extra);
+  const dryHop = /\b(ipa|pale ale|hoppy|hopped)\b/i.test(beer.style);
+  const hazy = Boolean(beer.hazy);
   return {
     lager: /\b(lager|pils(?:ner)?|europils|m[äa]rzen|oktoberfest)\b/i.test(both),
-    dryHop: /\b(ipa|pale ale|hoppy|hopped)\b/i.test(beer.style),
-    hazy: Boolean(beer.hazy),
-    extras: found.slice(0, 2).map((f) => f.extra),
+    dryHop,
+    hazy,
+    extras,
+    turn: extras.some((e) => e.kind === "fruit") ? "fruit" : hazy ? (dryHop ? "dryhop" : "ferment") : null,
   };
 }
 

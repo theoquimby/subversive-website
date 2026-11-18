@@ -11,9 +11,8 @@
 //   after  eased back as the last runs out, drawn clear of the glass and held upright
 //          for a moment, then set down with a small bounce
 // Smoothness (Theo: "lots of jitter and stutters"): every move starts from where the can
-// really is, so none jumps; while it is carried the can is one composited layer, its label
-// does not move and it does not answer the phone's lean (each of those redrew it every
-// frame); and there is no wobble or shake added for effect.
+// really is, so none jumps; while it is carried the can is one composited layer, and its
+// label is a picture drawn once (Can.tsx); and there is no wobble or shake added for effect.
 // The glass's model says where the pour is (onPhase); the can follows it. The pour runs at
 // a can's pace, slower than the bar tap. Stepping to another beer does it all again.
 // With reduced motion nothing moves: the glass is simply full and the can stands beside it.
@@ -217,7 +216,7 @@ export function ItemPour({
       </div>
       <span className="item-pour__can">
         <span className="item-pour__hand">
-          <Can key={id} label={labels[id]} name={name} color={color} open={opened} alive frozen={aloft} />
+          <Can key={id} label={labels[id]} name={name} color={color} open={opened} />
         </span>
       </span>
     </div>

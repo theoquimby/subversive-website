@@ -3,17 +3,20 @@
 // A can you can spin. The can is ours, in pen: the lid, the tab, the shoulders, a few
 // hatch lines for its roundness. The label is Max's own art, untouched, wrapped round it:
 // the front slides behind the pen outline as the can turns, then the plain back of the
-// wrap, then the front again. It turns only when asked (Theo, 2026-11-18): a drag or a
-// flick spins it with momentum, slowing by friction to a soft detent face-forward, and a
-// phone leaned to one side turns it a little that way.
+// wrap, then the front again. It turns only when it is dragged (Theo, 2026-11-18): a drag
+// or a flick spins it with momentum, slowing by friction to a soft detent face-forward.
 // A beer with no label yet wears the house can: its name over a band of its own colour.
+// Cheap to move (Theo: "janky... bad frame rate"): a label is hundreds of vector shapes,
+// so it is drawn once, to a small canvas at the screen's own resolution, when the can
+// first comes into view; turning the can then only slides a picture. Nothing listens to
+// the phone's lean (that slid, and so redrew, every can on the page all the time), and
+// the labels' own animated files are not used for now (they redrew every frame too).
 // One loop per can (src/lib/motion/loop.ts): asleep off screen and at rest, none with
 // reduced motion (the can then simply faces front; a drag still turns it by hand).
 // Decorative: hidden from assistive tech. Styles: fx-can.css.
 import type { Label } from "@content/labels";
-import { type CSSProperties, type PointerEvent, useEffect, useRef, useState } from "react";
+import { type CSSProperties, type PointerEvent, useEffect, useRef } from "react";
 import { createLoop, type Loop } from "@/lib/motion/loop";
-import { onTilt } from "@/lib/motion/tilt";
 import { KERNELS } from "../graphics/BarleyMark";
 
 /** the wrap is this many times the can's visible width: a turn shows all of it */
@@ -30,22 +33,15 @@ interface Props {
   color?: string;
   /** the tab is lifted and the mouth open (the beer sheet's pour) */
   open?: boolean;
-  /** being carried: no answer to the phone's lean, no moving label (the beer sheet's pour) */
-  frozen?: boolean;
-  /** let the label's own parts move, where it has a live file (the beer sheet's can) */
-  alive?: boolean;
   className?: string;
 }
 
-export function Can({ label, name, color, open = false, alive = false, frozen = false, className }: Props) {
+export function Can({ label, name, color, open = false, className }: Props) {
   const root = useRef<HTMLSpanElement>(null);
   const strip = useRef<HTMLSpanElement>(null);
-  const held = useRef(frozen);
-  held.current = frozen;
   const state = useRef({
     t: 0,
     v: 0,
-    lean: 0,
     dragged: 0,
     held: false,
     x: 0,
@@ -65,15 +61,16 @@ export function Can({ label, name, color, open = false, alive = false, frozen = 
     const loop = createLoop(el, (dt) => {
       if (s.held) return false;
       // friction, and a detent that pulls the face forward once the spin is slow
-      const near = Math.round(s.t - s.lean) + s.lean;
+      const near = Math.round(s.t);
       const slow = Math.abs(s.v) < 0.9;
       const pull = slow ? (near - s.t) * DETENT : 0;
       s.v += (pull - s.v * (slow ? 7 : FRICTION)) * dt;
       s.t += s.v * dt;
       if (slow && Math.abs(s.v) < REST && Math.abs(near - s.t) < REST) {
-        s.t = s.lean;
+        s.t = 0;
         s.v = 0;
         draw();
+        band.style.willChange = "";
         return false;
       }
       draw();
@@ -81,67 +78,51 @@ export function Can({ label, name, color, open = false, alive = false, frozen = 
     });
     s.loop = loop;
     draw();
-    // a phone leaned to one side shows a little more of that side of the label
-    const offTilt = onTilt((rad) => {
-      if (held.current) return;
-      s.lean = (rad / 0.45) * 0.09;
-      loop.wake();
-    });
     return () => {
-      offTilt();
       loop.stop();
       s.loop = null;
     };
   }, []);
 
-  // the moving label loads only where motion is welcome: not with reduced motion, not
-  // while Pause motion is on (the file's own loops cannot be paused from the page)
-  const [moving, setMoving] = useState(false);
-  const live = alive ? label?.live : undefined;
+  // the label, drawn once into its canvases (one for each turn of the wrap) when the can
+  // first comes near the screen, and again if the can changes size
+  const src = label?.src;
   useEffect(() => {
-    if (!live) return;
-    const calm =
-      window.matchMedia("(prefers-reduced-motion: reduce)").matches ||
-      document.documentElement.dataset.motion === "paused";
-    setMoving(!calm);
-  }, [live]);
-  const art = moving && live && !frozen ? live : label?.src;
-
-  // Carried, the can shows a picture of its label, drawn once: a label is hundreds of
-  // shapes, and as the live file it was drawn again on every frame the can moved (the
-  // pour ran at 37 frames a second for it). Set down, the real label is back.
-  const still = useRef<HTMLCanvasElement>(null);
-  const [pictured, setPictured] = useState(false);
-  useEffect(() => {
-    const canvas = still.current;
-    const wrap = canvas?.parentElement;
-    if (!frozen || !label || !canvas || !wrap) {
-      setPictured(false);
-      return;
-    }
-    let on = true;
-    const img = new Image();
-    img.onload = () => {
-      const w = wrap.clientWidth;
-      const h = wrap.clientHeight;
+    const el = root.current;
+    if (!el || !src) return;
+    let img: HTMLImageElement | undefined;
+    const paint = () => {
+      if (!img?.complete || !img.naturalWidth) return;
       const k = Math.min(3, window.devicePixelRatio || 1);
-      canvas.width = Math.round(w * k);
-      canvas.height = Math.round(h * k);
-      const ctx = canvas.getContext("2d");
-      if (!on || !ctx) return;
-      ctx.scale(k, k);
-      ctx.fillStyle = label.bg;
-      ctx.fillRect(0, 0, w, h);
-      // as it stands on the can: the front, full height, centred
-      const iw = h * label.ratio;
-      ctx.drawImage(img, (w - iw) / 2, 0, iw, h);
-      setPictured(true);
+      for (const c of el.querySelectorAll<HTMLCanvasElement>("canvas.can__label")) {
+        const w = Math.round(c.clientWidth * k);
+        const h = Math.round(c.clientHeight * k);
+        if (!w || !h || (c.width === w && c.height === h && c.dataset.done === src)) continue;
+        c.width = w;
+        c.height = h;
+        c.getContext("2d")?.drawImage(img, 0, 0, w, h);
+        c.dataset.done = src;
+      }
     };
-    img.src = label.src;
+    const size = new ResizeObserver(paint);
+    const near = new IntersectionObserver(
+      ([e]) => {
+        if (!e?.isIntersecting || img) return;
+        img = new Image();
+        img.decoding = "async";
+        img.onload = paint;
+        img.src = src;
+        size.observe(el);
+        near.disconnect();
+      },
+      { rootMargin: "300px" },
+    );
+    near.observe(el);
     return () => {
-      on = false;
+      near.disconnect();
+      size.disconnect();
     };
-  }, [frozen, label]);
+  }, [src]);
 
   const down = (e: PointerEvent<HTMLSpanElement>) => {
     const s = state.current;
@@ -150,6 +131,8 @@ export function Can({ label, name, color, open = false, alive = false, frozen = 
     s.x = e.clientX;
     s.at = performance.now();
     s.v = 0;
+    // a layer of its own while it turns; given back at rest
+    if (strip.current) strip.current.style.willChange = "transform";
     e.currentTarget.setPointerCapture(e.pointerId);
   };
   const move = (e: PointerEvent<HTMLSpanElement>) => {
@@ -190,8 +173,7 @@ export function Can({ label, name, color, open = false, alive = false, frozen = 
   const face = (key: string) => (
     <span key={key} className="can__turn">
       {label ? (
-        // biome-ignore lint/performance/noImgElement: an SVG file, drawn as it is
-        <img className="can__label" src={art} alt="" loading="lazy" decoding="async" draggable={false} />
+        <canvas className="can__label" />
       ) : (
         <span className="can__house">
           <span className="can__house-name">{name}</span>
@@ -214,7 +196,6 @@ export function Can({ label, name, color, open = false, alive = false, frozen = 
       style={look}
       aria-hidden="true"
       data-open={open ? "" : undefined}
-      data-pictured={pictured ? "" : undefined}
       onPointerDown={down}
       onPointerMove={move}
       onPointerUp={up}
@@ -233,7 +214,6 @@ export function Can({ label, name, color, open = false, alive = false, frozen = 
           {face("a")}
           {face("b")}
         </span>
-        <canvas ref={still} className="can__still" />
         <span className="can__round" />
       </span>
       <svg viewBox="0 0 100 235" className="can__pen" focusable="false">

@@ -27,6 +27,13 @@ const label = (id: string, w: number, h: number, bg: string, on: Label["on"] = "
   on,
 });
 
+/** Beers with a label that are not on the menu: the name and the style line as printed on
+ *  the label's front, nothing more (no strength: the label and Max's photo disagree). */
+export const offMenu: readonly { id: string; name: string; style: string }[] = [
+  { id: "camp-comet", name: "Camp Comet", style: "IPA brewed with Comet hops" },
+  { id: "golden-lime", name: "Golden Lime", style: "Lager with calamansi" },
+];
+
 export const labels: Readonly<Record<string, Label>> = {
   "cheap-dills": label("cheap-dills", 276.5, 297, "#fbefd5"),
   "chinga-la-migra": label("chinga-la-migra", 236.2, 280.8, "#ffffff"),

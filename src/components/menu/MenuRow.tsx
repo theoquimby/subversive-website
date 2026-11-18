@@ -5,7 +5,7 @@
 // list does the same, Home's rows link to the beer on the menu, and elsewhere it is plain. The small glass left the row: the glass is in the detail view.
 import { menuLabels } from "@content/microcopy";
 import { type PhotoId, photos } from "@content/photos";
-import type { CSSProperties } from "react";
+import type { CSSProperties, ReactNode } from "react";
 import { isBeer } from "@/lib/menu/kinds";
 import { formatPair, formatPrice } from "@/lib/menu/price";
 import type { ItemView } from "@/lib/menu/view";
@@ -31,6 +31,8 @@ export function MenuRow({
   index,
   detail = false,
   to,
+  lead,
+  note,
 }: {
   row: ItemView;
   index: number;
@@ -38,6 +40,10 @@ export function MenuRow({
   detail?: boolean;
   /** elsewhere: the whole row is a link to this address (Home's rows open the beer on the menu) */
   to?: string;
+  /** something standing before the row (Our beer: the beer's can) */
+  lead?: ReactNode;
+  /** a second badge (Our beer: "On tap now") */
+  note?: string;
 }) {
   const { item } = row;
   const beer = isBeer(item);
@@ -52,10 +58,11 @@ export function MenuRow({
       <span className="mrow__sum">
         <span className="mrow__main">
           <span className="mrow__name">{item.name}</span>
-          {meta || row.badge ? (
+          {meta || row.badge || note ? (
             <span className="mrow__line">
               {meta ? <span className="mrow__meta">{meta}</span> : null}
               {row.badge ? <Badge>{row.badge}</Badge> : null}
+              {note ? <Badge>{note}</Badge> : null}
             </span>
           ) : null}
           {item.description ? <span className="mrow__desc">{item.description}</span> : null}
@@ -77,7 +84,7 @@ export function MenuRow({
 
   return (
     <li
-      className="mrow"
+      className={lead ? "mrow mrow--lead" : "mrow"}
       data-row={row.id}
       data-color={detail && beer ? item.color : undefined}
       data-hazy={detail && beer && item.hazy ? "" : undefined}
@@ -85,6 +92,7 @@ export function MenuRow({
       data-photo-alt={photo?.alt}
       style={{ "--i": Math.min(index, 8) } as CSSProperties}
     >
+      {lead}
       {detail ? (
         <a id={row.id} className="mrow__box" href={`?item=${encodeURIComponent(row.id)}`} data-item={row.id}>
           {inner}

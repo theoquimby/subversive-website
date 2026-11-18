@@ -3,60 +3,46 @@
    nothing animated here. Every moving value is written by the component each frame. */
 
 .brew {
-  /* a grid item: never wider than its column (the phone's one-line row of beers scrolls) */
+  /* a grid item: never wider than its column */
   min-width: 0;
-  /* the chosen beer's colour arrives inline as --brew-beer (and --brew-beer-look, cloudier
-     for a hazy beer); these are the defaults and what is made from it */
+  /* the chosen beer arrives inline: --brew-beer (the menu's colour), --brew-beer-look (the
+     same, cloudier for a hazy beer) and --brew-base (what it is before anything turns it:
+     itself, or plain gold for a fruit beer). These are the defaults and what is made of them. */
   --brew-beer: var(--pils);
   --brew-beer-look: var(--brew-beer);
-  --brew-wort: color-mix(in srgb, var(--brew-beer) 62%, var(--ember-deep));
+  --brew-plain: var(--pils);
+  --brew-base: var(--brew-beer);
+  --brew-wort: color-mix(in srgb, var(--brew-base) 62%, var(--ember-deep));
   --brew-water: color-mix(in srgb, var(--sky) 34%, var(--card));
   --brew-grain: var(--gold);
   --brew-wet: color-mix(in srgb, var(--gold) 45%, var(--card));
   --brew-toast: color-mix(in srgb, var(--gold) 72%, var(--ember-deep));
   --brew-bed: color-mix(in srgb, var(--gold) 70%, var(--paper-deep));
   --brew-hop: color-mix(in srgb, var(--go) 45%, var(--pils));
-  --brew-pen: 2;
   --brew-quiet: color-mix(in srgb, var(--fg) 30%, transparent);
 }
 
-/* ---- the beers to choose from ---- */
-.brew__beers {
+/* ---- the beer: one quiet line, and a sheet to change it ---- */
+.brew__now {
   display: flex;
   flex-wrap: wrap;
-  gap: var(--s-2);
-  margin-bottom: var(--s-5);
+  align-items: baseline;
+  gap: var(--s-1) var(--s-3);
+  margin: 0 0 var(--s-4);
 }
-.brew__beer {
-  display: inline-flex;
-  align-items: center;
-  gap: var(--s-2);
-  min-height: 44px;
-  padding: 0 var(--s-4);
-  border: var(--stroke) solid var(--fg);
-  border-radius: var(--r-pill);
-  background: transparent;
-  color: inherit;
+.brew__now-label {
   font-family: var(--ff-utility);
   font-size: var(--t-label);
   letter-spacing: var(--track-label);
   text-transform: uppercase;
-  cursor: pointer;
-  transition: background-color var(--d-2) var(--ease-out);
+  color: var(--fg-muted);
 }
-.brew__beer[aria-pressed="true"] {
-  background: var(--fg);
-  color: var(--bg);
-}
-@media (hover: hover) {
-  .brew__beer:not([aria-pressed="true"]):hover {
-    background: var(--highlight);
-    color: var(--fg);
-  }
-}
-.brew__beer:focus-visible {
-  outline: var(--stroke) solid var(--focus);
-  outline-offset: 3px;
+.brew__now-beer {
+  display: inline-flex;
+  align-items: baseline;
+  gap: var(--s-2);
+  font-size: var(--t-h3);
+  line-height: var(--lh-h3);
 }
 .brew__swatch {
   width: 0.75rem;
@@ -64,6 +50,67 @@
   border-radius: 50%;
   border: 1.5px solid currentColor;
   flex: none;
+}
+.brew__change,
+.brew__again {
+  font: inherit;
+  font-size: var(--t-small);
+  color: inherit;
+  border: 0;
+  /* a 44 px target round a small word; the underline stays under the word */
+  padding: 12px 0;
+  background-origin: content-box;
+  cursor: pointer;
+}
+.brew__change:focus-visible,
+.brew__again:focus-visible,
+.brew__step:focus-visible,
+.brew-sheet__beer:focus-visible {
+  outline: var(--stroke) solid var(--focus);
+  outline-offset: 3px;
+}
+.brew-sheet__title {
+  margin: 0 var(--gutter) var(--s-3);
+  font-size: var(--t-h3);
+  line-height: var(--lh-h3);
+}
+.brew-sheet__list {
+  margin: 0;
+  padding: 0 0 var(--s-6);
+  list-style: none;
+}
+.brew-sheet__beer {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  align-items: baseline;
+  column-gap: var(--s-3);
+  width: 100%;
+  min-height: 52px;
+  padding: var(--s-2) var(--gutter);
+  border: 0;
+  border-top: 1px solid var(--rule);
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+.brew-sheet__beer .brew__swatch {
+  align-self: center;
+  grid-row: span 2;
+}
+.brew-sheet__style {
+  grid-column: 2;
+  font-size: var(--t-small);
+  color: var(--fg-muted);
+}
+.brew-sheet__beer[aria-current="true"] .brew-sheet__name {
+  background: linear-gradient(var(--highlight) 0 0) 0 100% / 100% 45% no-repeat;
+}
+@media (hover: hover) {
+  .brew-sheet__beer:hover {
+    background: color-mix(in srgb, var(--highlight) 35%, transparent);
+  }
 }
 
 /* ---- the drawing ---- */
@@ -78,8 +125,14 @@
   display: block;
   width: 100%;
   height: auto;
+  /* The camera (BrewProcess writes the viewBox and --z, how far it has closed in). One
+     unit of pen, --u, is divided by it, so the line and the labels keep their weight on the
+     page however close the view: one ink weight, as in the rest of the site's drawings. */
+  --z: 1;
+  --k: 1;
+  --u: calc(1px * var(--k) / var(--z));
 }
-/* tall, in floors, on a phone; never wider than a phone's worth */
+/* stacked floors on a phone; never wider than a phone's worth */
 .brew__svg--phone {
   max-width: 30rem;
   margin-inline: auto;
@@ -93,6 +146,13 @@
   }
   .brew__svg--wide {
     display: block;
+  }
+  /* running, the wide drawing is a window on one or two stations: narrower than the whole
+     picture was, so it fits a laptop's height; --k keeps the pen's weight as it was */
+  .brew__art[data-live] .brew__svg--wide {
+    max-width: 56rem;
+    margin-inline: auto;
+    --k: 1.23;
   }
 }
 
@@ -118,6 +178,12 @@
 .brew--bed {
   --tone: var(--brew-bed);
 }
+.brew--toast {
+  --tone: var(--brew-toast);
+}
+.brew--toast-top {
+  --tone: color-mix(in srgb, var(--brew-toast) 78%, var(--card));
+}
 .brew--yeast,
 .brew--foam {
   --tone: var(--card);
@@ -128,16 +194,16 @@
 .brew__hatch {
   fill: none;
   stroke: var(--brew-quiet);
-  stroke-width: 1.2;
+  stroke-width: calc(1.2 * var(--u));
   stroke-linecap: round;
 }
 .brew__hatch {
-  stroke-width: 1;
+  stroke-width: calc(1 * var(--u));
 }
 .brew__shelf {
   fill: none;
   stroke: color-mix(in srgb, var(--fg) 60%, transparent);
-  stroke-width: 1.5;
+  stroke-width: calc(1.5 * var(--u));
   stroke-linecap: round;
 }
 
@@ -145,7 +211,7 @@
 .brew__ink :is(path, circle) {
   fill: none;
   stroke: var(--fg);
-  stroke-width: var(--brew-pen);
+  stroke-width: calc(2.1 * var(--u));
   stroke-linecap: round;
   stroke-linejoin: round;
 }
@@ -158,18 +224,23 @@
   stroke: none;
 }
 .brew__ink .brew__thin {
-  stroke-width: 1.2;
+  stroke-width: calc(1.2 * var(--u));
+}
+/* hatching for shade: the same pen, lighter */
+.brew__ink .brew__shade {
+  stroke: color-mix(in srgb, var(--fg) 46%, transparent);
+  stroke-width: calc(1 * var(--u));
 }
 .brew__ink .brew__dash {
-  stroke-width: 1.2;
+  stroke-width: calc(1.2 * var(--u));
   stroke-dasharray: 3 5;
 }
 .brew__ink .brew__belt {
-  stroke-width: 1.2;
+  stroke-width: calc(1.2 * var(--u));
   stroke-dasharray: 3 7;
 }
 .brew__ink .brew__steam {
-  stroke-width: 1.3;
+  stroke-width: calc(1.3 * var(--u));
 }
 .brew__ink .brew__paper2,
 .brew__ink .brew__sack {
@@ -183,7 +254,7 @@
 }
 .brew__ink .brew__grainfill {
   fill: var(--brew-grain);
-  stroke-width: 1.2;
+  stroke-width: calc(1.2 * var(--u));
 }
 .brew__ink .brew__inkfill {
   fill: var(--fg);
@@ -197,31 +268,31 @@
   stroke: none;
 }
 .brew__ink .brew__fruit {
-  stroke-width: 1.2;
+  stroke-width: calc(1.2 * var(--u));
 }
 /* sprouting kernels on the floor, and their rootlets */
 .brew__ink .brew__kernel {
   fill: var(--brew-wet);
-  stroke-width: 0.8;
+  stroke-width: calc(0.8 * var(--u));
 }
 .brew__ink .brew__root {
-  stroke-width: 0.9;
+  stroke-width: calc(0.9 * var(--u));
 }
 /* a lager's cold rest */
 .brew__ink .brew__frost {
   stroke: var(--sky-deep);
-  stroke-width: 1.1;
+  stroke-width: calc(1.1 * var(--u));
 }
 /* bubbles as in the Home glass */
 .brew__ink .brew__bubble {
   fill: color-mix(in srgb, var(--card) 38%, transparent);
   stroke: var(--card);
-  stroke-width: 0.55;
+  stroke-width: calc(0.55 * var(--u));
 }
 /* grain on its way, and things in the air */
 .brew__ink .brew__grain {
   fill: var(--brew-grain);
-  stroke-width: 0.6;
+  stroke-width: calc(0.6 * var(--u));
 }
 .brew__ink .brew__cracked {
   fill: color-mix(in srgb, var(--gold) 60%, var(--card));
@@ -229,7 +300,7 @@
 }
 .brew__ink .brew__toss {
   fill: var(--card);
-  stroke-width: 0.6;
+  stroke-width: calc(0.6 * var(--u));
 }
 
 /* pipes and augers: an ink pipe with a hollow; what runs in a pipe fills the hollow, and an
@@ -269,92 +340,116 @@
   fill: var(--tone);
 }
 
-/* the station names, in the site's small condensed capitals */
+/* the station names, in the site's small condensed capitals; sized in --u like the pen */
 .brew__label {
   /* a halo of the page round each word, so a name over a pipe or a board still reads */
   paint-order: stroke;
   stroke: var(--bg);
-  stroke-width: 4px;
+  stroke-width: calc(4 * var(--u));
   stroke-linejoin: round;
   font-family: var(--ff-utility);
-  font-size: 13px;
+  font-size: calc(13 * var(--u));
   text-transform: uppercase;
   letter-spacing: var(--track-label);
   fill: var(--fg);
 }
 .brew__label--small {
-  font-size: 10.5px;
+  font-size: calc(10.5 * var(--u));
   fill: var(--fg-muted);
 }
 .brew__label--group {
-  font-size: 15px;
+  font-size: calc(15 * var(--u));
   fill: var(--accent-text);
 }
 .brew__svg--wide .brew__label {
-  font-size: 16px;
+  font-size: calc(16 * var(--u));
 }
 .brew__svg--wide .brew__label--small {
-  font-size: 12.5px;
+  font-size: calc(12.5 * var(--u));
 }
 .brew__svg--wide .brew__label--group {
-  font-size: 19px;
+  font-size: calc(19 * var(--u));
+}
+/* a capped can's label: Max's art, or (no label yet) a band of the beer between two lines */
+.brew__canlabel .brew__band {
+  stroke: var(--fg);
+  stroke-width: calc(1 * var(--u));
 }
 
-.brew__foot {
+/* ---- the step rail: the stations in order, in their two acts ---- */
+.brew__rail {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  gap: var(--s-2) var(--s-6);
   margin-top: var(--s-4);
-  text-align: center;
 }
-.brew__again {
-  font: inherit;
-  font-size: var(--t-small);
-  color: inherit;
-  border: 0;
-  padding-inline: 0;
-  cursor: pointer;
-}
-.brew__again[hidden] {
+.brew__rail[hidden] {
   display: none;
 }
-.brew__again:focus-visible {
-  outline: var(--stroke) solid var(--focus);
-  outline-offset: 3px;
+.brew__act {
+  display: grid;
+}
+.brew__act-name {
+  font-family: var(--ff-utility);
+  font-size: var(--t-label);
+  letter-spacing: var(--track-label);
+  text-transform: uppercase;
+  color: var(--accent-text);
+}
+.brew__steps {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0 var(--s-4);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.brew__step {
+  position: relative;
+  min-width: 44px;
+  min-height: 44px;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--fg-muted);
+  font: inherit;
+  font-size: var(--t-small);
+  cursor: pointer;
+}
+.brew__step[aria-current="step"] {
+  color: var(--fg);
+}
+/* the mark under the current step: one pen stroke */
+.brew__step svg {
+  position: absolute;
+  right: 0;
+  bottom: 7px;
+  left: 0;
+  width: 100%;
+  height: 6px;
+  fill: none;
+  stroke: var(--fg);
+  stroke-width: 2;
+  stroke-linecap: round;
+  visibility: hidden;
+}
+.brew__step svg path {
+  vector-effect: non-scaling-stroke;
+}
+.brew__step[aria-current="step"] svg {
+  visibility: visible;
+}
+@media (hover: hover) {
+  .brew__step:hover {
+    color: var(--fg);
+  }
+}
+.brew__rail .brew__again {
+  align-self: flex-end;
+  margin-left: auto;
 }
 /* the menu links here (#brew): leave room for the header */
 .brew-section {
   scroll-margin-top: var(--s-10);
-}
-/* the beers are a fieldset only for their name; it draws nothing of its own */
-fieldset.brew__beers {
-  border: 0;
-  padding: 0;
-  min-width: 0;
-}
-
-/* Phones: the eleven beers as one row you swipe along, not six rows of buttons in front of
-   the drawing. The row runs to the screen's edges; the chosen beer is scrolled into view. */
-@media (max-width: 47.99rem) {
-  fieldset.brew__beers {
-    flex-wrap: nowrap;
-    overflow-x: auto;
-    overscroll-behavior-x: contain;
-    scroll-snap-type: x proximity;
-    scroll-padding-inline: var(--gutter);
-    scrollbar-width: none;
-    margin-inline: calc(-1 * var(--gutter));
-    padding: var(--s-1) var(--gutter);
-  }
-  fieldset.brew__beers::-webkit-scrollbar {
-    display: none;
-  }
-  .brew__beer {
-    flex: none;
-    scroll-snap-align: start;
-    white-space: nowrap;
-  }
-}
-
-/* a capped can's label: Max's art, or (no label yet) a band of the beer between two lines */
-.brew__canlabel .brew__band {
-  stroke: var(--fg);
-  stroke-width: 1;
 }

@@ -12,6 +12,7 @@ export type Stage =
   | "steep"
   | "germ"
   | "kiln"
+  | "malt"
   | "mill"
   | "mash"
   | "runoff"
@@ -30,12 +31,15 @@ export type LabelKey =
   | "steep"
   | "germinate"
   | "kiln"
+  | "malt"
   | "mill"
   | "mash"
   | "runoff"
   | "boil"
   | "ferment"
   | "out";
+/** a station's own box, [x, y, width, height] in its coordinates: what the camera frames */
+export type Box = readonly [number, number, number, number];
 export type Into = "mash" | "kettle" | "ferm";
 
 /** A pipe or auger: its line, its length, and how long anything takes to travel it. */
@@ -66,6 +70,8 @@ export interface Layout {
     hops: Pt;
     jar: Pt;
     bin: Pt;
+    /** the bin the finished malt waits in, between the two acts */
+    malt: Pt;
   };
   /** the sack is drawn mirrored, its mouth to the left */
   sackFlip: boolean;
@@ -86,15 +92,18 @@ export interface Layout {
   hatch: string;
   /** where the shovel leans when it is not in use: the blade's middle on the floor */
   shovelRest: Pt;
+  /** the camera: how wide a piece of the drawing it shows at least, and its shape (height
+      over width); the model moves it from station to station */
+  frame: { w: number; aspect: number };
   shelves: string;
   labels: readonly { key: LabelKey; x: number; y: number; anchor?: "start" | "middle" | "end" }[];
   /** what a tap replays from; "paddle" stirs */
   hits: readonly { to: Stage | "paddle"; r: readonly [number, number, number, number] }[];
 }
 
-/** augers that are drawn; the grain's other moves are by shovel (links 0, 3 and 4 stay
-    in the list, unused, so the indices hold) */
-export const GRAIN_LINKS = [5, 6] as const;
+/** the auger that is drawn; the grain's other moves are by shovel (links 0, 3, 4 and 5
+    stay in the list, unused, so the indices hold) */
+export const GRAIN_LINKS = [6] as const;
 export const LIQUID_LINKS = [
   { i: 1, tone: "water" },
   { i: 2, tone: "water" },
@@ -205,6 +214,23 @@ export function hatch(x0: number, x1: number, y: number) {
   for (let x = x0 + 2; x < x1; x += 4.5) d += `M${f(x)} ${f(y + 1.5)}l-3 3.2`;
   return d;
 }
+/** shade on a round vessel's far side: a column of short strokes */
+function shade(x: number, y0: number, y1: number, lean = -4) {
+  let d = "";
+  for (let y = y0; y < y1; y += 6) d += `M${f(x)} ${f(y)}l${lean} 3.4`;
+  return d;
+}
+/** a row of rivets, as short ticks along the near side of a rim */
+function rivets(cx: number, cy: number, a: number, b: number, n: number) {
+  let d = "";
+  for (let i = 1; i < n; i++) {
+    const u = (i / n) * 2 - 1;
+    const x = cx + a * u;
+    const y = cy + b * Math.sqrt(Math.max(0, 1 - u * u));
+    d += `M${f(x)} ${f(y + 2.2)}v0.6`;
+  }
+  return d;
+}
 /** the line of a cylinder's liquid: x for spring i of n at half-width a */
 export const spread = (cx: number, a: number, i: number, n: number) => cx + a * ((2 * i) / (n - 1) - 1);
 
@@ -227,6 +253,10 @@ export const SACK = {
   ],
   mouth: [72, 60] as Pt,
   foot: [2, 74, 68] as const,
+  detail:
+    "M9 59l2.5 1.6M14.5 62l2.6 1M21 64l2.6 .7M28 65h2.7M35 65.4h2.7M42 64.8l2.6-.5M49 63.4l2.5-.9M20 8C22 5 31 4 34 7M17 14C22 16 31 16 37 13",
+  shade: "M47 40l-4 5M53 43l-4 5M58 47l-4 5M51 53l-4 5M44 57l-4 5M32 21l-3 4M36 26l-3 4",
+  box: [0, 0, 78, 70] as Box,
 };
 
 /** one hop cone at the origin, about 16 tall */
@@ -247,6 +277,9 @@ export const BALE = {
   ] as const,
   from: [28, 8] as Pt,
   foot: [4, 56, 50] as const,
+  detail: "M5 36C20 35 38 37 52 36L58 30M28 22V16.3M44 22l6-5.6",
+  shade: "M55 22l-3 3M55.5 28l-3 3M56 34l-3 3M56 40l-3 3",
+  box: [0, -4, 62, 56] as Box,
 };
 
 /** the water tank on the wall, a tap to the right and an outlet underneath */
@@ -258,6 +291,9 @@ export const TANK = {
   bracket: "M8 34H1M8 74H1M1 30V78",
   out: [61, 78] as Pt,
   under: [30, 96] as Pt,
+  detail: "M14 30V78M12 36h4M12 48h4M12 60h4M12 72h4M21 12.5h18",
+  shade: shade(49, 30, 82, -3),
+  box: [0, 0, 64, 96] as Box,
 };
 
 /** a jar of yeast; it tips from its near bottom corner to pour */
@@ -268,6 +304,8 @@ export const JAR = {
   mouth: [10, 10] as Pt,
   pivot: [8, 49] as Pt,
   foot: [6, 38, 49] as const,
+  detail: "M13 24H31V36H13ZM17 28H27M17 32H24",
+  box: [0, 0, 44, 50] as Box,
 };
 
 /** the steeping tank: a small cylinder with a cone, on legs */
@@ -286,6 +324,9 @@ export const STEEP = {
   out: [40, 106] as Pt,
   drain: [5, 60] as Pt,
   foot: [4, 76, 118] as const,
+  detail: `${ell(40, 18, 30.6, 7)}M12.4 100H67.6M20 30V58M18 36h4M18 44h4M18 52h4${rivets(40, 66, 28, 28 * RIM, 9)}`,
+  shade: `${shade(64, 28, 62)}M58 71l-4 3M53 76l-4 3M48 81l-4 3`,
+  box: [0, 6, 80, 114] as Box,
 };
 
 /** the germination floor: a low tray seen a little from above */
@@ -298,6 +339,8 @@ export const GERM = {
   x0: 3,
   thick: 24, // bed thickness per batch unit of grain
   foot: [0, 124, 58] as const,
+  detail: "M28 50V58M56 50V58M84 50V58M22 46H100M30 41H114M119 43V51",
+  box: [0, 16, 126, 44] as Box,
 };
 
 /** the kiln: a brick base with a fire in its arch, a slatted floor on top */
@@ -313,6 +356,10 @@ export const KILN = {
   thick: 20,
   fire: [50, 74] as Pt,
   foot: [0, 112, 74] as const,
+  detail:
+    "M0 63H36M64 63H100M14 52V63M86 52V63M8 63V74M26 63V74M74 63V74M92 63V74M50 40V52M100 52L112 42M100 63L112 53M46.4 55L45.4 50H54.6L53.6 55M98 30V10H108V30M95 10H111",
+  shade: "M110 34l-3 4M110 46l-3 4M110 57l-3 4",
+  box: [0, 2, 114, 72] as Box,
 };
 
 /** the mill: a hopper, two rollers in a housing open top and bottom, a crank, a post */
@@ -328,6 +375,10 @@ export const MILL = {
   ] as const,
   crank: [100, 59] as Pt,
   foot: [10, 34, 108] as const,
+  detail:
+    "M27.6 10Q60 14.5 92.4 10M36 46.5v.6M84 46.5v.6M36 71.5v.6M84 71.5v.6M54 76L52 83M66 76L68 83M17 108V112M27 108V112",
+  shade: "M88 6l-4 4M83 13l-4 4M78 20l-4 4M73 27l-4 4",
+  box: [8, -8, 100, 118] as Box,
 };
 
 const MB = 62 * RIM;
@@ -350,6 +401,10 @@ export const MASH = {
   },
   pivot: [56, 24] as Pt,
   foot: [12, 138, 150] as const,
+  /** a lip round the rim, two hoops, a dial */
+  detail: `${ell(75, 30, 65.4, MB + 1.2)}${near(75, 58, 62, MB)}${near(75, 98, 62, MB)}${ell(118, 80, 6, 6)}M118 80L121.4 76.4`,
+  shade: shade(131, 44, 122),
+  box: [6, 0, 142, 156] as Box,
 };
 
 const KB = 62 * RIM;
@@ -366,6 +421,10 @@ export const KETTLE = {
   handle: "M155 84V72",
   valveAt: [155, 84] as Pt,
   foot: [8, 142, 150] as const,
+  /** a lip round the rim, rivets under it, a handle each side */
+  detail: `${ell(75, 20, 65.4, KB + 1.2)}${rivets(75, 22, 62, KB, 14)}M13 38C4 38 4 54 13 54M137 38C146 38 146 54 137 54M99 124H110V150`,
+  shade: `${shade(131, 36, 92)}M124 99l-4 3M116 104l-4 3M107 108l-4 3`,
+  box: [2, 2, 164, 150] as Box,
 };
 
 const FB = 44 * RIM;
@@ -404,6 +463,12 @@ export const FERM = {
     return d;
   })(),
   foot: [0, 110, 250] as const,
+  /** a manway, two jacket bands, a thermometer, a sample tap */
+  detail: `${ell(55, 66, 12, 15)}M49 66h12M67 62v8${near(55, 100, 44, FB)}${near(55, 142, 44, FB)}M24 112V134M22 116h4M22 122h4M22 128h4M99 152H106V157`,
+  shade: `${shade(93, 40, 166)}M88 177l-4 3M82 183l-4 3M76 189l-4 3M70 195l-4 3M64 201l-4 3`,
+  box: [0, -16, 110, 268] as Box,
+  /** its top: where the wort comes in */
+  topBox: [0, -16, 110, 110] as Box,
 };
 
 /** the filler: a belt, a nozzle, a capper; a keg and three cans ride the belt */
@@ -429,6 +494,9 @@ export const BIN = {
   lines: `${ell(20, 10, 18, 18 * RIM)}M2 10V40M38 10V40${near(20, 40, 18, 18 * RIM)}M0 18H2M38 18H40`,
   inside: barrel(20, 10, 40, 18, 18 * RIM),
   foot: [2, 38, 44] as const,
+  /** staves and a hoop: a wooden tub */
+  detail: `M11 13.5V43M20 14V44M29 13.5V43${near(20, 27, 18, 18 * RIM)}`,
+  box: [0, 2, 40, 44] as Box,
 };
 
 export const OUT = {
@@ -453,6 +521,9 @@ export const OUT = {
     [14, 46, 120],
     [294, 326, 120],
   ] as const,
+  detail:
+    "M14 100a3 3 0 1 0 6 0a3 3 0 1 0 -6 0M320 100a3 3 0 1 0 6 0a3 3 0 1 0 -6 0M70 96V104M130 96V104M190 96V104M250 96V104M144 3H156M190 7H198M126 30H132M200 30H194",
+  box: [0, -6, 350, 130] as Box,
 };
 
 /** an extra input: a bowl of fruit, or a jar */
@@ -523,6 +594,7 @@ function phone(): Layout {
     jar: [314, 831] as Pt,
     out: [10, 1134] as Pt,
     bin: [170, 556] as Pt,
+    malt: [318, 334] as Pt,
   };
   const W = 360;
   const floors = [230, 380, 600, 800, 1090, 1254];
@@ -546,7 +618,8 @@ function phone(): Layout {
     foot(at.ferm, FERM.foot) +
     OUT.foot.map((fp) => foot(at.out, fp)).join("") +
     foot(at.jar, JAR.foot) +
-    foot(at.bin, BIN.foot);
+    foot(at.bin, BIN.foot) +
+    foot(at.malt, BIN.foot);
   return {
     id: "phone",
     box: [W, 1290],
@@ -672,6 +745,7 @@ function phone(): Layout {
     room,
     hatch: hatchAll,
     shovelRest: [214, 220.5],
+    frame: { w: 250, aspect: 1.25 },
     shelves: shelf(312, 356, 880),
     labels: [
       { key: "water", x: 38, y: 14 },
@@ -680,6 +754,7 @@ function phone(): Layout {
       { key: "steep", x: 198, y: 254 },
       { key: "germinate", x: 79, y: 404 },
       { key: "kiln", x: 252, y: 404 },
+      { key: "malt", x: 338, y: 404 },
       { key: "mash", x: 40, y: 624 },
       { key: "mill", x: 286, y: 624 },
       { key: "runoff", x: 162, y: 642, anchor: "start" },
@@ -720,6 +795,7 @@ function wide(): Layout {
     jar: [1092, 61] as Pt,
     out: [850, 370] as Pt,
     bin: [652, 426] as Pt,
+    malt: [446, 424] as Pt,
   };
   const W = 1200;
   const H = 520;
@@ -745,7 +821,8 @@ function wide(): Layout {
     foot(at.ferm, FERM.foot) +
     OUT.foot.map((fp) => foot(at.out, fp)).join("") +
     foot(at.jar, JAR.foot) +
-    foot(at.bin, BIN.foot);
+    foot(at.bin, BIN.foot) +
+    foot(at.malt, BIN.foot);
   return {
     id: "wide",
     box: [W, H],
@@ -872,6 +949,7 @@ function wide(): Layout {
     room,
     hatch: hatchAll,
     shovelRest: [182, 362.5],
+    frame: { w: 400, aspect: 0.5625 },
     shelves: shelf(1084, 1150, 110),
     labels: [
       { key: "water", x: 50, y: 30 },
@@ -880,13 +958,14 @@ function wide(): Layout {
       { key: "steep", x: 148, y: 398 },
       { key: "germinate", x: 259, y: 398 },
       { key: "kiln", x: 406, y: 398 },
+      { key: "malt", x: 466, y: 486 },
       { key: "mill", x: 550, y: 398 },
       { key: "mash", x: 606, y: 412, anchor: "middle" },
       { key: "runoff", x: 746, y: 414 },
       { key: "boil", x: 875, y: 398 },
       { key: "hops", x: 788, y: 494 },
       { key: "yeast", x: 1118, y: 128 },
-      { key: "ferment", x: 1040, y: 96 },
+      { key: "ferment", x: 1082, y: 252, anchor: "start" },
       { key: "out", x: 1020, y: 512 },
     ],
     hits: [

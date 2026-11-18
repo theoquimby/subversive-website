@@ -36,6 +36,17 @@ import itemWings from "../public/photos/item-wings.webp";
 import kettleDark from "../public/photos/kettle-dark.webp";
 import lobsterRoll from "../public/photos/lobster-roll.webp";
 import patioPlate from "../public/photos/patio-plate.webp";
+// Professional beer photographs, from Max, 2026-11-18. Every one of them is of a can whose
+// label carries the old name: the "Malting | Brewing" line is painted out on Forbidden Fruit
+// and Dark Harvest (and Dark Harvest is cropped above "house-made + roasted malts"); the two
+// Camp Comet shots, the pour and the goblin glass show none of it. Six more, of beers not
+// brewed lately, are not here yet: each needs the same check and repair first.
+import proCampCometSmores from "../public/photos/pro-camp-comet-smores.webp";
+import proCampCometWindow from "../public/photos/pro-camp-comet-window.webp";
+import proDarkHarvest from "../public/photos/pro-dark-harvest.webp";
+import proForbiddenFruit from "../public/photos/pro-forbidden-fruit.webp";
+import proGoblinGlass from "../public/photos/pro-goblin-glass.webp";
+import proPour from "../public/photos/pro-pour.webp";
 import tanks from "../public/photos/tanks.webp";
 import taproomInside from "../public/photos/taproom-inside.webp";
 import taproomTables from "../public/photos/taproom-tables.webp";
@@ -182,6 +193,36 @@ export const photos = {
   "item-wings": {
     src: itemWings,
     alt: "A hand lifting a buffalo wing from a paper-lined basket with carrots and celery",
+    focal: [50, 50],
+  },
+  "pro-forbidden-fruit": {
+    src: proForbiddenFruit,
+    alt: "A can of Forbidden Fruit beside a stemmed glass of the dark red beer, on a wooden table",
+    focal: [50, 55],
+  },
+  "pro-camp-comet-window": {
+    src: proCampCometWindow,
+    alt: "A can of Camp Comet and a tall glass of golden beer on a sunlit windowsill",
+    focal: [50, 50],
+  },
+  "pro-camp-comet-smores": {
+    src: proCampCometSmores,
+    alt: "Cans of Camp Comet and a glass of hazy golden beer, with toasted marshmallows on skewers",
+    focal: [50, 45],
+  },
+  "pro-dark-harvest": {
+    src: proDarkHarvest,
+    alt: "A hand reaching for a can of Dark Harvest stout",
+    focal: [50, 60],
+  },
+  "pro-pour": {
+    src: proPour,
+    alt: "Golden beer pouring into a tilted glass printed with the barley mark",
+    focal: [50, 50],
+  },
+  "pro-goblin-glass": {
+    src: proGoblinGlass,
+    alt: "A glass of golden beer printed with a grinning goblin holding a mug",
     focal: [50, 50],
   },
 } as const satisfies Record<string, Photo>;

@@ -127,6 +127,14 @@ export const inquiryLabels = {
 // About page: interface labels
 export const aboutLabels = { title: "About", founders: "Founders" } as const;
 
+// Our beer's list of beers (Theo, 2026-11-18: "beer library or history or something so
+// people don't think they are all available now"). Beers on the menu carry the "On tap
+// now" mark; the others are beers Max has sent labels for, with only what the label says.
+export const libraryLabels = {
+  title: "Beer library",
+  onTap: "On tap now",
+} as const;
+
 export const homeLabels = {
   headline: ["Beer.", "Burgers.", "Catskill."] as const,
   subline: (street: string) => `Farmhouse brewery, taproom & kitchen at ${street}.`,
@@ -164,7 +172,12 @@ export const brewLabels = {
   title: "How it's made",
   aria: (beer: string) =>
     `How ${beer} is made, from New York grain through malting, mashing and the boil to kegs and cans`,
-  choose: "Choose a beer to brew",
+  nowBrewing: "Now brewing",
+  change: "Change",
+  choose: "Choose a beer",
+  steps: "Steps",
+  brewing: "Brewing",
+  malt: "Malt",
   grain: "Grain",
   hops: "Hops",
   water: "Water",

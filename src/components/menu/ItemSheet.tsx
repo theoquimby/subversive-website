@@ -95,7 +95,8 @@ export function ItemSheet() {
     const onPop = () => showItem(itemParam());
     const onClick = (e: MouseEvent) => {
       if (e.defaultPrevented || e.button !== 0 || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;
-      const a = (e.target as Element | null)?.closest?.("a[data-item]") as HTMLAnchorElement | null;
+      // a row's link, or anything else that stands for an item (Our beer's cans)
+      const a = (e.target as Element | null)?.closest?.("[data-item]") as HTMLElement | null;
       const id = a?.dataset.item;
       if (!id) return;
       e.preventDefault();

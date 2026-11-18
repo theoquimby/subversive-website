@@ -5,12 +5,14 @@
 //
 // One of the old site's three brewery paragraphs names a process the brand has dropped
 // (spec O10), so it is left out whole rather than edited. TODO(Max): approve a rewording.
-import { labels } from "@content/labels";
-import { brewLabels, homeLabels } from "@content/microcopy";
+import { labels, offMenu } from "@content/labels";
+import { brewLabels, homeLabels, libraryLabels } from "@content/microcopy";
 import type { Metadata } from "next";
 import { BrewProcess } from "@/components/beer/BrewProcess";
 import { Can } from "@/components/beer/Can";
+import { CanLink } from "@/components/beer/CanLink";
 import { PhotoFrame } from "@/components/graphics/PhotoFrame";
+import { PhotoStrip } from "@/components/home/PhotoStrip";
 import { Drawing } from "@/components/home/Ways";
 import { WhereFrom } from "@/components/home/WhereFrom";
 import { PageWipe } from "@/components/layout/PageWipe";
@@ -82,49 +84,73 @@ export default async function BeerPage() {
             <PhotoFrame id="tanks" ratio="4/5" reveal={false} sizes="(min-width: 1024px) 260px, 50vw" />
           </div>
 
-          {/* What is pouring now: every tap, as a shelf of cans in Max's labels and as a
-              list. A tap on either opens the beer's view, with its can pouring the glass,
-              as on the menu (the same ItemSheet reads these rows, hence the menu's data
-              attributes; data-show is set so the sheet's list switch has nothing to do). */}
-          <div data-menu="" data-show="drinks">
+          {/* The beer library (Theo, 2026-11-18): each beer with its can beside it, in
+              Max's label where he has sent one. Not all of these are pouring today, so the
+              ones on the menu say "On tap now". A tap on a can or a row opens the beer's
+              view, with its can pouring the glass, as on the menu (the same ItemSheet
+              reads these rows, hence the menu's data attributes; data-show is set so the
+              sheet's list switch has nothing to do). Beers with a label but not on the
+              menu are listed with only what their label says. */}
+          <div className="beer-top__wide" data-menu="" data-show="drinks">
             <section
               className="prose-section"
               aria-labelledby="tap-title"
               data-list="drinks"
-              data-section="on-tap"
+              data-section="library"
             >
               <SectionHead id="tap-title" note={`${view.pourSizes.half} / ${view.pourSizes.full}`}>
-                {homeLabels.onTap}
+                {libraryLabels.title}
               </SectionHead>
-              <ul className="can-row can-row--shelf">
-                {taps.map((row) => (
-                  <li key={row.id}>
-                    {/* the row below is the named link; the can is a second way in, for a
-                        pointer or a finger only */}
-                    {/* biome-ignore lint/a11y/useAnchorContent: hidden from assistive tech on purpose; the list row names the same link */}
-                    <a
-                      href={`?item=${encodeURIComponent(row.id)}`}
-                      data-item={row.id}
-                      className="can-link"
-                      aria-hidden="true"
-                      tabIndex={-1}
-                      draggable={false}
-                    >
-                      <Can
-                        label={labels[row.id]}
-                        name={row.item.name}
-                        color={isBeer(row.item) ? row.item.color : undefined}
-                      />
-                    </a>
+              <ul className="mlist library">
+                {taps.map((row, i) => (
+                  <MenuRow
+                    key={row.id}
+                    row={row}
+                    index={i}
+                    detail
+                    note={libraryLabels.onTap}
+                    lead={
+                      <CanLink id={row.id}>
+                        <Can
+                          label={labels[row.id]}
+                          name={row.item.name}
+                          color={isBeer(row.item) ? row.item.color : undefined}
+                        />
+                      </CanLink>
+                    }
+                  />
+                ))}
+                {offMenu.map((b) => (
+                  <li key={b.id} className="mrow mrow--lead">
+                    <Can label={labels[b.id]} name={b.name} />
+                    <div className="mrow__box">
+                      <span className="mrow__sum">
+                        <span className="mrow__main">
+                          <span className="mrow__name">{b.name}</span>
+                          <span className="mrow__line">
+                            <span className="mrow__meta">{b.style}</span>
+                          </span>
+                        </span>
+                      </span>
+                    </div>
                   </li>
                 ))}
               </ul>
-              <ul className="mlist home-tap">
-                {taps.map((row, i) => (
-                  <MenuRow key={row.id} row={row} index={i} detail />
-                ))}
-              </ul>
             </section>
+          </div>
+
+          {/* Max's photographs of the beers (2026-11-18); each opens large */}
+          <div className="beer-top__wide">
+            <PhotoStrip
+              ids={[
+                "pro-forbidden-fruit",
+                "pro-pour",
+                "pro-camp-comet-window",
+                "pro-dark-harvest",
+                "pro-camp-comet-smores",
+                "pro-goblin-glass",
+              ]}
+            />
           </div>
         </div>
 

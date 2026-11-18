@@ -124,6 +124,8 @@ export function scene(
       path(TANK.neck),
       path(TANK.tap),
       path(TANK.bracket, "brew__thin"),
+      path(TANK.detail, "brew__thin"),
+      path(TANK.shade, "brew__shade"),
     ]),
   );
   // the grain sack
@@ -135,6 +137,8 @@ export function scene(
         path(SACK.tie),
         path(SACK.spill, "brew__grainfill"),
         path(SACK.ear, "brew__thin"),
+        path(SACK.detail, "brew__thin"),
+        path(SACK.shade, "brew__shade"),
         ...SACK.kernels.map((d) => path(d, "brew__inkfill")),
       ],
       {
@@ -157,6 +161,8 @@ export function scene(
       ]),
       path(STEEP.lines),
       path(STEEP.seamLine, "brew__thin"),
+      path(STEEP.detail, "brew__thin"),
+      path(STEEP.shade, "brew__shade"),
       path(STEEP.valve, "brew__solid"),
       live("path", "vS", undefined, { d: STEEP.handle }),
     ]),
@@ -166,6 +172,7 @@ export function scene(
     station(A.germ, [
       path(GERM.fill, "brew__solid"),
       path(GERM.lines),
+      path(GERM.detail, "brew__thin"),
       live("path", "germ.bed", "brew__liq brew--wet"),
       live("path", "germ.edge", "brew__thin"),
       ...keys("sp", POOLS.sprouts).map((k, i) =>
@@ -194,6 +201,8 @@ export function scene(
       ),
       path(KILN.lines),
       path(KILN.slats, "brew__thin"),
+      path(KILN.detail, "brew__thin"),
+      path(KILN.shade, "brew__shade"),
       live("path", "kiln.bed", "brew__liq"),
       live("path", "kiln.edge", "brew__thin"),
       live("path", "kiln.s0", "brew__steam"),
@@ -219,6 +228,8 @@ export function scene(
       ),
       path(MILL.housing),
       path(MILL.post),
+      path(MILL.detail, "brew__thin"),
+      path(MILL.shade, "brew__shade"),
       g(
         [
           path(`M${MILL.crank[0]} ${MILL.crank[1]}V${MILL.crank[1] - 10}`),
@@ -252,6 +263,8 @@ export function scene(
         "paddle",
       ),
       path(MASH.lines),
+      path(MASH.detail, "brew__thin"),
+      path(MASH.shade, "brew__shade"),
       path(MASH.valve, "brew__solid"),
       live("path", "vM", undefined, { d: MASH.handle }),
       live("path", "mash.s0", "brew__steam"),
@@ -280,6 +293,8 @@ export function scene(
         live("path", "ket.top", "brew__liq brew--wort-top"),
       ]),
       path(KETTLE.lines),
+      path(KETTLE.detail, "brew__thin"),
+      path(KETTLE.shade, "brew__shade"),
       path(KETTLE.valve, "brew__solid"),
       live("path", "vK", undefined, { d: KETTLE.handle }),
       live("path", "ket.s0", "brew__steam"),
@@ -300,6 +315,8 @@ export function scene(
       ]),
       path(FERM.seams, "brew__thin"),
       path(FERM.lines),
+      path(FERM.detail, "brew__thin"),
+      path(FERM.shade, "brew__shade"),
       g([path(FERM.frost, "brew__frost")], undefined, undefined, "frost"),
       path(FERM.port, "brew__solid"),
       path(FERM.valve, "brew__solid"),
@@ -316,6 +333,8 @@ export function scene(
       path(BALE.body, "brew__bale"),
       path(BALE.top, "brew__bale"),
       path(BALE.straps, "brew__thin"),
+      path(BALE.detail, "brew__thin"),
+      path(BALE.shade, "brew__shade"),
       ...BALE.cones.map(([x, y, r]) => g(cone(), { transform: `translate(${x} ${y}) rotate(${r})` })),
     ]),
   );
@@ -326,6 +345,7 @@ export function scene(
           path(JAR.body, "brew__solid"),
           clipped("jar", [live("path", "jar.f", "brew__liq brew--yeast")]),
           path(JAR.body),
+          path(JAR.detail, "brew__thin"),
           path(JAR.lid, "brew__paper2"),
         ],
         undefined,
@@ -369,6 +389,18 @@ export function scene(
     });
     out.push(station(p, kids));
   });
+  // the bin the finished malt waits in between the acts
+  out.push(
+    station(A.malt, [
+      path(BIN.inside, "brew__solid"),
+      clipped("bin", [
+        live("path", "malt.g", "brew__liq brew--toast"),
+        live("path", "malt.top", "brew__liq brew--toast-top"),
+      ]),
+      path(BIN.lines),
+      path(BIN.detail, "brew__thin"),
+    ]),
+  );
   // the bin the spent grain is shovelled into
   out.push(
     station(A.bin, [
@@ -378,12 +410,14 @@ export function scene(
         live("path", "bin.top", "brew__liq brew--wet"),
       ]),
       path(BIN.lines),
+      path(BIN.detail, "brew__thin"),
     ]),
   );
   // the filler
   out.push(
     station(A.out, [
       path(OUT.beltFill, "brew__solid"),
+      path(OUT.detail, "brew__thin"),
       path(OUT.frame),
       path(OUT.belt),
       live("path", "belt", "brew__belt", { d: OUT.beltMid }),

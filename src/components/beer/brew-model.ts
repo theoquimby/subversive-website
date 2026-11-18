@@ -23,12 +23,20 @@
 //             grain out of the mash tun. One shovel, one move at a time: it scoops (the
 //             source drops by a scoopful), carries along an arc, and tips; the grain falls as
 //             dots under gravity and counts in the destination only when it lands.
+//   two acts  malting (sack, steep, floor, kiln) ends with the malt in its bin; brewing
+//             (mill to cans) starts from that bin. Each conserves its own: 0.5 of grain from
+//             sack to malt bin, then from malt bin to the spent-grain bin.
+//   colour    what is in the vessel, never ahead of its cause: water, then wort as the mash
+//             converts, then beer as it ferments; a fruit or a haze only once it is in.
+//   camera    the view follows the work: a frame round the station in use, moved by a
+//             damped spring, written each frame as the drawing's viewBox.
 // The extra inputs and the cold rest come from the beer's own menu words (brew-recipe.ts).
 
 import {
   along,
   BALE,
   BIN,
+  type Box,
   EXTRA,
   FERM,
   GERM,
@@ -41,6 +49,7 @@ import {
   type LinkGeo,
   MASH,
   MILL,
+  OUT,
   type Pt,
   RIM,
   SACK,
@@ -48,6 +57,7 @@ import {
   STEEP,
   type Stage,
   spread,
+  TANK,
 } from "./brew-layout";
 import type { ExtraKind, Recipe } from "./brew-recipe";
 
@@ -280,9 +290,11 @@ interface Dot {
   share: number;
   pile: Pile;
   ty: number;
+  /** how far its landing turns the liquid toward the beer's final look */
+  tint: number;
 }
 /** where grain lies, for the shovel */
-export type Pile = "sack" | "steep" | "floor" | "kiln" | "mash" | "bin";
+export type Pile = "sack" | "steep" | "floor" | "kiln" | "malt" | "hopper" | "mash" | "bin";
 interface Shovel {
   x: number;
   y: number;
@@ -339,6 +351,8 @@ export interface Brew {
   kilnG: number;
   toast: number;
   kilnHeat: number;
+  /** the finished malt in its bin, between the acts */
+  maltG: number;
   heap: number;
   mashW: number;
   mashG: number;
@@ -351,6 +365,9 @@ export interface Brew {
   evap: number;
   ferm: number;
   fermP: number;
+  /** 0..1: how far the liquid has turned from plain to the beer's final look (a fruit
+      going in, a dry hop's haze); only read when the recipe has such a turn */
+  tint: number;
   krausen: number;
   co2: number;
   frost: number;
@@ -395,6 +412,10 @@ export interface Brew {
   sh: Shovel;
   /** where the stage's shovel work has got to */
   shStep: number;
+  /** the camera: the middle of what it shows and how wide (0: not placed yet), its speed,
+      and where it is going */
+  cam: { x: number; y: number; w: number; vx: number; vy: number; vw: number };
+  camTo: { x: number; y: number; w: number };
 }
 
 export const POOLS = {
@@ -424,6 +445,7 @@ const dot = (): Dot => ({
   share: 0,
   pile: "steep",
   ty: 0,
+  tint: 0,
 });
 const pool = (n: number) => Array.from({ length: n }, dot);
 const newLink = (): Link => ({
@@ -437,7 +459,7 @@ const newLink = (): Link => ({
   enter: 0,
   ty: 0,
 });
-const NO_RECIPE: Recipe = { lager: false, dryHop: false, hazy: false, extras: [] };
+const NO_RECIPE: Recipe = { lager: false, dryHop: false, hazy: false, extras: [], turn: null };
 const HOP_REST: readonly (readonly [number, number])[] = [
   [52, 0.5],
   [74, -0.4],
@@ -485,6 +507,7 @@ export function createBrew(recipe: Recipe = NO_RECIPE): Brew {
     kilnG: 0,
     toast: 0,
     kilnHeat: 0,
+    maltG: 0,
     heap: 0,
     mashW: 0,
     mashG: 0,
@@ -497,6 +520,7 @@ export function createBrew(recipe: Recipe = NO_RECIPE): Brew {
     evap: 0,
     ferm: 0,
     fermP: 0,
+    tint: 0,
     krausen: 0,
     co2: 0,
     frost: 0,
@@ -568,14 +592,40 @@ export function createBrew(recipe: Recipe = NO_RECIPE): Brew {
       ry: 0,
     },
     shStep: 0,
+    cam: { x: 0, y: 0, w: 0, vx: 0, vy: 0, vw: 0 },
+    camTo: { x: 0, y: 0, w: 0 },
   };
 }
 
-/** the shovel leaning where it lives */
+/** where the shovel is put down after working at a pile */
+function restAt(L: Layout, p: Pile): Pt {
+  const A = L.at;
+  if (p === "floor" || p === "kiln" || p === "malt") return [A.germ[0] + 132, A.germ[1] + 55.5];
+  if (p === "hopper") return [A.mill[0] + 114, A.mill[1] + 105.5];
+  if (p === "mash") return [A.mash[0] + 152, A.mash[1] + 147.5];
+  if (p === "bin") return [A.bin[0] + 52, A.bin[1] + 41.5];
+  return L.shovelRest;
+}
+/** the pile the shovel last worked at, when a stage begins */
+const LAST_PILE: Partial<Record<Stage, Pile>> = {
+  kiln: "floor",
+  malt: "floor",
+  mill: "malt",
+  mash: "hopper",
+  runoff: "hopper",
+  spent: "hopper",
+  boil: "bin",
+  transfer: "bin",
+  ferment: "bin",
+  out: "bin",
+  done: "bin",
+};
+/** the shovel leaning where it was last used */
 function home(s: Brew, L: Layout) {
   const sh = s.sh;
-  sh.rx = L.shovelRest[0];
-  sh.ry = L.shovelRest[1];
+  const at = restAt(L, LAST_PILE[s.stage] ?? "sack");
+  sh.rx = at[0];
+  sh.ry = at[1];
   sh.x = sh.rx;
   sh.y = sh.ry;
   sh.a = SHOVEL.lean;
@@ -595,6 +645,9 @@ export function stillBrew(L: Layout): Brew {
   s.kilnG = GRAIN * 0.7;
   s.toast = 0.75;
   s.kilnHeat = 1;
+  s.maltG = GRAIN * 0.7;
+  s.binG = GRAIN * 0.5;
+  s.tint = 1;
   s.heap = 0.16;
   s.mashW = 1;
   s.mashG = GRAIN;
@@ -627,6 +680,7 @@ const ORDER: Stage[] = [
   "steep",
   "germ",
   "kiln",
+  "malt",
   "mill",
   "mash",
   "runoff",
@@ -652,6 +706,8 @@ export function setStage(s: Brew, stage: Stage, L: Layout) {
     sprout: 0,
     kilnG: 0,
     toast: 0,
+    maltG: 0,
+    tint: 0,
     heap: 0,
     mashW: 0,
     mashG: 0,
@@ -676,15 +732,15 @@ export function setStage(s: Brew, stage: Stage, L: Layout) {
     stirred: false,
     exLeft: [0, 0],
     exNext: [0, 0],
-    exDone: { mash: at > 4, kettle: at > 8, ferm: at > 10 },
-    dryDone: at > 10,
+    exDone: { mash: at > 5, kettle: at > 9, ferm: at > 11 },
+    dryDone: at > 11,
     shStep: 0,
   });
-  // the shovel puts down whatever it held and goes back to its place
+  s.stage = stage;
+  // the shovel puts down whatever it held, where it would have been left
   s.sh.load = 0;
   s.sh.busy = false;
-  if (s.sh.rx === 0 && s.sh.ry === 0) home(s, L);
-  else s.sh.phase = 0;
+  home(s, L);
   for (const l of s.lids) {
     l.st = 0;
     l.y = 0;
@@ -718,6 +774,10 @@ export function setStage(s: Brew, stage: Stage, L: Layout) {
   }
   if (at >= 5) {
     s.kilnG = 0;
+    s.maltG = GRAIN;
+  }
+  if (at >= 6) {
+    s.maltG = 0;
     s.tankM = 0;
     s.mashW = MASH_WATER;
     s.mashG = GRAIN;
@@ -725,18 +785,18 @@ export function setStage(s: Brew, stage: Stage, L: Layout) {
     s.paddle.stir = 2.2;
     s.stirred = true;
   }
-  if (at >= 6) s.mashC = 1;
-  if (at >= 7) {
+  if (at >= 7) s.mashC = 1;
+  if (at >= 8) {
     s.mashW = 0;
     s.kettle = MASH_WATER;
     s.heat = 1;
     s.boil = 0.6;
   }
-  if (at >= 8) {
+  if (at >= 9) {
     s.mashG = 0;
     s.binG = GRAIN;
   }
-  if (at >= 9) {
+  if (at >= 10) {
     s.kettle = 0;
     s.heat = 0;
     s.boil = 0;
@@ -752,8 +812,9 @@ export function setStage(s: Brew, stage: Stage, L: Layout) {
     });
     s.hopsTossed = 3;
   }
-  if (at >= 11) {
+  if (at >= 12) {
     s.fermP = 1;
+    s.tint = 1;
     s.yeastIn = true;
     s.jar = 0.6;
   }
@@ -881,10 +942,15 @@ function throwTo(
   o.age = 0;
   o.T = T;
 }
-function tossDot(s: Brew, a: Pt, b: Pt, T: number, fill: string, into: Into | "yeast", r = 1.8) {
+function tossDot(s: Brew, a: Pt, b: Pt, T: number, fill: string, into: Into | "yeast", r = 1.8, tint = 0) {
   const d = s.fx.find((x) => !x.on);
-  if (!d) return;
+  if (!d) {
+    // none to spare: it counts as in, unseen
+    s.tint = Math.min(1, s.tint + tint);
+    return;
+  }
   d.on = true;
+  d.tint = tint;
   throwTo(d, a, [b[0] + (Math.random() - 0.5) * 8, b[1]], T * (0.9 + Math.random() * 0.2));
   d.fill = fill;
   d.into = into;
@@ -916,15 +982,21 @@ function amount(s: Brew, p: Pile) {
         ? s.floorG
         : p === "kiln"
           ? s.kilnG
-          : p === "mash"
-            ? s.mashG
-            : s.binG;
+          : p === "malt"
+            ? s.maltG
+            : p === "hopper"
+              ? s.heap
+              : p === "mash"
+                ? s.mashG
+                : s.binG;
 }
 function give(s: Brew, p: Pile, v: number) {
   if (p === "sack") s.sack += v;
   else if (p === "steep") s.steepG += v;
   else if (p === "floor") s.floorG += v;
   else if (p === "kiln") s.kilnG += v;
+  else if (p === "malt") s.maltG += v;
+  else if (p === "hopper") s.heap += v;
   else if (p === "mash") s.mashG += v;
   else s.binG += v;
 }
@@ -957,6 +1029,14 @@ function spot(s: Brew, L: Layout, p: Pile, n: number, dig: boolean): { at: Pt; l
     const top = A.mash[1] + mashY(s.mashG);
     return { at: [x, dig ? top : A.mash[1] + MASH.top - 16], lands: top };
   }
+  if (p === "malt") {
+    const top = A.malt[1] + binY(s.maltG);
+    return { at: [A.malt[0] + BIN.cx, dig ? top : A.malt[1] + BIN.top - 14], lands: top };
+  }
+  if (p === "hopper") {
+    const x = A.mill[0] + 60 + ((n % 3) - 1) * 10;
+    return { at: [x, A.mill[1] - 16], lands: A.mill[1] + hopperY(s.heap) };
+  }
   const x = A.bin[0] + BIN.cx;
   return { at: [x, A.bin[1] + BIN.top - 14], lands: A.bin[1] + binY(s.binG) };
 }
@@ -986,15 +1066,15 @@ const SHOVEL_FILL: Record<Pile, string> = {
   steep: "var(--brew-wet)",
   floor: "var(--brew-wet)",
   kiln: "var(--brew-toast)",
+  malt: "var(--brew-toast)",
+  hopper: "var(--brew-toast)",
   mash: "var(--brew-bed)",
   bin: "var(--brew-bed)",
 };
 function shovel(s: Brew, L: Layout, dt: number) {
   const sh = s.sh;
-  sh.rx = L.shovelRest[0];
-  sh.ry = L.shovelRest[1];
   if (sh.phase === 0) {
-    // home: it leans by the steep
+    // put down: it leans where it was last used
     const k = Math.min(1, dt * 4);
     sh.x += (sh.rx - sh.x) * k;
     sh.y += (sh.ry - sh.y) * k;
@@ -1077,10 +1157,132 @@ function shovel(s: Brew, L: Layout, dt: number) {
       if (sh.left > 0 && amount(s, sh.from) > 1e-6) begin(sh, 1);
       else {
         sh.busy = false;
+        const at = restAt(L, sh.to);
+        sh.rx = at[0];
+        sh.ry = at[1];
         begin(sh, 0);
       }
     }
   }
+}
+
+// ---- the camera --------------------------------------------------------------------------
+
+type Place =
+  | "sack"
+  | "steep"
+  | "germ"
+  | "kiln"
+  | "malt"
+  | "mill"
+  | "mash"
+  | "bin"
+  | "kettle"
+  | "hops"
+  | "ferm"
+  | "fermTop"
+  | "jar"
+  | "out";
+const PLACE_BOX: Record<Place, Box> = {
+  sack: SACK.box,
+  steep: STEEP.box,
+  germ: GERM.box,
+  kiln: KILN.box,
+  malt: BIN.box,
+  mill: MILL.box,
+  mash: MASH.box,
+  bin: BIN.box,
+  kettle: KETTLE.box,
+  hops: BALE.box,
+  ferm: FERM.box,
+  fermTop: FERM.topBox,
+  jar: JAR.box,
+  out: OUT.box,
+};
+const PLACE_AT: Record<Place, keyof Layout["at"]> = {
+  sack: "sack",
+  steep: "steep",
+  germ: "germ",
+  kiln: "kiln",
+  malt: "malt",
+  mill: "mill",
+  mash: "mash",
+  bin: "bin",
+  kettle: "kettle",
+  hops: "hops",
+  ferm: "ferm",
+  fermTop: "ferm",
+  jar: "jar",
+  out: "out",
+};
+const PILE_PLACE: Record<Pile, Place> = {
+  sack: "sack",
+  steep: "steep",
+  floor: "germ",
+  kiln: "kiln",
+  malt: "malt",
+  hopper: "mill",
+  mash: "mash",
+  bin: "bin",
+};
+const STAGE_PLACES: Record<Stage, readonly Place[]> = {
+  fresh: ["sack", "steep"],
+  grain: ["sack", "steep"],
+  steep: ["steep"],
+  germ: ["germ"],
+  kiln: ["kiln"],
+  malt: ["kiln", "malt"],
+  mill: ["mill", "mash"],
+  mash: ["mash"],
+  runoff: ["mash", "kettle"],
+  spent: ["mash", "bin"],
+  boil: ["kettle", "hops"],
+  transfer: ["kettle", "fermTop"],
+  ferment: ["ferm", "jar"],
+  out: ["out"],
+  done: ["out"],
+};
+const EXTRA_STAGE: Partial<Record<Stage, Into>> = { mill: "mash", boil: "kettle", ferment: "ferm" };
+/** What the camera should show now: the piles the shovel is working between, else the
+    stage's stations (and the beer's extra input, when this is where it goes in), as a frame
+    of the layout's shape, never smaller than the layout's closest view. */
+function view(s: Brew, L: Layout): { x: number; y: number; w: number } {
+  const sh = s.sh;
+  const places: readonly Place[] = sh.busy ? [PILE_PLACE[sh.from], PILE_PLACE[sh.to]] : STAGE_PLACES[s.stage];
+  let x0 = Number.POSITIVE_INFINITY;
+  let y0 = Number.POSITIVE_INFINITY;
+  let x1 = Number.NEGATIVE_INFINITY;
+  let y1 = Number.NEGATIVE_INFINITY;
+  const take = (x: number, y: number, w: number, h: number) => {
+    x0 = Math.min(x0, x);
+    y0 = Math.min(y0, y);
+    x1 = Math.max(x1, x + w);
+    y1 = Math.max(y1, y + h);
+  };
+  for (const p of places) {
+    const o = L.at[PLACE_AT[p]];
+    const b = PLACE_BOX[p];
+    take(o[0] + b[0], o[1] + b[1], b[2], b[3]);
+  }
+  const into = sh.busy ? undefined : EXTRA_STAGE[s.stage];
+  if (into)
+    s.recipe.extras.forEach((e, i) => {
+      if (e.into !== into) return;
+      const c = L.extras[into][i] ?? L.extras[into][0];
+      take(c[0] - 8, c[1] - 30, 46, 62);
+    });
+  // the tank feeds the steep from above: on the phone's stacked floors it is close enough to show
+  if (s.stage === "grain" && !sh.busy && L.id === "phone")
+    take(L.at.tank[0], L.at.tank[1], TANK.box[2], TANK.box[3]);
+  const [W, H] = L.box;
+  const { w: closest, aspect } = L.frame;
+  const w = Math.min(Math.max(closest, x1 - x0 + 56, (y1 - y0 + 70) / aspect), W, H / aspect);
+  const h = w * aspect;
+  return {
+    x: clamp((x0 + x1) / 2, w / 2, W - w / 2),
+    y: clamp((y0 + y1) / 2 + 10, h / 2, H - h / 2),
+    w,
+  };
 }
 
 // ---- the batch, stage by stage -------------------------------------------------------------
@@ -1089,6 +1291,8 @@ function go(s: Brew, stage: Stage) {
   s.stage = stage;
   s.stageT = 0;
   s.shStep = 0;
+  // whatever turns the beer has turned it by the time it is packed
+  if (stage === "out" && s.recipe.turn) s.tint = 1;
   for (const k of s.links) k.open = false;
 }
 
@@ -1133,10 +1337,18 @@ function control(s: Brew, L: Layout, dt: number) {
       if (s.shStep === 0) s.shStep = startJob(s, "floor", "kiln") ? 1 : 2;
       if (s.shStep === 1 && moved(s)) s.shStep = 2;
       if (s.shStep === 2) s.toast = Math.min(1, s.toast + dt / 0.9);
-      if (s.toast >= 1) go(s, "mill");
+      if (s.toast >= 1) go(s, "malt");
+      break;
+    case "malt":
+      // the finished malt is shovelled out of the kiln into its bin: the end of the malting
+      if (s.shStep === 0) s.shStep = startJob(s, "kiln", "malt") ? 1 : 2;
+      if (s.shStep === 1 && moved(s)) s.shStep = 2;
+      if (s.shStep === 2 && s.stageT > 0.5) go(s, "mill");
       break;
     case "mill":
-      (k[5] as Link).open = s.kilnG > 0;
+      // brewing starts from the malt bin: into the hopper by the shovelful, and milled
+      if (s.shStep === 0) s.shStep = startJob(s, "malt", "hopper") ? 1 : 2;
+      if (s.shStep === 1 && moved(s)) s.shStep = 2;
       (k[6] as Link).open = true;
       (k[7] as Link).open = s.tankM > 0;
       if (s.stageT > 0.9 && !s.stirred) {
@@ -1146,10 +1358,9 @@ function control(s: Brew, L: Layout, dt: number) {
       if (s.mashW > 0.3) addExtras(s, "mash");
       if (
         s.stageT > 1 &&
-        s.kilnG <= 0 &&
+        s.shStep === 2 &&
         s.heap <= 0 &&
         s.tankM <= 0 &&
-        empty(k[5]) &&
         empty(k[6]) &&
         empty(k[7]) &&
         s.exLeft.every((n) => n <= 0)
@@ -1179,20 +1390,24 @@ function control(s: Brew, L: Layout, dt: number) {
     }
     case "transfer":
       (k[9] as Link).open = s.kettle > 0;
-      if (!s.yeastIn && s.ferm > 0.3) pitch(s);
       if (s.kettle <= 0 && empty(k[9])) go(s, "ferment");
       break;
     case "ferment": {
+      // in order: the yeast is pitched into the full tank; it gets to work (bubbles, a head,
+      // wort turning to beer); with that under way, any fruit or citrus, then any dry hop;
+      // it quietens; a lager is then chilled
       if (!s.yeastIn) pitch(s);
-      if (s.stageT > 0.4) addExtras(s, "ferm");
-      if (s.recipe.dryHop && !s.dryDone && s.stageT > 1.2) {
+      if (s.stageT > 1.9) addExtras(s, "ferm");
+      if (s.recipe.dryHop && !s.dryDone && s.stageT > 2.3) {
         s.dryDone = true;
         tossHop(s, L, 3, "ferm");
         tossHop(s, L, 4, "ferm");
       }
-      s.fermP = Math.max(s.fermP, smooth((s.stageT - 0.3) / 2.4));
-      const end = s.recipe.lager ? 3.6 : 2.6;
-      if (s.stageT > end && s.exLeft.every((n) => n <= 0)) go(s, "out");
+      s.fermP = Math.max(s.fermP, smooth((s.stageT - 1.2) / 2.2));
+      if (s.recipe.turn === "ferment") s.tint = Math.max(s.tint, s.fermP);
+      const end = s.recipe.lager ? 5 : 4;
+      const inFlight = s.fx.some((d) => d.on) || s.hops.some((h) => h.st === 1);
+      if (s.stageT > end && s.exLeft.every((n) => n <= 0) && !inFlight) go(s, "out");
       break;
     }
     case "out": {
@@ -1246,7 +1461,7 @@ export function step(s: Brew, L: Layout, dt: number) {
   s.stageT += dt;
   control(s, L, dt);
 
-  const { steep: S, mill: M, mash: H, kettle: K, ferm: F, out: O } = L.at;
+  const { steep: S, mash: H, kettle: K, ferm: F, out: O } = L.at;
   const g = (i: number) => L.links[i] as LinkGeo;
 
   s.tiltV += (70 * (s.tiltTo - s.tilt) - 5.5 * s.tiltV) * dt;
@@ -1261,16 +1476,13 @@ export function step(s: Brew, L: Layout, dt: number) {
   };
 
   // malting: the tank into the steep, its water to the drain; the shovel does the grain's
-  // hand moves; the kiln's grain goes on to the mill by auger
+  // hand moves, the last of them from the malt bin into the mill
   shovel(s, L, dt);
   s.tankS -= move(s, g(1), 1, dt, s.tankS, 1, true);
   s.steepW += land(s, g(1), 1, S[1] + steepY(s.steepG + s.steepW));
   s.steepW -= move(s, g(2), 2, dt, s.steepW, 1, true);
   s.steepW = Math.max(0, s.steepW);
   s.drained += land(s, g(2), 2, L.drain[1]);
-  s.kilnG -= move(s, g(5), 5, dt, s.kilnG, 1, true);
-  s.kilnG = Math.max(0, s.kilnG);
-  s.heap += land(s, g(5), 5, M[1] + hopperY(s.heap) - 2);
   s.kilnHeat += ((s.stage === "kiln" ? 1 : 0) - s.kilnHeat) * Math.min(1, dt * 1.5);
   // the steep is aired from below while the grain soaks
   if ((s.stage === "grain" || s.stage === "steep") && s.steepW > 0.05 && Math.random() < 14 * dt) {
@@ -1293,7 +1505,7 @@ export function step(s: Brew, L: Layout, dt: number) {
   }
 
   // the mill into the mash
-  const millLast = s.kilnG <= 0 && empty(s.links[5]);
+  const millLast = s.maltG <= 0 && moved(s);
   s.heap -= move(s, g(6), 6, dt, s.heap, s.heap * 5 * dt + 1e-5, millLast);
   s.heap = Math.max(0, s.heap);
   let a = land(s, g(6), 6, H[1] + mashLevel + rowAt(s.mash, g(6).out[0] - H[0]));
@@ -1302,7 +1514,6 @@ export function step(s: Brew, L: Layout, dt: number) {
   const turning = (s.links[6] as Link).flow > 0.05 && (s.heap > 0 || !empty(s.links[6])) ? 1 : 0;
   s.spin += (turning - s.spin) * Math.min(1, dt * 4);
   s.roller += s.spin * 7 * dt;
-  grains(s, g(5), 5, s.grains, dt, 1.6);
   // a shovelful falls as dots; each counts where it lands
   for (const p of s.grains) {
     if (!p.on || p.link !== -1) continue;
@@ -1383,6 +1594,7 @@ export function step(s: Brew, L: Layout, dt: number) {
         if (h.into === "ferm") {
           h.st = 4;
           kick(s.fer, FERM.cx, 6);
+          if (s.recipe.turn === "dryhop") s.tint = Math.min(1, s.tint + 0.5);
         } else {
           kick(s.ket, h.x - K[0], h.vy * 0.3);
           h.st = s.kettle > 0.05 ? 2 : 3;
@@ -1423,6 +1635,10 @@ export function step(s: Brew, L: Layout, dt: number) {
       FILLS[e.kind],
       e.into,
       2.2,
+      // a fruit turns the beer its colour, a handful at a time
+      e.kind === "fruit"
+        ? 1 / (6 * Math.max(1, s.recipe.extras.filter((x) => x.kind === "fruit").length))
+        : 0,
     );
   });
   // the yeast: the jar tips over the port, and pours
@@ -1452,6 +1668,7 @@ export function step(s: Brew, L: Layout, dt: number) {
     d.age += dt;
     if (d.age < d.T) continue;
     d.on = false;
+    if (d.tint > 0) s.tint = Math.min(1, s.tint + d.tint);
     if (d.into === "kettle") kick(s.ket, d.x - K[0], 14);
     else if (d.into === "mash") kick(s.mash, d.x - H[0], 10);
     else if (d.into === "yeast") {
@@ -1486,12 +1703,12 @@ export function step(s: Brew, L: Layout, dt: number) {
     d.y += d.vy * dt;
     if (d.r <= 0.2 || d.y > 205) d.on = false;
   }
-  const busy = s.stage === "ferment" ? smooth(s.stageT / 1) * (1 - smooth((s.stageT - 1.9) / 1)) : 0;
+  const busy = s.stage === "ferment" ? smooth((s.stageT - 1) / 0.9) * (1 - smooth((s.stageT - 3) / 0.9)) : 0;
   s.co2 += (busy - s.co2) * Math.min(1, dt * 3);
   s.krausen += (9 * s.co2 + (s.fermP > 0.5 && s.ferm > 0.05 ? 2.5 : 0) - s.krausen) * Math.min(1, dt * 1.2);
   if (s.ferm < 0.02) s.krausen = Math.min(s.krausen, s.ferm * 100);
   // a lager's cold rest: frost comes up on the tank, and goes once it is packed
-  const cold = s.recipe.lager && s.stage === "ferment" && s.stageT > 2.2 ? 1 : 0;
+  const cold = s.recipe.lager && s.stage === "ferment" && s.stageT > 3.9 ? 1 : 0;
   s.frost += (cold - s.frost) * Math.min(1, dt * (cold ? 1.6 : 0.8));
   if (s.co2 > 0.02 && Math.random() < s.co2 * 26 * dt) {
     const b = s.cb.find((d) => !d.on);
@@ -1565,6 +1782,21 @@ export function step(s: Brew, L: Layout, dt: number) {
     kick(s.mash, bx - 14, push);
   }
 
+  // the camera: a damped spring toward the frame round the work in hand
+  const to = view(s, L);
+  s.camTo = to;
+  const c = s.cam;
+  if (c.w <= 0) Object.assign(c, to, { vx: 0, vy: 0, vw: 0 });
+  else {
+    const W = 4.4;
+    c.vx += (W * W * (to.x - c.x) - 2 * W * c.vx) * dt;
+    c.vy += (W * W * (to.y - c.y) - 2 * W * c.vy) * dt;
+    c.vw += (W * W * (to.w - c.w) - 2 * W * c.vw) * dt;
+    c.x += c.vx * dt;
+    c.y += c.vy * dt;
+    c.w += c.vw * dt;
+  }
+
   const tilt = clamp(s.tilt, -TILT, TILT);
   rowStep(s.mash, dt, tilt);
   rowStep(s.ket, dt, tilt);
@@ -1586,6 +1818,9 @@ export function moving(s: Brew) {
   if (Math.abs(s.tiltTo - s.tilt) > 0.003 || Math.abs(s.tiltV) > 0.02) return true;
   const sh = s.sh;
   if (sh.phase !== 0 || Math.hypot(sh.x - sh.rx, sh.y - sh.ry) > 0.3 || Math.abs(sh.a - SHOVEL.lean) > 0.5)
+    return true;
+  const c = s.cam;
+  if (Math.hypot(s.camTo.x - c.x, s.camTo.y - c.y, s.camTo.w - c.w) > 0.4 || Math.hypot(c.vx, c.vy, c.vw) > 1)
     return true;
   return !(rowStill(s.mash) && rowStill(s.ket) && rowStill(s.fer));
 }
@@ -1610,6 +1845,7 @@ export function relayout(s: Brew, L: Layout) {
   const busy = sh.busy;
   home(s, L);
   if (busy) begin(sh, 1);
+  s.cam.w = 0; // the camera is placed afresh
   for (const p of [s.grains, s.cracked, s.fx]) for (const d of p) d.on = false;
   const K = L.at.kettle;
   s.hops.forEach((h, i) => {
@@ -1644,7 +1880,17 @@ export function paint(s: Brew, L: Layout, put: Put) {
   const t = s.t;
   const water = "var(--brew-water)";
   const wort = "var(--brew-wort)";
-  const beer = "var(--brew-beer-look)";
+  /** plain until whatever turns this beer goes in; then, by that much, its final look */
+  const turned = (c: string) => (s.recipe.turn ? MIX("var(--brew-beer-look)", c, s.tint) : c);
+
+  // the camera
+  const cam = s.cam;
+  if (cam.w > 0) {
+    const h = cam.w * L.frame.aspect;
+    put("cam", "viewBox", `${f1(cam.x - cam.w / 2)} ${f1(cam.y - h / 2)} ${f1(cam.w)} ${f1(h)}`);
+    // how much larger than the whole picture: pen and labels are divided by it, in steps
+    put("cam", "z", (Math.round((L.box[0] / cam.w) * 20) / 20).toFixed(2));
+  }
 
   // the tank and the jar
   put("tank.w", "d", `M8 ${f1(tankY(s.tankS + s.tankM))}H52V91H8Z`);
@@ -1698,6 +1944,11 @@ export function paint(s: Brew, L: Layout, put: Put) {
   );
   show(put, "shovel.load", sh.load > 0);
   if (sh.fill) put("shovel.load", "fill", sh.fill);
+  const mb = liquid(null, BIN.cx, BIN.a, binY(s.maltG), BIN.bottom + 12);
+  put("malt.g", "d", mb.body);
+  put("malt.top", "d", mb.top);
+  show(put, "malt.g", s.maltG > 0.003);
+  show(put, "malt.top", s.maltG > 0.003);
   const bny = binY(s.binG);
   const bn = liquid(null, BIN.cx, BIN.a, bny, BIN.bottom + 12);
   put("bin.g", "d", bn.body);
@@ -1741,7 +1992,10 @@ export function paint(s: Brew, L: Layout, put: Put) {
 
   // the mash
   const my = mashY(s.mashW + s.mashG);
-  const mashTone = MIX(wort, water, s.mashC * 0.85);
+  // water, then the pale straw of wet grain, then wort: never a grey halfway between blue and amber
+  const mc = s.mashC * 0.9;
+  const mashTone =
+    mc < 0.45 ? MIX("var(--brew-wet)", water, mc / 0.45) : MIX(wort, "var(--brew-wet)", (mc - 0.45) / 0.55);
   const ml = liquid(s.mash, MASH.cx, MASH.a, my, MASH.bottom + 16);
   const wet = s.mashW > 0.02;
   put("mash.b", "d", ml.body);
@@ -1785,7 +2039,7 @@ export function paint(s: Brew, L: Layout, put: Put) {
 
   // the fermenter
   const fy = fermY(s.ferm);
-  const fermTone = MIX(beer, wort, s.fermP);
+  const fermTone = turned(MIX("var(--brew-base)", wort, s.fermP));
   const fl = liquid(s.fer, FERM.cx, fermHalf(fy), fy, 220, s.krausen, t);
   put("fer.b", "d", fl.body);
   put("fer.top", "d", fl.top);
