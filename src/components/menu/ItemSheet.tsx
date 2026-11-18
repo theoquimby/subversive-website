@@ -7,10 +7,12 @@
 // The address gains ?item=<id>, so Back closes the sheet and the link can be shared; the
 // left and right arrow keys step through the list. Nothing is sent to the browser twice:
 // the sheet reads the row that is already in the page.
+import { labels } from "@content/labels";
 import { brewLabels, menuLabels } from "@content/microcopy";
 import { Dialog } from "radix-ui";
 import { type KeyboardEvent, useCallback, useEffect, useState } from "react";
 import type { Show } from "@/lib/menu/filters";
+import { Can } from "../beer/Can";
 import { AddToOrder } from "../order/AddToOrder";
 import { Sheet } from "../ui/Sheet";
 import { TextLink } from "../ui/TextLink";
@@ -153,7 +155,12 @@ export function ItemSheet() {
             // biome-ignore lint/performance/noImgElement: the address is already an optimised one, written by the server on the row
             <img className="item__photo" src={item.photo.src} alt={item.photo.alt} width={828} height={621} />
           ) : item.color ? (
-            <ItemGlass id={item.id} color={item.color} hazy={item.hazy} />
+            // a house beer: the pour, and beside it the can in its label (Max's own art;
+            // the house can where a beer has no label yet). Flick the can to spin it.
+            <div className="item__pour">
+              <ItemGlass id={item.id} color={item.color} hazy={item.hazy} />
+              <Can key={item.id} label={labels[item.id]} name={item.name} color={item.color} />
+            </div>
           ) : null}
           <div className="item__head">
             <Dialog.Title className="item__name">{item.name}</Dialog.Title>

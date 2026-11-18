@@ -1,0 +1,170 @@
+/* ---------- A can you can spin (src/components/beer/Can.tsx) ----------
+   Sized by font-size: the can is 10em wide and 19em tall. The can is pen (lid, tab,
+   shoulders, hatch); the label is Max's art, sliding behind the outline as the can turns.
+   The wrap is 3.1 body-widths long: the label's front, then the plain back. */
+.can {
+  position: relative;
+  display: inline-block;
+  flex: none;
+  width: 10em;
+  height: 19em;
+  font-size: 0.5rem;
+  line-height: 1;
+  cursor: grab;
+  touch-action: pan-y;
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-tap-highlight-color: transparent;
+}
+.can:active {
+  cursor: grabbing;
+}
+/* the body: where the label shows (9.4em wide, 15em tall) */
+.can__wrap {
+  position: absolute;
+  inset: 2.75em 0.3em 1.25em;
+  overflow: hidden;
+  border-radius: 0.2em 0.2em 1em 1em / 0.2em 0.2em 0.6em 0.6em;
+  background: var(--can-bg);
+  contain: layout paint;
+}
+/* two turns of wrap; at rest the front sits centred on the body */
+.can__strip {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: calc(50% - 9.4em * 3.1 * var(--can-front) / 2);
+  display: flex;
+  width: calc(9.4em * 3.1 * 2);
+  will-change: transform;
+}
+.can__turn {
+  display: flex;
+  flex: none;
+  width: 50%;
+  height: 100%;
+}
+.can__label,
+.can__house {
+  flex: none;
+  width: calc(100% * var(--can-front));
+  height: 100%;
+}
+.can__label {
+  display: block;
+  object-fit: cover;
+  pointer-events: none;
+}
+.can__back {
+  display: grid;
+  flex: 1;
+  place-items: center;
+}
+.can__barley {
+  width: auto;
+  height: 38%;
+  overflow: visible;
+}
+.can__barley path {
+  fill: none;
+  stroke: var(--can-ink);
+  stroke-width: 3.5;
+  stroke-linejoin: round;
+  opacity: 0.55;
+}
+
+/* the house can: a beer with no label yet. Its name, over a band of its own colour. */
+.can__house {
+  display: grid;
+  align-content: center;
+  justify-items: center;
+  background:
+    linear-gradient(var(--ink), var(--ink)) 0 31% / 100% 0.2em no-repeat,
+    linear-gradient(var(--ink), var(--ink)) 0 69% / 100% 0.2em no-repeat,
+    linear-gradient(transparent 31%, var(--can-beer) 31% 69%, transparent 69%);
+}
+.can__house-name {
+  max-width: 8.4em;
+  color: var(--ink);
+  font-family: var(--ff-display);
+  font-size: 1.7em;
+  line-height: 1.02;
+  text-align: center;
+  text-wrap: balance;
+}
+
+/* the body's roundness: the far edge falls into shade, the near side catches a light */
+.can__round {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    90deg,
+    rgb(0 0 0 / 0.2),
+    rgb(0 0 0 / 0) 16%,
+    rgb(255 255 255 / 0.16) 27%,
+    rgb(255 255 255 / 0) 40%,
+    rgb(0 0 0 / 0) 66%,
+    rgb(0 0 0 / 0.3)
+  );
+  pointer-events: none;
+}
+
+/* the pen */
+.can__pen {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+  pointer-events: none;
+}
+.can__pen path {
+  fill: none;
+  stroke: var(--fg);
+  stroke-width: var(--stroke);
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  vector-effect: non-scaling-stroke;
+}
+.can__pen .can__metal {
+  fill: var(--paper-deep);
+}
+.can__pen .can__hatch {
+  stroke-width: 1px;
+  opacity: 0.4;
+}
+.can__pen .can__shine {
+  stroke: var(--card);
+  stroke-width: 1.5px;
+  opacity: 0.7;
+}
+
+/* ---------- Where cans stand ---------- */
+/* the item sheet: the pour and its can, side by side on one ground */
+.item__pour {
+  display: flex;
+  align-items: flex-end;
+  gap: var(--s-6);
+}
+.item__pour .can {
+  font-size: min(0.72rem, 1.45dvh);
+  margin-bottom: 0.9em;
+}
+/* Home, On tap: the featured beers in a row */
+.can-row {
+  display: flex;
+  align-items: flex-end;
+  /* four cans fit a 320 px phone: 4 x 56 px and three gaps */
+  gap: var(--s-3);
+  margin: 0 0 var(--s-6);
+  padding: 0;
+  list-style: none;
+}
+@media (min-width: 48rem) {
+  .can-row {
+    gap: var(--s-6);
+  }
+}
+.can-row .can {
+  font-size: clamp(0.34rem, 1.75vw, 0.62rem);
+}

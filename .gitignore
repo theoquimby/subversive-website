@@ -15,3 +15,4 @@ next-env.d.ts
 
 # full-site review captures (large; kept locally)
 .impeccable/review/site-*/
+.impeccable/shots/

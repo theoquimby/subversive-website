@@ -7,9 +7,11 @@
 //   phone) · coming up (a ticket: three tickets) · on tap (the featured beers) · from the
 //   kitchen (a burger: one photo) · where it comes from (barley: the map you can ask)
 // Hours in full, the whole menu and every event live on their own pages.
+import { labels } from "@content/labels";
 import { homeLabels, microcopy, visitLabels } from "@content/microcopy";
 import { type Photo, photos } from "@content/photos";
 import type { Metadata } from "next";
+import { Can } from "@/components/beer/Can";
 import { PhotoFrame } from "@/components/graphics/PhotoFrame";
 import { Hero } from "@/components/home/Hero";
 import { PhotoStrip } from "@/components/home/PhotoStrip";
@@ -178,6 +180,19 @@ export default async function Home() {
           <SectionHead id="tap-title" note={`${view.pourSizes.half} / ${view.pourSizes.full}`}>
             {homeLabels.onTap}
           </SectionHead>
+          {/* the featured beers as cans, in Max's labels: each one spins under a finger and
+              opens its beer on the menu */}
+          <ul className="can-row">
+            {featured.map((row) => (
+              <li key={row.id}>
+                <Can
+                  label={labels[row.id]}
+                  name={row.item.name}
+                  color={isBeer(row.item) ? row.item.color : undefined}
+                />
+              </li>
+            ))}
+          </ul>
           <ul className="mlist home-tap">
             {featured.map((row, i) => (
               <MenuRow key={row.id} row={row} index={i} />
