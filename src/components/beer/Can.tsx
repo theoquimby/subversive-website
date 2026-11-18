@@ -30,14 +30,18 @@ interface Props {
   color?: string;
   /** the tab is lifted and the mouth open (the beer sheet's pour) */
   open?: boolean;
+  /** being carried: no answer to the phone's lean, no moving label (the beer sheet's pour) */
+  frozen?: boolean;
   /** let the label's own parts move, where it has a live file (the beer sheet's can) */
   alive?: boolean;
   className?: string;
 }
 
-export function Can({ label, name, color, open = false, alive = false, className }: Props) {
+export function Can({ label, name, color, open = false, alive = false, frozen = false, className }: Props) {
   const root = useRef<HTMLSpanElement>(null);
   const strip = useRef<HTMLSpanElement>(null);
+  const held = useRef(frozen);
+  held.current = frozen;
   const state = useRef({ t: 0, v: 0, lean: 0, held: false, x: 0, at: 0, loop: null as Loop | null });
 
   useEffect(() => {
@@ -70,6 +74,7 @@ export function Can({ label, name, color, open = false, alive = false, className
     draw();
     // a phone leaned to one side shows a little more of that side of the label
     const offTilt = onTilt((rad) => {
+      if (held.current) return;
       s.lean = (rad / 0.45) * 0.09;
       loop.wake();
     });
@@ -91,7 +96,43 @@ export function Can({ label, name, color, open = false, alive = false, className
       document.documentElement.dataset.motion === "paused";
     setMoving(!calm);
   }, [live]);
-  const art = moving && live ? live : label?.src;
+  const art = moving && live && !frozen ? live : label?.src;
+
+  // Carried, the can shows a picture of its label, drawn once: a label is hundreds of
+  // shapes, and as the live file it was drawn again on every frame the can moved (the
+  // pour ran at 37 frames a second for it). Set down, the real label is back.
+  const still = useRef<HTMLCanvasElement>(null);
+  const [pictured, setPictured] = useState(false);
+  useEffect(() => {
+    const canvas = still.current;
+    const wrap = canvas?.parentElement;
+    if (!frozen || !label || !canvas || !wrap) {
+      setPictured(false);
+      return;
+    }
+    let on = true;
+    const img = new Image();
+    img.onload = () => {
+      const w = wrap.clientWidth;
+      const h = wrap.clientHeight;
+      const k = Math.min(3, window.devicePixelRatio || 1);
+      canvas.width = Math.round(w * k);
+      canvas.height = Math.round(h * k);
+      const ctx = canvas.getContext("2d");
+      if (!on || !ctx) return;
+      ctx.scale(k, k);
+      ctx.fillStyle = label.bg;
+      ctx.fillRect(0, 0, w, h);
+      // as it stands on the can: the front, full height, centred
+      const iw = h * label.ratio;
+      ctx.drawImage(img, (w - iw) / 2, 0, iw, h);
+      setPictured(true);
+    };
+    img.src = label.src;
+    return () => {
+      on = false;
+    };
+  }, [frozen, label]);
 
   const down = (e: PointerEvent<HTMLSpanElement>) => {
     const s = state.current;
@@ -162,6 +203,7 @@ export function Can({ label, name, color, open = false, alive = false, className
       style={look}
       aria-hidden="true"
       data-open={open ? "" : undefined}
+      data-pictured={pictured ? "" : undefined}
       onPointerDown={down}
       onPointerMove={move}
       onPointerUp={up}
@@ -173,6 +215,7 @@ export function Can({ label, name, color, open = false, alive = false, className
           {face("a")}
           {face("b")}
         </span>
+        <canvas ref={still} className="can__still" />
         <span className="can__round" />
       </span>
       <svg viewBox="0 0 100 235" className="can__pen" focusable="false">

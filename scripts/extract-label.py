@@ -147,7 +147,7 @@ def main() -> None:
         back = r.width * r.height > 0.45 * box.width * box.height
         (backs if back else parts).append(f'<path d="{d}" {" ".join(attrs)}/>')
     svg = (
-        f'<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 {fmt(box.width)} {fmt(box.height)}">'
+        f'<svg xmlns="http://www.w3.org/2000/svg" width="{fmt(box.width)}" height="{fmt(box.height)}" viewBox="0 0 {fmt(box.width)} {fmt(box.height)}">'
         + (f"<style>{css}</style>" if css else "")
         + (f'<clipPath id="c"><path d="M0 0H{fmt(box.width)}V{fmt(box.height)}H0Z"/></clipPath><g clip-path="url(#c)">' if clip else "")
         + (f'<path d="M0 0H{fmt(box.width)}V{fmt(box.height)}H0Z" fill="{flags["bg"]}"/>' if flags.get("bg") else "")

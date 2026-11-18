@@ -167,25 +167,12 @@
   display: block;
   font-size: min(0.56rem, 1.15dvh);
 }
-/* in the air: held by a hand that is not quite steady, and not for spinning */
+/* in the air: one layer, moved by the compositor, and not for spinning */
+.item-pour[data-aloft] .item-pour__can {
+  will-change: transform;
+}
 .item-pour[data-aloft] .can {
   pointer-events: none;
-}
-@media (prefers-reduced-motion: no-preference) {
-  .item-pour[data-aloft] .item-pour__hand {
-    animation: hand-held 1.7s var(--ease-in-out, cubic-bezier(0.45, 0, 0.2, 1)) infinite alternate;
-  }
-}
-@keyframes hand-held {
-  0% {
-    transform: rotate(-0.9deg) translateY(0.6px);
-  }
-  40% {
-    transform: rotate(0.5deg) translateY(-0.8px);
-  }
-  100% {
-    transform: rotate(1.1deg) translateY(0.4px);
-  }
 }
 /* Home, On tap: the featured beers in a row */
 .can-row {
@@ -243,4 +230,19 @@
     opacity: 0;
     transform: translateY(-3px);
   }
+}
+
+/* ---------- Carried: a picture of the label in place of the label ---------- */
+.can__still {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  visibility: hidden;
+}
+.can[data-pictured] .can__still {
+  visibility: visible;
+}
+.can[data-pictured] .can__strip {
+  visibility: hidden;
 }
