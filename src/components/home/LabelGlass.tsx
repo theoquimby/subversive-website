@@ -154,6 +154,9 @@ export function LabelGlass({
   pour,
   className,
   bare = false,
+  tap = true,
+  hold = false,
+  onPhase,
 }: {
   beer: GlassBeer;
   /** changes with every pour */
@@ -161,10 +164,19 @@ export function LabelGlass({
   className?: string;
   /** no ridge and no long lines: a short ground, the tap, the glass (the menu's item view) */
   bare?: boolean;
+  /** draw the tap (the item view pours from a can instead) */
+  tap?: boolean;
+  /** arrive empty and wait: the first pour starts only when `pour` changes */
+  hold?: boolean;
+  /** told each time the pour moves on: drain, fill, rest, topup, settle, idle */
+  onPhase?: (phase: string) => void;
 }) {
   const svg = useRef<SVGSVGElement>(null);
   const first = useRef(beer); // what the server drew; the model owns the colour after that
   const model = useRef<{ start: (b: GlassBeer, n: number) => void; stop: () => void } | null>(null);
+  const tell = useRef(onPhase);
+  tell.current = onPhase;
+  const waits = useRef(hold);
 
   useEffect(() => {
     const root = svg.current;
@@ -176,7 +188,7 @@ export function LabelGlass({
     const stream = q<SVGPathElement>(".lglass__stream");
     const dropEls = [...root.querySelectorAll<SVGCircleElement>(".lglass__drops circle")];
     const headEls = [...root.querySelectorAll<SVGCircleElement>(".lglass__head circle")];
-    const handle = q<SVGGElement>(".lglass__handle");
+    const handle = root.querySelector<SVGGElement>(".lglass__handle");
     const bubbleEls = [...root.querySelectorAll<SVGCircleElement>(".lglass__bubbles circle")];
     const spillEls = [...root.querySelectorAll<SVGPathElement>(".lglass__spills path")];
     const edgeEls = [...root.querySelectorAll<SVGPathElement>(".lglass__edges path")];
@@ -297,7 +309,7 @@ export function LabelGlass({
         );
         stream.style.display = "";
       } else stream.style.display = "none";
-      handle.setAttribute("transform", `rotate(${(-34 * s.flow).toFixed(1)} 128 -58)`);
+      handle?.setAttribute("transform", `rotate(${(-34 * s.flow).toFixed(1)} 128 -58)`);
       dropEls.forEach((el, i) => {
         const d = s.drops[i];
         if (!d) {
@@ -647,6 +659,7 @@ export function LabelGlass({
       }
     };
 
+    let told = "idle";
     const frame = (now: number) => {
       const dt = Math.min(0.033, (now - last) / 1000 || 0.016);
       last = now;
@@ -654,6 +667,10 @@ export function LabelGlass({
       step(dt / 2);
       step(dt / 2);
       draw();
+      if (s.phase !== told) {
+        told = s.phase;
+        tell.current?.(told);
+      }
       // nothing runs once the glass is still, or while it is off the screen
       raf = s.phase === "idle" || !seen ? 0 : requestAnimationFrame(frame);
     };
@@ -766,7 +783,7 @@ export function LabelGlass({
       s.f = 0;
       draw();
       root.dataset.sim = "run";
-      start(first.current, 0);
+      if (!waits.current) start(first.current, 0);
     } else root.dataset.sim = "run";
 
     return () => model.current?.stop();
@@ -852,11 +869,15 @@ export function LabelGlass({
       <g className="lglass__line">
         {bare ? null : <path d={GROUND_LINE} />}
         <path d={bare ? BARE_ONE_LINE : ONE_LINE} className={bare ? undefined : "lglass__one"} />
-        <path d={bare ? BARE_TAP_LINE : TAP_LINE} />
-        <g className="lglass__handle">
-          <path d="M128 -58L135 -78" />
-          <circle cx="136.4" cy="-82" r="4.2" className="lglass__knob" />
-        </g>
+        {tap ? (
+          <>
+            <path d={bare ? BARE_TAP_LINE : TAP_LINE} />
+            <g className="lglass__handle">
+              <path d="M128 -58L135 -78" />
+              <circle cx="136.4" cy="-82" r="4.2" className="lglass__knob" />
+            </g>
+          </>
+        ) : null}
       </g>
     </svg>
   );

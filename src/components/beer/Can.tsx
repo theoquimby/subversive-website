@@ -3,8 +3,9 @@
 // A can you can spin. The can is ours, in pen: the lid, the tab, the shoulders, a few
 // hatch lines for its roundness. The label is Max's own art, untouched, wrapped round it:
 // the front slides behind the pen outline as the can turns, then the plain back of the
-// wrap, then the front again. A flick spins it with momentum; it slows by friction and
-// settles face-forward on a soft detent. It turns once when it first comes into view.
+// wrap, then the front again. It turns only when asked (Theo, 2026-11-18): a drag or a
+// flick spins it with momentum, slowing by friction to a soft detent face-forward, and a
+// phone leaned to one side turns it a little that way.
 // A beer with no label yet wears the house can: its name over a band of its own colour.
 // One loop per can (src/lib/motion/loop.ts): asleep off screen and at rest, none with
 // reduced motion (the can then simply faces front; a drag still turns it by hand).
@@ -12,6 +13,7 @@
 import type { Label } from "@content/labels";
 import { type CSSProperties, type PointerEvent, useEffect, useRef, useState } from "react";
 import { createLoop, type Loop } from "@/lib/motion/loop";
+import { onTilt } from "@/lib/motion/tilt";
 import { KERNELS } from "../graphics/BarleyMark";
 
 /** the wrap is this many times the can's visible width: a turn shows all of it */
@@ -26,17 +28,17 @@ interface Props {
   name: string;
   /** the beer's colour: the house can's band */
   color?: string;
-  /** turn once on first sight */
-  greet?: boolean;
+  /** the tab is lifted and the mouth open (the beer sheet's pour) */
+  open?: boolean;
   /** let the label's own parts move, where it has a live file (the beer sheet's can) */
   alive?: boolean;
   className?: string;
 }
 
-export function Can({ label, name, color, greet = true, alive = false, className }: Props) {
+export function Can({ label, name, color, open = false, alive = false, className }: Props) {
   const root = useRef<HTMLSpanElement>(null);
   const strip = useRef<HTMLSpanElement>(null);
-  const state = useRef({ t: 0, v: 0, held: false, x: 0, at: 0, loop: null as Loop | null });
+  const state = useRef({ t: 0, v: 0, lean: 0, held: false, x: 0, at: 0, loop: null as Loop | null });
 
   useEffect(() => {
     const el = root.current;
@@ -45,18 +47,18 @@ export function Can({ label, name, color, greet = true, alive = false, className
     const s = state.current;
     const draw = () => {
       const turn = s.t - Math.floor(s.t);
-      band.style.transform = `translate3d(${-turn * 50}%,0,0)`;
+      band.style.transform = `translateX(${(-turn * 50).toFixed(3)}%)`;
     };
     const loop = createLoop(el, (dt) => {
       if (s.held) return false;
       // friction, and a detent that pulls the face forward once the spin is slow
-      const near = Math.round(s.t);
+      const near = Math.round(s.t - s.lean) + s.lean;
       const slow = Math.abs(s.v) < 0.9;
       const pull = slow ? (near - s.t) * DETENT : 0;
       s.v += (pull - s.v * (slow ? 7 : FRICTION)) * dt;
       s.t += s.v * dt;
       if (slow && Math.abs(s.v) < REST && Math.abs(near - s.t) < REST) {
-        s.t = 0;
+        s.t = s.lean;
         s.v = 0;
         draw();
         return false;
@@ -66,20 +68,17 @@ export function Can({ label, name, color, greet = true, alive = false, className
     });
     s.loop = loop;
     draw();
-    let greeted = !greet;
-    const seen = new IntersectionObserver(([e]) => {
-      if (!e?.isIntersecting || greeted) return;
-      greeted = true;
-      s.v = 1.9; // about one turn
+    // a phone leaned to one side shows a little more of that side of the label
+    const offTilt = onTilt((rad) => {
+      s.lean = (rad / 0.45) * 0.09;
       loop.wake();
     });
-    seen.observe(el);
     return () => {
-      seen.disconnect();
+      offTilt();
       loop.stop();
       s.loop = null;
     };
-  }, [greet]);
+  }, []);
 
   // the moving label loads only where motion is welcome: not with reduced motion, not
   // while Pause motion is on (the file's own loops cannot be paused from the page)
@@ -115,7 +114,7 @@ export function Can({ label, name, color, greet = true, alive = false, className
     s.x = e.clientX;
     s.at = now;
     const turn = s.t - Math.floor(s.t);
-    if (strip.current) strip.current.style.transform = `translate3d(${-turn * 50}%,0,0)`;
+    if (strip.current) strip.current.style.transform = `translateX(${(-turn * 50).toFixed(3)}%)`;
   };
   const up = () => {
     const s = state.current;
@@ -161,6 +160,7 @@ export function Can({ label, name, color, greet = true, alive = false, className
       className={["can", label ? "" : "can--house", className ?? ""].filter(Boolean).join(" ")}
       style={look}
       aria-hidden="true"
+      data-open={open ? "" : undefined}
       onPointerDown={down}
       onPointerMove={move}
       onPointerUp={up}
@@ -185,7 +185,17 @@ export function Can({ label, name, color, greet = true, alive = false, className
           d="M14 13C14 8.5 30 5.5 50 5.5S86 8.5 86 13S70 20.5 50 20.5S14 17.5 14 13Z"
           className="can__metal"
         />
-        <path d="M41 12.6C41 10.6 45 9.4 50 9.4S59 10.6 59 12.6S55 15.8 50 15.8S41 14.6 41 12.6ZM47 12.4h6" />
+        {/* the mouth, dark once the tab is lifted; the tab stands up on its rivet */}
+        <path
+          d="M40 13.4C40 11.6 44 10.6 49 10.6S57 11.6 57 13.4S53 16.4 49 16.4S40 15.2 40 13.4Z"
+          className="can__mouth"
+        />
+        <path
+          d="M49 12.4C49 10.9 52.5 10 56.5 10S64 10.9 64 12.4S60.5 14.8 56.5 14.8S49 13.9 49 12.4ZM54 12.3h5"
+          className="can__tab"
+        />
+        {/* the hiss as it opens: three short pen ticks */}
+        <path d="M44 3.5L41.5 -3M50 2.5V-4.5M56 3.5L58.5 -3" className="can__hiss" />
         {/* the body's two sides and its foot */}
         <path d="M3 27.5C2.2 70 2.4 130 3 177.5M97 27.5C97.8 70 97.6 130 97 177.5" />
         <path

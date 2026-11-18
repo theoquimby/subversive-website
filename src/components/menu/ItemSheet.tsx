@@ -2,21 +2,19 @@
 
 // One menu item, looked at closely (Theo asked for it; review pass 2026-11-15). A tap on a
 // row opens a sheet with what the row says, set large: a photo when the item has one (no
-// placeholder when it has not), the glass poured in the beer's colour for a beer, the name on the
+// placeholder when it has not), the beer's can pouring its glass for a beer, the name on the
 // ink line, the price by pour size, the whole description, the tags and the add-ons.
 // The address gains ?item=<id>, so Back closes the sheet and the link can be shared; the
 // left and right arrow keys step through the list. Nothing is sent to the browser twice:
 // the sheet reads the row that is already in the page.
-import { labels } from "@content/labels";
 import { brewLabels, menuLabels } from "@content/microcopy";
 import { Dialog } from "radix-ui";
 import { type KeyboardEvent, useCallback, useEffect, useState } from "react";
 import type { Show } from "@/lib/menu/filters";
-import { Can } from "../beer/Can";
 import { AddToOrder } from "../order/AddToOrder";
 import { Sheet } from "../ui/Sheet";
 import { TextLink } from "../ui/TextLink";
-import { ItemGlass } from "./ItemGlass";
+import { ItemPour } from "./ItemPour";
 import { setShow } from "./show-store";
 
 interface Detail {
@@ -155,12 +153,9 @@ export function ItemSheet() {
             // biome-ignore lint/performance/noImgElement: the address is already an optimised one, written by the server on the row
             <img className="item__photo" src={item.photo.src} alt={item.photo.alt} width={828} height={621} />
           ) : item.color ? (
-            // a house beer: the pour, and beside it the can in its label (Max's own art;
-            // the house can where a beer has no label yet). Flick the can to spin it.
-            <div className="item__pour">
-              <ItemGlass id={item.id} color={item.color} hazy={item.hazy} />
-              <Can key={item.id} label={labels[item.id]} name={item.name} color={item.color} alive />
-            </div>
+            // a house beer: its can pops open and pours the glass (Max's label on the can,
+            // or the house can where a beer has none yet)
+            <ItemPour id={item.id} name={item.name} color={item.color} hazy={item.hazy} />
           ) : null}
           <div className="item__head">
             <Dialog.Title className="item__name">{item.name}</Dialog.Title>
