@@ -1,66 +1,72 @@
-"""Which shapes of a label move, and how: used by extract-label.py for the `.live.svg` files.
+"""Which shapes of a label move: used by extract-label.py to cut a label into layers.
 
 The print PDFs have no named layers, so parts are found by where they are and what colour
-they are. Each label has `classify(i, box, fill, stroke)`, which names a shape's class
-(or None), and CSS for those classes. `i` counts the shapes that fall in the label's
-front, in the PDF's order; `box` is [x0, y0, x1, y1] in the front's own units.
+they are. Each label has `part_of(i, box, fill, stroke)`, which names the part a shape
+belongs to (or None: it stays in the base), and a table of its parts. `i` counts the
+shapes that fall in the label's front, in the PDF's order; `box` is [x0, y0, x1, y1] in
+the front's own units.
 
-Shapes keep their place in the paint order: they are classed, not regrouped, and every
-shape of one part turns about the same point, so a part moves as one.
-Motion is stepped, like the site's other loops, and stops with reduced motion.
+Why layers (Theo, 2026-11-18: "janky feeling and bad frame rate"): the first attempt put
+the motion in the label's own SVG, and a browser redraws all of an SVG image on every step.
+Now each part is cut out into its own small picture (`<id>.parts.svg`, a sheet of them) and
+the label is kept without them (`<id>.base.svg`); the page draws each once and then only
+moves or fades the pictures (Can.tsx, fx-can.css: the motion itself lives there, by `kind`).
+
+A part: kind (which keyframes), origin (the point it turns or scales about, in the
+front's units), optionally delay and time in seconds (so a flock is out of step), and
+cling (keep only the shapes that touch the part's first shape, its body).
 """
-
-HEAD = "@media (prefers-reduced-motion:reduce){*{animation:none!important}}"
 
 
 def hexsum(h):
     return 999 if not h else sum(int(h[k : k + 2], 16) for k in (1, 3, 5))
 
 
-# ---- Cheap Dills: the pickle strolls on the spot; his shadow breathes ------------------
-PICKLE = set(range(19, 23)) | {24} | set(range(26, 63)) | set(range(79, 83)) | set(range(88, 94))
+# ---- Cheap Dills: the pickle rocks and bobs on the spot; his shadow breathes -----------
+# (19-22 and 24 are an earlier drawing of him, left under the yellow oval: never seen, so
+# they stay still, and the oval need not be lifted over them)
+PICKLE = set(range(26, 63)) | set(range(79, 83)) | set(range(88, 94))
 
 
 def cheap_dills(i, box, fill, stroke):
     if i in PICKLE:
-        return "pk"
+        return "pickle"
     if i == 63:
-        return "sh"
+        return "shadow"
     return None
 
 
-CHEAP_DILLS_CSS = (
-    ".pk{transform-origin:118px 244px;animation:pk 1.1s steps(5,jump-none) infinite alternate}"
-    "@keyframes pk{from{transform:rotate(-3deg) translateY(0)}50%{transform:rotate(0deg) translateY(-3.5px)}"
-    "to{transform:rotate(3deg) translateY(0)}}"
-    ".sh{transform-origin:121px 243px;animation:sh .55s steps(3,jump-none) infinite alternate}"
-    "@keyframes sh{from{transform:scaleX(1)}to{transform:scaleX(.9)}}"
-)
+CHEAP_DILLS = {
+    "shadow": {"kind": "shadow", "origin": (121, 243)},
+    "pickle": {"kind": "pickle", "origin": (118, 244)},
+}
 
 
-# ---- Camp Comet: the stars twinkle, the tail shimmers, the speed lines slide ------------
+# ---- Camp Comet: the stars twinkle in four groups; the tail shimmers --------------------
+# the six streaks above the comet, by index: each with its mirror, from the middle out
+TAIL = {1119: 0, 1121: 0, 1120: 1, 1122: 1, 1123: 2, 1124: 2}
+STARS = []  # (box, group) of the stars so far
+
+
 def camp_comet(i, box, fill, stroke):
     w, h = box[2] - box[0], box[3] - box[1]
-    if 1118 <= i <= 1124:
-        return f"tl t{i - 1118}"
-    if i in (14, 15, 16):
-        return f"sp s{i - 14}"
-    if w < 5 and h < 5 and box[1] < 230:
-        return f"st k{i % 4}"
+    if i in TAIL:
+        return f"tail{TAIL[i]}"
+    if w < 5 and h < 5 and box[1] < 230 and i > 16 and i < 1118:
+        # dealt round the four groups, but a star that touches others joins the topmost of
+        # their groups: a group is one picture, laid over the groups before it, so a star
+        # may lie over a lower group's star and never under a higher one's
+        near = [g for b, g in STARS if b[0] < box[2] + 3 and box[0] < b[2] + 3 and b[1] < box[3] + 3 and box[1] < b[3] + 3]
+        group = max(near) if near else len(STARS) % 4
+        STARS.append((box, group))
+        return f"stars{group}"
     return None
 
 
-CAMP_COMET_CSS = (
-    ".st{animation:tw 2.4s steps(3,jump-none) infinite alternate}"
-    ".k1{animation-delay:-.6s}.k2{animation-delay:-1.2s}.k3{animation-delay:-1.8s}"
-    "@keyframes tw{from{opacity:1}to{opacity:.25}}"
-    ".tl{transform-origin:132px 150px;animation:tl 1.2s steps(4,jump-none) infinite alternate}"
-    + "".join(f".t{k}{{animation-delay:-{k * 0.17:.2f}s}}" for k in range(7))
-    + "@keyframes tl{from{transform:scaleY(1)}to{transform:scaleY(.78)}}"
-    ".sp{animation:sp 1.6s steps(4,jump-none) infinite alternate}"
-    ".s1{animation-delay:-.4s}.s2{animation-delay:-.8s}"
-    "@keyframes sp{from{transform:translateX(0)}to{transform:translateX(-7px)}}"
-)
+CAMP_COMET = {
+    **{f"stars{k}": {"kind": "star", "delay": round(-0.6 * k, 1)} for k in range(4)},
+    **{f"tail{k}": {"kind": "tail", "origin": (132, 150), "delay": round(-0.4 * k, 1)} for k in range(3)},
+}
 
 
 # ---- Chinga La Migra: the monarchs flutter ---------------------------------------------
@@ -84,7 +90,7 @@ ORDER = list(WINGS)
 
 def chinga_la_migra(i, box, fill, stroke):
     if i in WINGS:
-        return f"b b{ORDER.index(i)}"
+        return f"wing{ORDER.index(i)}"
     if i < 42 or fill is None:
         return None
     # a wing's markings: orange, white or black, lying inside one silhouette
@@ -99,22 +105,23 @@ def chinga_la_migra(i, box, fill, stroke):
             d = (cx - (x0 + x1) / 2) ** 2 + (cy - (y0 + y1) / 2) ** 2
             if best is None or d < best[0]:
                 best = (d, k)
-    return f"b b{ORDER.index(best[1])}" if best else None
+    return f"wing{ORDER.index(best[1])}" if best else None
 
 
-CHINGA_CSS = (
-    ".b{animation:fl .5s steps(3,jump-none) infinite alternate}"
-    + "".join(
-        f".b{n}{{transform-origin:{(x0 + x1) / 2:.0f}px {(y0 + y1) / 2:.0f}px;"
-        f"animation-delay:-{(n * 0.137) % 0.9:.2f}s;animation-duration:{0.42 + (n % 4) * 0.07:.2f}s}}"
-        for n, (x0, y0, x1, y1) in enumerate(WINGS.values())
-    )
-    + "@keyframes fl{from{transform:translateY(0) rotate(-5deg) scale(1)}"
-    "to{transform:translateY(-2.5px) rotate(5deg) scale(.84)}}"
-)
+# each a little out of step: its own beat and its own place in it
+CHINGA = {
+    f"wing{n}": {
+        "kind": "wing",
+        "cling": True,
+        "origin": ((x0 + x1) / 2, (y0 + y1) / 2),
+        "delay": round(-((n * 0.137) % 0.9), 2),
+        "time": round(0.42 + (n % 4) * 0.07, 2),
+    }
+    for n, (x0, y0, x1, y1) in enumerate(WINGS.values())
+}
 
-MOTION = {
-    "cheap-dills": (cheap_dills, CHEAP_DILLS_CSS),
-    "camp-comet": (camp_comet, CAMP_COMET_CSS),
-    "chinga-la-migra": (chinga_la_migra, CHINGA_CSS),
+PARTS = {
+    "cheap-dills": (cheap_dills, CHEAP_DILLS),
+    "camp-comet": (camp_comet, CAMP_COMET),
+    "chinga-la-migra": (chinga_la_migra, CHINGA),
 }

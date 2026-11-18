@@ -216,7 +216,7 @@ export function ItemPour({
       </div>
       <span className="item-pour__can">
         <span className="item-pour__hand">
-          <Can key={id} label={labels[id]} name={name} color={color} open={opened} />
+          <Can key={id} label={labels[id]} name={name} color={color} open={opened} alive={!aloft} />
         </span>
       </span>
     </div>

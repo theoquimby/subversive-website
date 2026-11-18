@@ -9,12 +9,18 @@
 // Cheap to move (Theo: "janky... bad frame rate"): a label is hundreds of vector shapes,
 // so it is drawn once, to a small canvas at the screen's own resolution, when the can
 // first comes into view; turning the can then only slides a picture. Nothing listens to
-// the phone's lean (that slid, and so redrew, every can on the page all the time), and
-// the labels' own animated files are not used for now (they redrew every frame too).
+// the phone's lean (that slid, and so redrew, every can on the page all the time).
+// Three labels have parts that move (Max: "fun to have like beer labels animated"; the
+// pickle rocks, the monarchs flutter, the stars twinkle). Motion inside the label's own
+// file redrew all of it on every step, so the label comes cut in layers instead
+// (scripts/label_motion.py): each part is drawn once, to a small canvas of its own over
+// the label, and after that CSS only moves or fades those pictures (fx-can.css). Only a
+// can told it may (`alive`: the beer view's) loads the layers; every other can is still,
+// and that one shows the plain label too whenever its parts are not playing.
 // One loop per can (src/lib/motion/loop.ts): asleep off screen and at rest, none with
 // reduced motion (the can then simply faces front; a drag still turns it by hand).
 // Decorative: hidden from assistive tech. Styles: fx-can.css.
-import type { Label } from "@content/labels";
+import type { Label, LabelPart } from "@content/labels";
 import { type CSSProperties, type PointerEvent, useEffect, useRef } from "react";
 import { createLoop, type Loop } from "@/lib/motion/loop";
 import { KERNELS } from "../graphics/BarleyMark";
@@ -25,6 +31,12 @@ const FRICTION = 1.6; // per second
 const DETENT = 26; // spring to face front, per second squared
 const REST = 0.004;
 
+/** a part's own place in the beat, and its own beat, where the label gives one */
+const beat = (p: LabelPart): CSSProperties => ({
+  animationDelay: p.delay ? `${p.delay}s` : undefined,
+  animationDuration: p.time ? `${p.time}s` : undefined,
+});
+
 interface Props {
   /** Max's label, or none for the house can */
   label?: Label;
@@ -33,10 +45,13 @@ interface Props {
   color?: string;
   /** the tab is lifted and the mouth open (the beer sheet's pour) */
   open?: boolean;
+  /** the label's parts move while this is true and hold still while it is false (the can
+   *  is being carried). Left out, the can is a still one and never loads the layers. */
+  alive?: boolean;
   className?: string;
 }
 
-export function Can({ label, name, color, open = false, className }: Props) {
+export function Can({ label, name, color, open = false, alive, className }: Props) {
   const root = useRef<HTMLSpanElement>(null);
   const strip = useRef<HTMLSpanElement>(null);
   const state = useRef({
@@ -85,33 +100,98 @@ export function Can({ label, name, color, open = false, className }: Props) {
   }, []);
 
   // the label, drawn once into its canvases (one for each turn of the wrap) when the can
-  // first comes near the screen, and again if the can changes size
+  // first comes near the screen, and again if the can changes size.
+  // A label in layers has, over that picture, the label without its parts and each layer
+  // off the sheet in a canvas of its own. They are shown only while the parts play: a
+  // browser rounds every box to the screen by itself, so a stack of boxes can sit a pixel
+  // off the one picture; at rest the can shows the one picture, the same as any other can.
+  // The stack is set on whole pixels of its own canvas to keep it as close as it can be.
+  const cut = alive === undefined ? undefined : label?.parts;
   const src = label?.src;
   useEffect(() => {
     const el = root.current;
     if (!el || !src) return;
     let img: HTMLImageElement | undefined;
+    let under: HTMLImageElement | undefined;
+    let sheet: HTMLImageElement | undefined;
+    const ready = (i?: HTMLImageElement): i is HTMLImageElement => !!i?.complete && !!i.naturalWidth;
     const paint = () => {
-      if (!img?.complete || !img.naturalWidth) return;
       const k = Math.min(3, window.devicePixelRatio || 1);
+      let first: HTMLCanvasElement[] | undefined;
       for (const c of el.querySelectorAll<HTMLCanvasElement>("canvas.can__label")) {
         const w = Math.round(c.clientWidth * k);
         const h = Math.round(c.clientHeight * k);
-        if (!w || !h || (c.width === w && c.height === h && c.dataset.done === src)) continue;
-        c.width = w;
-        c.height = h;
-        c.getContext("2d")?.drawImage(img, 0, 0, w, h);
-        c.dataset.done = src;
+        if (!w || !h) continue;
+        if (ready(img) && !(c.width === w && c.height === h && c.dataset.done === src)) {
+          c.width = w;
+          c.height = h;
+          c.getContext("2d")?.drawImage(img, 0, 0, w, h);
+          c.dataset.done = src;
+        }
+        const base = cut && c.parentElement?.querySelector<HTMLCanvasElement>("canvas.can__base");
+        if (!cut || !base || !ready(under) || !ready(sheet)) continue;
+        if (base.width === w && base.height === h && base.dataset.done) continue;
+        base.width = w;
+        base.height = h;
+        base.style.width = `${w / k}px`;
+        base.style.height = `${h / k}px`;
+        base.getContext("2d")?.drawImage(under, 0, 0, w, h);
+        base.dataset.done = "1";
+        const layers = [
+          ...(base.parentElement?.querySelectorAll<HTMLCanvasElement>("canvas.can__part") ?? []),
+        ];
+        const sx = w / cut.view[0];
+        const sy = h / cut.view[1];
+        for (const [i, p] of cut.list.entries()) {
+          const pc = layers[i];
+          if (!pc) continue;
+          // the layer's box, out to whole pixels of the label's canvas
+          const [x, y, bw, bh] = p.box;
+          const x0 = Math.floor(x * sx);
+          const y0 = Math.floor(y * sy);
+          pc.width = Math.ceil((x + bw) * sx) - x0;
+          pc.height = Math.ceil((y + bh) * sy) - y0;
+          pc.style.left = `${x0 / k}px`;
+          pc.style.top = `${y0 / k}px`;
+          pc.style.width = `${pc.width / k}px`;
+          pc.style.height = `${pc.height / k}px`;
+          if (p.origin) {
+            const ox = ((p.origin[0] * sx - x0) / pc.width) * 100;
+            const oy = ((p.origin[1] * sy - y0) / pc.height) * 100;
+            pc.style.transformOrigin = `${ox.toFixed(2)}% ${oy.toFixed(2)}%`;
+          }
+          const to = pc.getContext("2d");
+          // the second turn of the wrap copies the first: the sheet is drawn once a layer
+          const twin = first?.[i];
+          if (twin && twin.width === pc.width && twin.height === pc.height) to?.drawImage(twin, 0, 0);
+          else
+            to?.drawImage(
+              sheet,
+              (x - p.at[0]) * sx - x0,
+              (y - p.at[1]) * sy - y0,
+              cut.size[0] * sx,
+              cut.size[1] * sy,
+            );
+        }
+        first ??= layers;
       }
     };
     const size = new ResizeObserver(paint);
+    const load = (from: string) => {
+      const i = new Image();
+      i.decoding = "async";
+      i.onload = paint;
+      i.src = from;
+      return i;
+    };
     const near = new IntersectionObserver(
       ([e]) => {
         if (!e?.isIntersecting || img) return;
-        img = new Image();
-        img.decoding = "async";
-        img.onload = paint;
-        img.src = src;
+        img = load(src);
+        if (cut) {
+          under = load(cut.base);
+          sheet = load(cut.sheet);
+        }
         size.observe(el);
         near.disconnect();
       },
@@ -122,7 +202,7 @@ export function Can({ label, name, color, open = false, className }: Props) {
       near.disconnect();
       size.disconnect();
     };
-  }, [src]);
+  }, [src, cut]);
 
   const down = (e: PointerEvent<HTMLSpanElement>) => {
     const s = state.current;
@@ -172,7 +252,18 @@ export function Can({ label, name, color, open = false, className }: Props) {
 
   const face = (key: string) => (
     <span key={key} className="can__turn">
-      {label ? (
+      {label && cut ? (
+        // the label and, over it, its layers: they slide with it as one
+        <span className="can__art">
+          <canvas className="can__label" />
+          <span className="can__live">
+            <canvas className="can__base" />
+            {cut.list.map((p) => (
+              <canvas key={p.at.join()} className={`can__part can__part--${p.kind}`} style={beat(p)} />
+            ))}
+          </span>
+        </span>
+      ) : label ? (
         <canvas className="can__label" />
       ) : (
         <span className="can__house">
@@ -196,6 +287,7 @@ export function Can({ label, name, color, open = false, className }: Props) {
       style={look}
       aria-hidden="true"
       data-open={open ? "" : undefined}
+      data-live={cut && alive ? "" : undefined}
       onPointerDown={down}
       onPointerMove={move}
       onPointerUp={up}

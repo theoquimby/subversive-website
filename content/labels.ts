@@ -6,10 +6,37 @@
 // is set in its art; Max, 2026-11-18) and Heritage Grape (a raster scan).
 // TODO(Max): labels for Puff Puff Pils, New York Nectar, Subversive Saison, Sudachi Saison.
 
+import book from "../public/brand/labels/parts.json";
+
+/** One layer of a label that is cut up so parts of it can move (scripts/label_motion.py):
+ *  a part, or still art that lies over one. Lengths are in the label's own units. */
+export interface LabelPart {
+  /** which motion (fx-can.css), or none */
+  kind: "still" | "pickle" | "shadow" | "wing" | "star" | "tail";
+  /** where it sits on the label: x, y, width, height */
+  box: readonly [number, number, number, number];
+  /** where its picture is on the sheet */
+  at: readonly [number, number];
+  /** the point it turns or scales about, on the label */
+  origin?: readonly [number, number];
+  /** seconds: its place in the beat, and the beat, where it is out of step with the rest */
+  delay?: number;
+  time?: number;
+}
+
 export interface Label {
   src: string;
-  /** the same front with its parts moving (scripts/label_motion.py), where one is made */
-  live?: string;
+  /** the same front in layers, where parts of it move: the label without them, one sheet
+   *  with a picture of each, and where each goes, bottom first. Only a can that may move
+   *  loads these (Can.tsx); laid over one another they are the picture in `src`. */
+  parts?: {
+    base: string;
+    sheet: string;
+    /** the label's size and the sheet's, in the label's units */
+    view: readonly [number, number];
+    size: readonly [number, number];
+    list: readonly LabelPart[];
+  };
   /** the front's proportions, width / height */
   ratio: number;
   /** the label's ground colour, for the rest of the can's wrap */
@@ -18,14 +45,30 @@ export interface Label {
   on: "light" | "dark";
 }
 
-const LIVE = new Set(["cheap-dills", "camp-comet", "chinga-la-migra"]);
-const label = (id: string, w: number, h: number, bg: string, on: Label["on"] = "dark"): Label => ({
-  src: `/brand/labels/${id}.svg`,
-  ...(LIVE.has(id) ? { live: `/brand/labels/${id}.live.svg` } : {}),
-  ratio: w / h,
-  bg,
-  on,
-});
+// written by scripts/extract-label.py; JSON knows no tuples or unions, so it is told here
+const BOOK = book as unknown as Readonly<
+  Record<string, { view: [number, number]; sheet: [number, number]; parts: LabelPart[] }>
+>;
+const label = (id: string, w: number, h: number, bg: string, on: Label["on"] = "dark"): Label => {
+  const cut = BOOK[id];
+  return {
+    src: `/brand/labels/${id}.svg`,
+    ...(cut
+      ? {
+          parts: {
+            base: `/brand/labels/${id}.base.svg`,
+            sheet: `/brand/labels/${id}.parts.svg`,
+            view: cut.view,
+            size: cut.sheet,
+            list: cut.parts,
+          },
+        }
+      : {}),
+    ratio: w / h,
+    bg,
+    on,
+  };
+};
 
 /** Beers with a label that are not on the menu: the name and the style line as printed on
  *  the label's front, nothing more (no strength: the label and Max's photo disagree). */

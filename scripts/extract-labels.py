@@ -6,6 +6,7 @@ the label's id (the menu item's id where the beer is on the menu), the front pan
 as page fractions, and extract-label.py flags. Heritage Grape (a raster scan) and the
 Saison ("house-made malts" is set in its ring) are left out. The ABV and size lines are
 cropped or cut: the menu states them.
+Afterwards: python scripts/check-label-parts.py (the cut labels still paint the same).
 """
 
 import subprocess
@@ -28,11 +29,10 @@ src = Path(sys.argv[1])
 out = Path(__file__).resolve().parent.parent / "public" / "brand" / "labels"
 out.mkdir(parents=True, exist_ok=True)
 tool = Path(__file__).with_name("extract-label.py")
-LIVE = {"cheap-dills", "camp-comet", "chinga-la-migra"}  # labels with moving parts
+PARTS = {"cheap-dills", "camp-comet", "chinga-la-migra"}  # labels with moving parts (label_motion.py)
 for pdf, ident, box, flags in ROWS:
-    run = [sys.executable, str(tool), str(src / pdf)]
-    subprocess.run([*run, str(out / f"{ident}.svg"), *box.split(), *flags.split()], check=True)
-    if ident in LIVE:
-        subprocess.run(
-            [*run, str(out / f"{ident}.live.svg"), *box.split(), *flags.split(), f"live={ident}"], check=True
-        )
+    more = [f"parts={ident}"] if ident in PARTS else []
+    subprocess.run(
+        [sys.executable, str(tool), str(src / pdf), str(out / f"{ident}.svg"), *box.split(), *flags.split(), *more],
+        check=True,
+    )

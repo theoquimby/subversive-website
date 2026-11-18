@@ -61,9 +61,16 @@
     inset: -2px;
     border-radius: 50%;
     border: var(--stroke) solid var(--go);
-    animation: open-pulse 2s var(--ease-out) infinite;
+    /* In steps, like every other loop here. As a smooth 60-a-second pulse in the pinned
+       header it cost every other animation on the site: Home's pour ran at 46 frames a
+       second in WebKit at phone size with it, 57 with it stepped; under an open sheet a
+       page went from 62 to 30. (2026-11-18) */
+    animation: open-pulse 2s steps(6, jump-none) infinite;
   }
-  [data-motion="paused"] .open-now__dot::after {
+  /* still while motion is paused, and while a sheet or the menu is open over the page
+     (Radix marks the body while it holds the scroll) */
+  [data-motion="paused"] .open-now__dot::after,
+  body[data-scroll-locked] .open-now__dot::after {
     animation-play-state: paused;
     opacity: 0;
   }
