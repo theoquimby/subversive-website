@@ -1,5 +1,5 @@
 /* ---------- A can you can spin (src/components/beer/Can.tsx) ----------
-   Sized by font-size: the can is 10em wide and 19em tall. The can is pen (lid, tab,
+   Sized by font-size: the can is 10em wide and 23.5em tall (a tall 16 oz can). The can is pen (lid, tab,
    shoulders, hatch); the label is Max's art, sliding behind the outline as the can turns.
    The wrap is 3.1 body-widths long: the label's front, then the plain back. */
 .can {
@@ -7,7 +7,7 @@
   display: inline-block;
   flex: none;
   width: 10em;
-  height: 19em;
+  height: 23.5em;
   font-size: 0.5rem;
   line-height: 1;
   cursor: grab;
@@ -19,12 +19,12 @@
 .can:active {
   cursor: grabbing;
 }
-/* the body: where the label shows (9.4em wide, 15em tall) */
+/* the body: where the label shows (9.4em wide, 18.85em tall) */
 .can__wrap {
   position: absolute;
-  inset: 2.75em 0.3em 1.25em;
+  inset: 3.05em 0.3em 1.6em;
   overflow: hidden;
-  border-radius: 0.2em 0.2em 1em 1em / 0.2em 0.2em 0.6em 0.6em;
+  border-radius: 0;
   background: var(--can-bg);
 }
 /* two turns of wrap; at rest the front sits centred on the body */
@@ -97,12 +97,12 @@
   inset: 0;
   background: linear-gradient(
     90deg,
-    rgb(0 0 0 / 0.2),
-    rgb(0 0 0 / 0) 16%,
-    rgb(255 255 255 / 0.16) 27%,
-    rgb(255 255 255 / 0) 40%,
-    rgb(0 0 0 / 0) 66%,
-    rgb(0 0 0 / 0.3)
+    rgb(0 0 0 / 0.14),
+    rgb(0 0 0 / 0) 14%,
+    rgb(255 255 255 / 0.14) 26%,
+    rgb(255 255 255 / 0) 38%,
+    rgb(0 0 0 / 0) 68%,
+    rgb(0 0 0 / 0.22)
   );
   pointer-events: none;
 }
@@ -126,6 +126,9 @@
 }
 .can__pen .can__metal {
   fill: var(--paper-deep);
+}
+.can__pen .can__thin {
+  stroke-width: 1px;
 }
 .can__pen .can__hatch {
   stroke-width: 1px;
@@ -153,20 +156,35 @@
   z-index: 1;
   display: block;
   margin-bottom: 0.55rem;
-  transform-origin: 17% 7%;
-  transition: transform 640ms cubic-bezier(0.45, 0, 0.2, 1);
+  /* the near edge of the rim: the mouth, and the point the can turns about */
+  transform-origin: 13% 4.5%;
+}
+.item-pour__hand {
+  display: block;
+  transform-origin: 50% 40%;
 }
 .item-pour .can {
   display: block;
-  font-size: min(0.66rem, 1.35dvh);
+  font-size: min(0.56rem, 1.15dvh);
 }
-/* in the air the can is not for spinning */
-.item-pour[data-pose="tip"] .can {
+/* in the air: held by a hand that is not quite steady, and not for spinning */
+.item-pour[data-aloft] .can {
   pointer-events: none;
 }
-@media (prefers-reduced-motion: reduce) {
-  .item-pour__can {
-    transition: none;
+@media (prefers-reduced-motion: no-preference) {
+  .item-pour[data-aloft] .item-pour__hand {
+    animation: hand-held 1.7s var(--ease-in-out, cubic-bezier(0.45, 0, 0.2, 1)) infinite alternate;
+  }
+}
+@keyframes hand-held {
+  0% {
+    transform: rotate(-0.9deg) translateY(0.6px);
+  }
+  40% {
+    transform: rotate(0.5deg) translateY(-0.8px);
+  }
+  100% {
+    transform: rotate(1.1deg) translateY(0.4px);
   }
 }
 /* Home, On tap: the featured beers in a row */
@@ -185,7 +203,7 @@
   }
 }
 .can-row .can {
-  font-size: clamp(0.34rem, 1.75vw, 0.62rem);
+  font-size: clamp(0.34rem, 1.75vw, 0.56rem);
 }
 
 /* ---------- The tab ---------- */

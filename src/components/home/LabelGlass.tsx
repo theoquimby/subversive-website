@@ -156,6 +156,7 @@ export function LabelGlass({
   bare = false,
   tap = true,
   hold = false,
+  pace = 1,
   onPhase,
 }: {
   beer: GlassBeer;
@@ -168,6 +169,8 @@ export function LabelGlass({
   tap?: boolean;
   /** arrive empty and wait: the first pour starts only when `pour` changes */
   hold?: boolean;
+  /** how fast the beer comes, as a share of the tap's flow (a can pours slower) */
+  pace?: number;
   /** told each time the pour moves on: drain, fill, rest, topup, settle, idle */
   onPhase?: (phase: string) => void;
 }) {
@@ -177,6 +180,7 @@ export function LabelGlass({
   const tell = useRef(onPhase);
   tell.current = onPhase;
   const waits = useRef(hold);
+  const rate = useRef(pace);
 
   useEffect(() => {
     const root = svg.current;
@@ -418,7 +422,7 @@ export function LabelGlass({
         }
       }
       s.flow += ((s.open ? 1 : 0) - s.flow) * Math.min(1, dt * 11);
-      poured += s.flow * dt;
+      poured += s.flow * dt * rate.current;
       hist.push([s.t, poured]);
       while (hist.length > 2 && (hist[1] as [number, number])[0] < s.t - 0.6) hist.shift();
 
@@ -530,7 +534,7 @@ export function LabelGlass({
         // bring the beer to its line: the level then slows into the line on its own.
         const inAir = poured - landed;
         // where that beer will bring the level: walked up the bowl, which widens as it rises
-        let left = inAir + s.flow / 11;
+        let left = inAir + (s.flow / 11) * rate.current;
         let ahead = s.y;
         while (left > 0 && ahead > LEVEL) {
           const step = Math.min(left, 0.01);
@@ -684,7 +688,9 @@ export function LabelGlass({
         raf = requestAnimationFrame(frame);
       }
     });
-    watcher.observe(root);
+    // (the item view's glass sits in an open sheet: it is always in sight, and is not left
+    // waiting on the observer, which on a phone can report late while the sheet slides in)
+    if (!waits.current) watcher.observe(root);
 
     const start = (b: GlassBeer, n: number) => {
       if (still.matches) {
@@ -734,7 +740,8 @@ export function LabelGlass({
       if (Math.abs(to - s.tiltTo) < 0.026) return;
       s.tiltTo = to;
       // wake the model if the glass was at rest, is on screen, and the lean is worth answering
-      if (!raf && seen && Math.abs(s.tiltTo - s.tilt) > 0.026) {
+      // (an empty glass has nothing to slosh: it stays asleep)
+      if (!raf && seen && s.y < EMPTY - 1 && Math.abs(s.tiltTo - s.tilt) > 0.026) {
         if (s.phase === "idle") s.phase = "settle";
         last = performance.now();
         raf = requestAnimationFrame(frame);

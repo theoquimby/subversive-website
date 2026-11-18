@@ -1,5 +1,6 @@
 "use client";
 
+import { labels as canLabels } from "@content/labels";
 // How their beer is made, as one living pen drawing (2026-11-16), for whichever of the beers
 // on tap is chosen: the grain through the steep, the germination floor and the kiln; the
 // mill; the mash tun and its paddle; the run-off; the kettle on its burner, hops tossed in
@@ -81,6 +82,8 @@ function draw(p: Prim, P: Attrs, key: number): React.ReactNode {
       );
     case "circle":
       return <circle key={key} {...r} />;
+    case "image":
+      return <image key={key} {...r} />;
     case "text":
       return (
         <text key={key} {...r}>
@@ -92,9 +95,19 @@ function draw(p: Prim, P: Attrs, key: number): React.ReactNode {
   }
 }
 
-const Scene = memo(function Scene({ L, uid, recipe }: { L: Layout; uid: string; recipe: Recipe }) {
+const Scene = memo(function Scene({
+  L,
+  uid,
+  recipe,
+  canArt,
+}: {
+  L: Layout;
+  uid: string;
+  recipe: Recipe;
+  canArt?: string;
+}) {
   const P = STILL[L.id];
-  const prims = scene(L, recipe, uid, brewLabels);
+  const prims = scene(L, recipe, uid, brewLabels, canArt);
   return (
     <svg
       viewBox={`0 0 ${L.box[0]} ${L.box[1]}`}
@@ -118,6 +131,8 @@ export function BrewProcess({ beers, className }: { beers: readonly BrewBeer[]; 
   const [chosen, choose] = useState(() => defaultBeer(beers)?.id ?? "");
   const beer = beers.find((b) => b.id === chosen) ?? defaultBeer(beers);
   const recipe = useMemo(() => recipeOf(beer ?? { style: "", description: "" }), [beer]);
+  // the cans at the end of the line wear the chosen beer's label, where Max has sent one
+  const canArt = beer ? canLabels[beer.id]?.src : undefined;
   const art = useRef<HTMLDivElement>(null);
   const again = useRef<HTMLButtonElement>(null);
   const model = useRef<Model | null>(null);
@@ -293,8 +308,8 @@ export function BrewProcess({ beers, className }: { beers: readonly BrewBeer[]; 
         </fieldset>
       ) : null}
       <div ref={art} className="brew__art" role="img" aria-label={brewLabels.aria(beer?.name ?? "our beer")}>
-        <Scene L={PHONE} uid={uid} recipe={recipe} />
-        <Scene L={WIDE} uid={uid} recipe={recipe} />
+        <Scene L={PHONE} uid={uid} recipe={recipe} canArt={canArt} />
+        <Scene L={WIDE} uid={uid} recipe={recipe} canArt={canArt} />
       </div>
       <p className="brew__foot">
         <button

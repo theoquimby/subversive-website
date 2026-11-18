@@ -352,3 +352,9 @@ fieldset.brew__beers {
     white-space: nowrap;
   }
 }
+
+/* a capped can's label: Max's art, or (no label yet) a band of the beer between two lines */
+.brew__canlabel .brew__band {
+  stroke: var(--fg);
+  stroke-width: 1;
+}

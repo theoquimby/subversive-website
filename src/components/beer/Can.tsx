@@ -125,8 +125,9 @@ export function Can({ label, name, color, open = false, alive = false, className
     s.loop?.wake();
   };
 
-  // the front's width as a share of the whole wrap (the body is 9.4 wide and 15 tall)
-  const front = label ? Math.min(0.62, (label.ratio * (15 / 9.4)) / WRAP) : 0.46;
+  // the front's width as a share of the whole wrap (a tall can: the body is 9.4 wide and
+  // 18.85 tall, the proportions of the 16 oz cans in Max's photos)
+  const front = label ? Math.min(0.75, (label.ratio * (18.85 / 9.4)) / WRAP) : 0.46;
   const look = {
     "--can-bg": label?.bg ?? "var(--card)",
     "--can-ink": label?.on === "light" ? "var(--bone)" : "var(--ink)",
@@ -174,37 +175,46 @@ export function Can({ label, name, color, open = false, alive = false, className
         </span>
         <span className="can__round" />
       </span>
-      <svg viewBox="0 0 100 190" className="can__pen" focusable="false">
-        {/* shoulders, from the lid down to the body */}
+      <svg viewBox="0 0 100 235" className="can__pen" focusable="false">
+        {/* A tall can, drawn the way one is built: a narrow rolled rim, the neck swelling
+            out to the body, the body, and the foot tucking back in to a base ring. */}
+        {/* the neck: from under the rim out to the shoulders */}
         <path
-          d="M14 13C13 19 7 22 3 27.5H97C93 22 87 19 86 13C86 17.5 70 20.5 50 20.5S14 17.5 14 13Z"
+          d="M12.5 10.5C12.5 17 4.5 20.5 3 30.5H97C95.5 20.5 87.5 17 87.5 10.5C87.5 14.5 70.5 17 50 17S12.5 14.5 12.5 10.5Z"
           className="can__metal"
         />
-        {/* lid and tab */}
+        <path d="M9 23.5C22 26.2 78 26.2 91 23.5" className="can__hatch" />
+        {/* the rim, and the lid's panel set down inside it */}
         <path
-          d="M14 13C14 8.5 30 5.5 50 5.5S86 8.5 86 13S70 20.5 50 20.5S14 17.5 14 13Z"
+          d="M12.5 10.5C12.5 6.8 29.3 4 50 4S87.5 6.8 87.5 10.5S70.7 17 50 17S12.5 14.2 12.5 10.5Z"
           className="can__metal"
         />
-        {/* the mouth, dark once the tab is lifted; the tab stands up on its rivet */}
         <path
-          d="M40 13.4C40 11.6 44 10.6 49 10.6S57 11.6 57 13.4S53 16.4 49 16.4S40 15.2 40 13.4Z"
+          d="M17.5 10.6C17.5 7.8 32 5.8 50 5.8S82.5 7.8 82.5 10.6S68 15.3 50 15.3S17.5 13.4 17.5 10.6Z"
+          className="can__thin"
+        />
+        {/* the mouth, dark once the tab is lifted; the tab on its rivet */}
+        <path
+          d="M27 11C27 9.4 31.5 8.3 37 8.3S47 9.4 47 11S42.5 13.6 37 13.6S27 12.6 27 11Z"
           className="can__mouth"
         />
         <path
-          d="M49 12.4C49 10.9 52.5 10 56.5 10S64 10.9 64 12.4S60.5 14.8 56.5 14.8S49 13.9 49 12.4ZM54 12.3h5"
+          d="M43 10.5C43 9 47.5 8 53 8S63 9 63 10.5S58.5 13 53 13S43 12 43 10.5ZM54 10.5h5.5"
           className="can__tab"
         />
         {/* the hiss as it opens: three short pen ticks */}
-        <path d="M44 3.5L41.5 -3M50 2.5V-4.5M56 3.5L58.5 -3" className="can__hiss" />
-        {/* the body's two sides and its foot */}
-        <path d="M3 27.5C2.2 70 2.4 130 3 177.5M97 27.5C97.8 70 97.6 130 97 177.5" />
+        <path d="M30 2L27 -4.5M37 1V-6M44 2L47 -4.5" className="can__hiss" />
+        {/* the body's two sides */}
+        <path d="M3 30.5C2.3 85 2.4 165 3 219M97 30.5C97.7 85 97.6 165 97 219" />
+        {/* the foot: tucked in, standing on its base ring */}
         <path
-          d="M3 177.5C5 182 9 185 14 186.2C36 188.6 64 188.6 86 186.2C91 185 95 182 97 177.5Z"
+          d="M3 219C3.6 224.5 8 228.8 15 230.3C37 233 63 233 85 230.3C92 228.8 96.4 224.5 97 219Z"
           className="can__metal"
         />
+        <path d="M17 230.6C38 228.900 62 228.900 83 230.6" className="can__thin" />
         {/* roundness, in hatch: short strokes down the far side, one long light on the near */}
-        <path d="M90.5 40V160M86 52V150M93.8 60V120" className="can__hatch" />
-        <path d="M10.5 38C10 80 10 130 10.6 166" className="can__shine" />
+        <path d="M90.5 44V204M86.5 60V188M93.8 70V150" className="can__hatch" />
+        <path d="M10.5 42C10 98 10 165 10.6 208" className="can__shine" />
       </svg>
     </span>
   );

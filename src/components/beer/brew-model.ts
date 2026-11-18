@@ -102,7 +102,7 @@ const binY = (v: number) => BIN.bottom - v * 52;
 const tankY = (v: number) => 89 - (v / (STEEP_WATER + MASH_WATER)) * 58;
 const jarY = (v: number) => 48 - v * 28;
 const contY = (i: number, v: number) =>
-  i === 0 ? 92 - (v / (CAP[0] ?? 1)) * 54 : 92 - (v / (CAP[i] ?? 1)) * 34;
+  i === 0 ? 92 - (v / (CAP[0] ?? 1)) * 54 : 92 - (v / (CAP[i] ?? 1)) * 50;
 
 // ---- surfaces ---------------------------------------------------------------------------
 
@@ -1871,6 +1871,8 @@ export function paint(s: Brew, L: Layout, put: Put) {
   });
   s.lids.forEach((l, i) => {
     show(put, `lid${i}`, l.st !== 0);
+    // a capped can wears its label
+    show(put, `lab${i}`, l.st === 2);
     put(`lid${i}`, "transform", `translate(0 ${f1(l.y)})`);
   });
 }

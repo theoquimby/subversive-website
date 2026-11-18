@@ -443,9 +443,12 @@ export const OUT = {
   keg: `${ell(0, 34, 20, 4.4)}M-20 34V92M20 34V92${near(0, 92, 20, 4.4)}M-5 33V28H5V33`,
   kegRibs: `${near(0, 52, 20.6, 4.5)}${near(0, 74, 20.6, 4.5)}`,
   kegFill: barrel(0, 34, 92, 20, 4.4),
-  can: `${ell(0, 56, 11, 2.4)}M-11 56V92M11 56V92${near(0, 92, 11, 2.4)}`,
-  canFill: barrel(0, 56, 92, 11, 2.4),
-  lid: "M-11.5 56A11.5 2.8 0 1 0 11.5 56A11.5 2.8 0 1 0 -11.5 56Z",
+  // tall cans (Theo, 2026-11-18: "tall boys"): 22 across, 52 tall
+  can: `${ell(0, 40, 11, 2.4)}M-11 40V92M11 40V92${near(0, 92, 11, 2.4)}`,
+  canFill: barrel(0, 40, 92, 11, 2.4),
+  lid: "M-11.5 40A11.5 2.8 0 1 0 11.5 40A11.5 2.8 0 1 0 -11.5 40Z",
+  /** where a can's label sits: [x, y, width, height] */
+  canLabel: [-11, 44, 22, 46] as const,
   foot: [
     [14, 46, 120],
     [294, 326, 120],

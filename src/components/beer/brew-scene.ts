@@ -29,7 +29,7 @@ import { FILLS, POOLS } from "./brew-model";
 import type { Recipe } from "./brew-recipe";
 
 export interface Prim {
-  el: "g" | "path" | "circle" | "text" | "clipPath";
+  el: "g" | "path" | "circle" | "text" | "clipPath" | "image";
   c?: string;
   k?: string;
   a?: Record<string, string | number>;
@@ -62,7 +62,14 @@ function cone(): Prim[] {
   return [path(CONE.body, "brew__hop"), path(CONE.scales, "brew__thin"), path(CONE.stem)];
 }
 
-export function scene(L: Layout, recipe: Recipe, uid: string, labels: Record<LabelKey, string>): Prim[] {
+export function scene(
+  L: Layout,
+  recipe: Recipe,
+  uid: string,
+  labels: Record<LabelKey, string>,
+  /** the chosen beer's can label (an SVG file), or none: the cans then wear a plain band */
+  canArt?: string,
+): Prim[] {
   const id = (n: string) => `${uid}-${L.id}-${n}`;
   const clipped = (n: string, kids: Prim[]) => g(kids, { "clip-path": `url(#${id(n)})` });
   const A = L.at;
@@ -390,7 +397,31 @@ export function scene(L: Layout, recipe: Recipe, uid: string, labels: Record<Lab
             ]),
             ...(i === 0
               ? [path(OUT.keg), path(OUT.kegRibs, "brew__thin")]
-              : [path(OUT.can), g([path(OUT.lid, "brew__paper2")], undefined, undefined, `lid${i - 1}`)]),
+              : [
+                  // the label goes on once the can is capped: Max's art, or a band of the beer
+                  g(
+                    [
+                      canArt
+                        ? {
+                            el: "image" as const,
+                            a: {
+                              href: canArt,
+                              x: OUT.canLabel[0],
+                              y: OUT.canLabel[1],
+                              width: OUT.canLabel[2],
+                              height: OUT.canLabel[3],
+                              preserveAspectRatio: "xMidYMid slice",
+                            },
+                          }
+                        : path("M-11 56H11V78H-11Z", "brew__liq brew--beer brew__band"),
+                    ],
+                    { "clip-path": `url(#${id("can")})` },
+                    "brew__canlabel",
+                    `lab${i - 1}`,
+                  ),
+                  path(OUT.can),
+                  g([path(OUT.lid, "brew__paper2")], undefined, undefined, `lid${i - 1}`),
+                ]),
           ],
           undefined,
           undefined,
