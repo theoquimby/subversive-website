@@ -8,6 +8,8 @@
 
 export interface Label {
   src: string;
+  /** the same front with its parts moving (scripts/label_motion.py), where one is made */
+  live?: string;
   /** the front's proportions, width / height */
   ratio: number;
   /** the label's ground colour, for the rest of the can's wrap */
@@ -16,8 +18,10 @@ export interface Label {
   on: "light" | "dark";
 }
 
+const LIVE = new Set(["cheap-dills", "camp-comet", "chinga-la-migra"]);
 const label = (id: string, w: number, h: number, bg: string, on: Label["on"] = "dark"): Label => ({
   src: `/brand/labels/${id}.svg`,
+  ...(LIVE.has(id) ? { live: `/brand/labels/${id}.live.svg` } : {}),
   ratio: w / h,
   bg,
   on,

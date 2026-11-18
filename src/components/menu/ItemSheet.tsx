@@ -159,7 +159,7 @@ export function ItemSheet() {
             // the house can where a beer has no label yet). Flick the can to spin it.
             <div className="item__pour">
               <ItemGlass id={item.id} color={item.color} hazy={item.hazy} />
-              <Can key={item.id} label={labels[item.id]} name={item.name} color={item.color} />
+              <Can key={item.id} label={labels[item.id]} name={item.name} color={item.color} alive />
             </div>
           ) : null}
           <div className="item__head">

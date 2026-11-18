@@ -10,7 +10,7 @@
 // reduced motion (the can then simply faces front; a drag still turns it by hand).
 // Decorative: hidden from assistive tech. Styles: fx-can.css.
 import type { Label } from "@content/labels";
-import { type CSSProperties, type PointerEvent, useEffect, useRef } from "react";
+import { type CSSProperties, type PointerEvent, useEffect, useRef, useState } from "react";
 import { createLoop, type Loop } from "@/lib/motion/loop";
 import { KERNELS } from "../graphics/BarleyMark";
 
@@ -28,10 +28,12 @@ interface Props {
   color?: string;
   /** turn once on first sight */
   greet?: boolean;
+  /** let the label's own parts move, where it has a live file (the beer sheet's can) */
+  alive?: boolean;
   className?: string;
 }
 
-export function Can({ label, name, color, greet = true, className }: Props) {
+export function Can({ label, name, color, greet = true, alive = false, className }: Props) {
   const root = useRef<HTMLSpanElement>(null);
   const strip = useRef<HTMLSpanElement>(null);
   const state = useRef({ t: 0, v: 0, held: false, x: 0, at: 0, loop: null as Loop | null });
@@ -79,6 +81,19 @@ export function Can({ label, name, color, greet = true, className }: Props) {
     };
   }, [greet]);
 
+  // the moving label loads only where motion is welcome: not with reduced motion, not
+  // while Pause motion is on (the file's own loops cannot be paused from the page)
+  const [moving, setMoving] = useState(false);
+  const live = alive ? label?.live : undefined;
+  useEffect(() => {
+    if (!live) return;
+    const calm =
+      window.matchMedia("(prefers-reduced-motion: reduce)").matches ||
+      document.documentElement.dataset.motion === "paused";
+    setMoving(!calm);
+  }, [live]);
+  const art = moving && live ? live : label?.src;
+
   const down = (e: PointerEvent<HTMLSpanElement>) => {
     const s = state.current;
     s.held = true;
@@ -124,14 +139,7 @@ export function Can({ label, name, color, greet = true, className }: Props) {
     <span key={key} className="can__turn">
       {label ? (
         // biome-ignore lint/performance/noImgElement: an SVG file, drawn as it is
-        <img
-          className="can__label"
-          src={label.src}
-          alt=""
-          loading="lazy"
-          decoding="async"
-          draggable={false}
-        />
+        <img className="can__label" src={art} alt="" loading="lazy" decoding="async" draggable={false} />
       ) : (
         <span className="can__house">
           <span className="can__house-name">{name}</span>

@@ -7,6 +7,7 @@ The box is in fractions of the page (0-1). Flags:
                 background drawing behind the artwork)
   drop=#hex,..  drop unstroked shapes filled with these colours
   bg=#hex       paint this colour behind everything
+  live=id       class the label's moving parts and embed their CSS (label_motion.py)
   cut=a,b,c,d   drop shapes wholly inside this box (page fractions): small print such as
                 an ABV line, which the menu states and a label may state differently Keeps only the vector shapes wholly inside
 it (the side panels, with the old "Malting" name, the warnings and the barcode, fall
@@ -87,11 +88,20 @@ def main() -> None:
     ox, oy = box.x0, box.y0
     parts: list[str] = []
     backs: list[str] = []
+    idx = -1
+    classify, css = None, ""
+    if flags.get("live"):
+        sys.path.insert(0, str(__import__("pathlib").Path(__file__).parent))
+        from label_motion import HEAD, MOTION
+
+        classify, css = MOTION[flags["live"]]
+        css = HEAD + css
     for dr in page.get_drawings():
         r = dr["rect"]
         inside = box.x0 - 0.5 <= r.x0 and r.x1 <= box.x1 + 0.5 and box.y0 - 0.5 <= r.y0 and r.y1 <= box.y1 + 0.5
         if not inside and not (clip and r.intersects(box)):
             continue
+        idx += 1
         if cut is not None and cut.contains(r):
             continue
         if dropbig is not None and r.width * r.height > dropbig * box.width * box.height:
@@ -119,6 +129,16 @@ def main() -> None:
             if dr.get("lineJoin"):
                 joins = {0: "miter", 1: "round", 2: "bevel"}
                 attrs.append(f'stroke-linejoin="{joins.get(int(dr["lineJoin"]), "miter")}"')
+        if classify:
+            rr = [r.x0 - ox, r.y0 - oy, r.x1 - ox, r.y1 - oy]
+            cls = classify(
+                idx,
+                rr,
+                color(dr.get("fill")) if dr["type"] in ("f", "fs") else None,
+                color(dr.get("color")) if dr["type"] in ("s", "fs") else None,
+            )
+            if cls:
+                attrs.append(f'class="{cls}"')
         op = dr.get("fill_opacity") if fill != "none" else dr.get("stroke_opacity")
         if op is not None and op < 0.999:
             attrs.append(f'opacity="{fmt(op)}"')
@@ -128,6 +148,7 @@ def main() -> None:
         (backs if back else parts).append(f'<path d="{d}" {" ".join(attrs)}/>')
     svg = (
         f'<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 {fmt(box.width)} {fmt(box.height)}">'
+        + (f"<style>{css}</style>" if css else "")
         + (f'<clipPath id="c"><path d="M0 0H{fmt(box.width)}V{fmt(box.height)}H0Z"/></clipPath><g clip-path="url(#c)">' if clip else "")
         + (f'<path d="M0 0H{fmt(box.width)}V{fmt(box.height)}H0Z" fill="{flags["bg"]}"/>' if flags.get("bg") else "")
         + "".join(backs + parts)

@@ -28,8 +28,11 @@ src = Path(sys.argv[1])
 out = Path(__file__).resolve().parent.parent / "public" / "brand" / "labels"
 out.mkdir(parents=True, exist_ok=True)
 tool = Path(__file__).with_name("extract-label.py")
+LIVE = {"cheap-dills", "camp-comet", "chinga-la-migra"}  # labels with moving parts
 for pdf, ident, box, flags in ROWS:
-    subprocess.run(
-        [sys.executable, str(tool), str(src / pdf), str(out / f"{ident}.svg"), *box.split(), *flags.split()],
-        check=True,
-    )
+    run = [sys.executable, str(tool), str(src / pdf)]
+    subprocess.run([*run, str(out / f"{ident}.svg"), *box.split(), *flags.split()], check=True)
+    if ident in LIVE:
+        subprocess.run(
+            [*run, str(out / f"{ident}.live.svg"), *box.split(), *flags.split(), f"live={ident}"], check=True
+        )
