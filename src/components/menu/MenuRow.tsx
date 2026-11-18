@@ -1,8 +1,8 @@
 // Menu row (spec §4.4; review pass 2026-11-15): name and badge, meta, the whole
 // description, tags, and the price at right in a column that does not shift. One kind of
 // row for everything, sauces included. On the menu page the whole row is a link that opens
-// the item's detail view (ItemSheet reads the row, so nothing is sent twice); elsewhere it
-// is plain. The small glass left the row: the glass is in the detail view.
+// the item's detail view (ItemSheet reads the row, so nothing is sent twice); Our beer's
+// list does the same, Home's rows link to the beer on the menu, and elsewhere it is plain. The small glass left the row: the glass is in the detail view.
 import { menuLabels } from "@content/microcopy";
 import { type PhotoId, photos } from "@content/photos";
 import type { CSSProperties } from "react";
@@ -10,6 +10,7 @@ import { isBeer } from "@/lib/menu/kinds";
 import { formatPair, formatPrice } from "@/lib/menu/price";
 import type { ItemView } from "@/lib/menu/view";
 import { Badge } from "../graphics/Badge";
+import { Link } from "../ui/Link";
 
 export function rowPrice(row: ItemView): string | undefined {
   const { item } = row;
@@ -29,11 +30,14 @@ export function MenuRow({
   row,
   index,
   detail = false,
+  to,
 }: {
   row: ItemView;
   index: number;
   /** the row opens the item's detail view (the menu page only) */
   detail?: boolean;
+  /** elsewhere: the whole row is a link to this address (Home's rows open the beer on the menu) */
+  to?: string;
 }) {
   const { item } = row;
   const beer = isBeer(item);
@@ -85,6 +89,10 @@ export function MenuRow({
         <a id={row.id} className="mrow__box" href={`?item=${encodeURIComponent(row.id)}`} data-item={row.id}>
           {inner}
         </a>
+      ) : to ? (
+        <Link id={row.id} className="mrow__box" href={to}>
+          {inner}
+        </Link>
       ) : (
         <div id={row.id} className="mrow__box">
           {inner}

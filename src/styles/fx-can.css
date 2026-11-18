@@ -82,10 +82,12 @@
     linear-gradient(transparent 31%, var(--can-beer) 31% 69%, transparent 69%);
 }
 .can__house-name {
-  max-width: 8.4em;
+  /* inside the can's face (9.4 can-ems wide), whatever the name's length */
+  max-width: 5.6em;
   color: var(--ink);
   font-family: var(--ff-display);
-  font-size: 1.7em;
+  font-size: 1.5em;
+  overflow-wrap: anywhere;
   line-height: 1.02;
   text-align: center;
   text-wrap: balance;
@@ -245,4 +247,15 @@
 }
 .can[data-pictured] .can__strip {
   visibility: hidden;
+}
+
+/* a can that is also a way in (Home: to the beer on the menu; Our beer: the beer's view) */
+.can-link {
+  display: block;
+  -webkit-touch-callout: none;
+}
+/* Our beer: every tap on one shelf, wrapping */
+.can-row--shelf {
+  flex-wrap: wrap;
+  row-gap: var(--s-5);
 }

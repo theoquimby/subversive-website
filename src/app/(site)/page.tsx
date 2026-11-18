@@ -180,22 +180,31 @@ export default async function Home() {
           <SectionHead id="tap-title" note={`${view.pourSizes.half} / ${view.pourSizes.full}`}>
             {homeLabels.onTap}
           </SectionHead>
-          {/* the featured beers as cans, in Max's labels: each one spins under a finger and
-              opens its beer on the menu */}
+          {/* the featured beers as cans, in Max's labels: each one spins under a finger, and
+              a tap on a can or a row opens that beer on the menu */}
           <ul className="can-row">
             {featured.map((row) => (
               <li key={row.id}>
-                <Can
-                  label={labels[row.id]}
-                  name={row.item.name}
-                  color={isBeer(row.item) ? row.item.color : undefined}
-                />
+                {/* the row below is the named link; the can is a second way in */}
+                <Link
+                  href={`/menu?item=${encodeURIComponent(row.id)}`}
+                  className="can-link"
+                  aria-hidden="true"
+                  tabIndex={-1}
+                  draggable={false}
+                >
+                  <Can
+                    label={labels[row.id]}
+                    name={row.item.name}
+                    color={isBeer(row.item) ? row.item.color : undefined}
+                  />
+                </Link>
               </li>
             ))}
           </ul>
           <ul className="mlist home-tap">
             {featured.map((row, i) => (
-              <MenuRow key={row.id} row={row} index={i} />
+              <MenuRow key={row.id} row={row} index={i} to={`/menu?item=${encodeURIComponent(row.id)}`} />
             ))}
           </ul>
           <TextLink href="/menu">{homeLabels.fullMenu}</TextLink>

@@ -42,7 +42,16 @@ export function Can({ label, name, color, open = false, alive = false, frozen = 
   const strip = useRef<HTMLSpanElement>(null);
   const held = useRef(frozen);
   held.current = frozen;
-  const state = useRef({ t: 0, v: 0, lean: 0, held: false, x: 0, at: 0, loop: null as Loop | null });
+  const state = useRef({
+    t: 0,
+    v: 0,
+    lean: 0,
+    dragged: 0,
+    held: false,
+    x: 0,
+    at: 0,
+    loop: null as Loop | null,
+  });
 
   useEffect(() => {
     const el = root.current;
@@ -137,6 +146,7 @@ export function Can({ label, name, color, open = false, alive = false, frozen = 
   const down = (e: PointerEvent<HTMLSpanElement>) => {
     const s = state.current;
     s.held = true;
+    s.dragged = 0;
     s.x = e.clientX;
     s.at = performance.now();
     s.v = 0;
@@ -152,6 +162,7 @@ export function Can({ label, name, color, open = false, alive = false, frozen = 
     const secs = Math.max(0.008, (now - s.at) / 1000);
     s.v = s.v * 0.6 + (by / secs) * 0.4;
     s.t += by;
+    s.dragged += Math.abs(e.clientX - s.x);
     s.x = e.clientX;
     s.at = now;
     const turn = s.t - Math.floor(s.t);
@@ -208,6 +219,13 @@ export function Can({ label, name, color, open = false, alive = false, frozen = 
       onPointerMove={move}
       onPointerUp={up}
       onPointerCancel={up}
+      // a can inside a link: a spin is not a tap
+      onClickCapture={(e) => {
+        if (state.current.dragged > 6) {
+          e.preventDefault();
+          e.stopPropagation();
+        }
+      }}
     >
       <span className="can__wrap">
         {/* the wrap, twice over, so it never runs out as it slides */}

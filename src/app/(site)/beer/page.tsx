@@ -5,14 +5,17 @@
 //
 // One of the old site's three brewery paragraphs names a process the brand has dropped
 // (spec O10), so it is left out whole rather than edited. TODO(Max): approve a rewording.
+import { labels } from "@content/labels";
 import { brewLabels, homeLabels } from "@content/microcopy";
 import type { Metadata } from "next";
 import { BrewProcess } from "@/components/beer/BrewProcess";
+import { Can } from "@/components/beer/Can";
 import { PhotoFrame } from "@/components/graphics/PhotoFrame";
 import { Drawing } from "@/components/home/Ways";
 import { WhereFrom } from "@/components/home/WhereFrom";
 import { PageWipe } from "@/components/layout/PageWipe";
 import { SectionHead } from "@/components/layout/SectionHead";
+import { ItemSheet } from "@/components/menu/ItemSheet";
 import { MenuRow } from "@/components/menu/MenuRow";
 import { TextLink } from "@/components/ui/TextLink";
 import { isBeer } from "@/lib/menu/kinds";
@@ -79,17 +82,50 @@ export default async function BeerPage() {
             <PhotoFrame id="tanks" ratio="4/5" reveal={false} sizes="(min-width: 1024px) 260px, 50vw" />
           </div>
 
-          {/* what is pouring now: every tap, as on Home, with the two pour sizes named once */}
-          <section className="prose-section" aria-labelledby="tap-title">
-            <SectionHead id="tap-title" note={`${view.pourSizes.half} / ${view.pourSizes.full}`}>
-              {homeLabels.onTap}
-            </SectionHead>
-            <ul className="mlist home-tap">
-              {taps.map((row, i) => (
-                <MenuRow key={row.id} row={row} index={i} />
-              ))}
-            </ul>
-          </section>
+          {/* What is pouring now: every tap, as a shelf of cans in Max's labels and as a
+              list. A tap on either opens the beer's view, with its can pouring the glass,
+              as on the menu (the same ItemSheet reads these rows, hence the menu's data
+              attributes; data-show is set so the sheet's list switch has nothing to do). */}
+          <div data-menu="" data-show="drinks">
+            <section
+              className="prose-section"
+              aria-labelledby="tap-title"
+              data-list="drinks"
+              data-section="on-tap"
+            >
+              <SectionHead id="tap-title" note={`${view.pourSizes.half} / ${view.pourSizes.full}`}>
+                {homeLabels.onTap}
+              </SectionHead>
+              <ul className="can-row can-row--shelf">
+                {taps.map((row) => (
+                  <li key={row.id}>
+                    {/* the row below is the named link; the can is a second way in, for a
+                        pointer or a finger only */}
+                    {/* biome-ignore lint/a11y/useAnchorContent: hidden from assistive tech on purpose; the list row names the same link */}
+                    <a
+                      href={`?item=${encodeURIComponent(row.id)}`}
+                      data-item={row.id}
+                      className="can-link"
+                      aria-hidden="true"
+                      tabIndex={-1}
+                      draggable={false}
+                    >
+                      <Can
+                        label={labels[row.id]}
+                        name={row.item.name}
+                        color={isBeer(row.item) ? row.item.color : undefined}
+                      />
+                    </a>
+                  </li>
+                ))}
+              </ul>
+              <ul className="mlist home-tap">
+                {taps.map((row, i) => (
+                  <MenuRow key={row.id} row={row} index={i} detail />
+                ))}
+              </ul>
+            </section>
+          </div>
         </div>
 
         {/* where the grain and the rest come from, then how it becomes beer (Theo,
@@ -108,6 +144,7 @@ export default async function BeerPage() {
           </p>
         </section>
       </div>
+      <ItemSheet />
     </PageWipe>
   );
 }

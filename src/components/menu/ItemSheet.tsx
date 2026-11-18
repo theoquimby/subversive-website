@@ -180,7 +180,18 @@ export function ItemSheet() {
           {item.desc ? <p className="item__desc">{item.desc}</p> : null}
           {/* house beers (the only items with a colour): how this one is brewed, on Our beer */}
           {item.color ? (
-            <p className="item__more">
+            // (on Our beer itself the drawing is on this page: the sheet closes, the drawing
+            // is told which beer, and the link's own #brew brings it into view)
+            // biome-ignore lint/a11y/noStaticElementInteractions: the link inside is the control; this only listens for it
+            // biome-ignore lint/a11y/useKeyWithClickEvents: Enter on the link is a click
+            <p
+              className="item__more"
+              onClick={() => {
+                if (window.location.pathname !== "/beer") return;
+                window.dispatchEvent(new CustomEvent("sv:brew", { detail: item.id }));
+                setOpen(false);
+              }}
+            >
               <TextLink href={`/beer?brew=${encodeURIComponent(item.id)}#brew`}>{brewLabels.seeHow}</TextLink>
             </p>
           ) : null}
