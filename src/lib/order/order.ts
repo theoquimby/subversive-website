@@ -4,7 +4,15 @@
 // number. Nothing it says about names or prices is believed: every line is looked up in
 // the catalog read from Square on the server, the options are checked against what that
 // item allows, and Square itself works out tax and the total. A payment is taken for
-// exactly the total Square returned for the order it just created.
+// exactly the total Square returned for the order it just created, and only when that is
+// the total the visitor was shown.
+//
+// Checked against Square's documentation on 2026-11-18: an order is created OPEN; a pickup
+// fulfilment needs the recipient's name and, for ASAP, a preparation time (Square works out
+// the pickup time); an order with a fulfilment shows on the till only once it is paid; a
+// payment for an order must be for exactly the order's total; a payment's idempotency key
+// is 45 characters at most, an order's 192; a recipient's phone number 17. Not yet run
+// against Square: see docs/ordering.md.
 import { z } from "zod";
 import { type SquareEnv, SquareError, square } from "../square/api";
 import type { Orderable } from "./catalog";
@@ -28,13 +36,28 @@ export const orderRequest = z.strictObject({
     .regex(/^\+?[0-9 ().-]{7,24}$/),
   /** the card token from Square's form in the browser */
   token: z.string().min(1).max(600),
+  /** cents: the total the visitor was shown. Only ever compared with Square's; never charged. */
+  expectedTotal: z.number().int().positive(),
   /** made once per attempt by the browser, so a retry can never charge twice */
   idempotencyKey: z.string().regex(/^[A-Za-z0-9-]{16,40}$/),
 });
 export type OrderLine = z.infer<typeof line>;
 
+/**
+ * A phone number the way Square takes it: "+" and digits, 17 characters at most (Square's
+ * limit for a pickup recipient). Ten digits are taken as a US number. Null when it cannot
+ * be one.
+ */
+export function squarePhone(raw: string): string | null {
+  const digits = raw.replace(/\D/g, "");
+  if (raw.trim().startsWith("+")) return digits.length >= 8 && digits.length <= 15 ? `+${digits}` : null;
+  if (digits.length === 10) return `+1${digits}`;
+  if (digits.length === 11 && digits.startsWith("1")) return `+${digits}`;
+  return null;
+}
+
 export class OrderProblem extends Error {
-  readonly code: "unknown-item" | "bad-options" | "closed" | "empty";
+  readonly code: "unknown-item" | "bad-options" | "bad-phone" | "closed" | "empty";
   readonly itemId?: string;
   constructor(code: OrderProblem["code"], itemId?: string) {
     super(code);
@@ -78,6 +101,9 @@ const orderOut = z.object({
     id: z.string().optional(),
     total_money: moneyOut,
     total_tax_money: moneyOut.optional(),
+    // what has been paid towards it, and what is still owed
+    tenders: z.array(z.unknown()).optional(),
+    net_amount_due_money: moneyOut.optional(),
   }),
 });
 
@@ -110,7 +136,19 @@ export async function quote(
 
 export type Placed =
   | { ok: true; total: number; reference: string }
-  | { ok: false; reason: "declined" | "card" | "failed" };
+  | { ok: false; reason: "declined" | "card" | "failed" }
+  /** Square's total is no longer the one the visitor was shown; nothing was charged */
+  | { ok: false; reason: "changed"; total: number; tax: number | null };
+
+/** Has this order been paid in full? Asked only when a payment's own answer was unclear. */
+async function paid(env: SquareEnv, orderId: string): Promise<boolean> {
+  try {
+    const { order } = orderOut.parse(await square(env, `/orders/${encodeURIComponent(orderId)}`));
+    return (order.tenders?.length ?? 0) > 0 && order.net_amount_due_money?.amount === 0;
+  } catch {
+    return false;
+  }
+}
 
 /** Create the pickup order in Square, then take payment for exactly its total. */
 export async function place(
@@ -118,18 +156,22 @@ export async function place(
   req: z.infer<typeof orderRequest>,
   items: Record<string, Orderable>,
 ): Promise<Placed> {
+  const phone = squarePhone(req.phone);
+  if (!phone) throw new OrderProblem("bad-phone");
   const created = orderOut.parse(
     await square(env, "/orders", {
       body: {
         idempotency_key: `o-${req.idempotencyKey}`,
         order: {
           ...orderBody(env, lineItems(req.lines, items)),
+          // the name on the kitchen's ticket (30 characters at most)
+          ticket_name: req.name.slice(0, 30),
           fulfillments: [
             {
               type: "PICKUP",
               state: "PROPOSED",
               pickup_details: {
-                recipient: { display_name: req.name, phone_number: req.phone },
+                recipient: { display_name: req.name, phone_number: phone },
                 schedule_type: "ASAP",
                 prep_time_duration: `PT${PREP_MINUTES}M`,
               },
@@ -140,7 +182,18 @@ export async function place(
     }),
   );
   const { id, total_money } = created.order;
-  if (!id || total_money.amount <= 0) return { ok: false, reason: "failed" };
+  if (!id || total_money.amount <= 0 || total_money.currency !== "USD")
+    return { ok: false, reason: "failed" };
+  // A price or a tax changed in Square after the visitor saw the total: charge nothing and
+  // show the new total. The order just created stays unpaid, which the kitchen never sees.
+  if (total_money.amount !== req.expectedTotal)
+    return {
+      ok: false,
+      reason: "changed",
+      total: total_money.amount,
+      tax: created.order.total_tax_money?.amount ?? null,
+    };
+  const done: Placed = { ok: true, total: total_money.amount, reference: id.slice(-6).toUpperCase() };
   try {
     await square(env, "/payments", {
       body: {
@@ -163,7 +216,11 @@ export async function place(
           reason: e.has("GENERIC_DECLINE") || e.has("INSUFFICIENT_FUNDS") ? "declined" : "card",
         };
     }
+    // Anything else (a timeout, a repeat of a request Square already has, Square down): the
+    // card may have been charged all the same. Ask Square before telling the visitor it
+    // failed, so a paid order is never answered with "try again".
+    if (await paid(env, id)) return done;
     throw e;
   }
-  return { ok: true, total: total_money.amount, reference: id.slice(-6).toUpperCase() };
+  return done;
 }

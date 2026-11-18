@@ -302,6 +302,31 @@ const pretzel = (
   </>
 );
 
+// the crest off the Festbier label: an ear of barley between two hop leaves, the leaves in
+// the label's blue, the kernels cut like the barley mark's
+const festSprig = (() => {
+  const hopLeaf =
+    "M0 0C-3 1.2 -6.5 0 -8.5 -3C-11 -2.6 -13 -5 -12 -8.5L-8 -8.6C-9 -12 -8 -15.5 -5.6 -17.6L-3 -14L0 -21L3 -14L5.6 -17.6C8 -15.5 9 -12 8 -8.6L12 -8.5C13 -5 11 -2.6 8.5 -3C6.5 0 3 1.2 0 0Z";
+  const kernels = [-20, -27, -34]
+    .map(
+      (y) => `M0 ${y}L-5 ${y - 2.5}V${y - 8.5}L0 ${y - 6}ZM0 ${y - 3.5}L5 ${y - 6}V${y - 12}L0 ${y - 9.5}Z`,
+    )
+    .join("");
+  return (
+    <>
+      <P d="M0 0C0.6 -8 -0.5 -15 0 -22" />
+      {[-1, 1].map((side) => (
+        <g key={side} transform={`translate(${side} -13) rotate(${46 * side}) scale(0.88)`}>
+          <P d={hopLeaf} f="sky" />
+          <P d="M0 -2V-13M0 -7L-5 -10M0 -7L5 -10" />
+        </g>
+      ))}
+      <P d={kernels} f="card" />
+      <P d="M0 -43.5V-49" />
+    </>
+  );
+})();
+
 const bottle = (
   <>
     <P d="M-7 0V-24C-7 -30 -3 -32 -2.5 -38V-46H2.5V-38C3 -32 7 -30 7 -24V0Z" f="fg" />
@@ -409,6 +434,7 @@ export const SCENES: Record<ThemeId, Piece[]> = {
     { dx: 8, art: bat, lift: 52 },
   ],
   oktoberfest: [
+    { dx: -41, art: festSprig, turn: -3 },
     { dx: -12, art: stein, turn: 8 },
     { dx: 12, art: <g transform="scale(-1 1)">{stein}</g>, turn: -8 },
     { dx: 40, art: pretzel },

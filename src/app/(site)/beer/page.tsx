@@ -149,6 +149,14 @@ export default async function BeerPage() {
                 "pro-dark-harvest",
                 "pro-camp-comet-smores",
                 "pro-goblin-glass",
+                "pro-drinkenbier",
+                "pro-farmhouse-supplies",
+                "pro-farmhouse-fire",
+                "pro-greenhorn-kellerpils",
+                "pro-greenhorn-ice",
+                "pro-grisette-beach",
+                "pro-local-lager-fireworks",
+                "pro-memory-voyage",
               ]}
             />
           </div>

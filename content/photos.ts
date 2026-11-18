@@ -39,13 +39,23 @@ import patioPlate from "../public/photos/patio-plate.webp";
 // Professional beer photographs, from Max, 2026-11-18. Every one of them is of a can whose
 // label carries the old name: the "Malting | Brewing" line is painted out on Forbidden Fruit
 // and Dark Harvest (and Dark Harvest is cropped above "house-made + roasted malts"); the two
-// Camp Comet shots, the pour and the goblin glass show none of it. Six more, of beers not
-// brewed lately, are not here yet: each needs the same check and repair first.
+// Camp Comet shots, the pour and the goblin glass show none of it. The other eight, of beers not
+// brewed lately, had the same check: that line is painted out on Farmhouse Supplies (both shots),
+// Memory Voyage and the Grisette glass, as is "and house-made malts" on Local Lager; Drinkenbier
+// and the two Greenhorn shots show none of it.
 import proCampCometSmores from "../public/photos/pro-camp-comet-smores.webp";
 import proCampCometWindow from "../public/photos/pro-camp-comet-window.webp";
 import proDarkHarvest from "../public/photos/pro-dark-harvest.webp";
+import proDrinkenbier from "../public/photos/pro-drinkenbier.webp";
+import proFarmhouseFire from "../public/photos/pro-farmhouse-fire.webp";
+import proFarmhouseSupplies from "../public/photos/pro-farmhouse-supplies.webp";
 import proForbiddenFruit from "../public/photos/pro-forbidden-fruit.webp";
 import proGoblinGlass from "../public/photos/pro-goblin-glass.webp";
+import proGreenhornIce from "../public/photos/pro-greenhorn-ice.webp";
+import proGreenhornKellerpils from "../public/photos/pro-greenhorn-kellerpils.webp";
+import proGrisetteBeach from "../public/photos/pro-grisette-beach.webp";
+import proLocalLagerFireworks from "../public/photos/pro-local-lager-fireworks.webp";
+import proMemoryVoyage from "../public/photos/pro-memory-voyage.webp";
 import proPour from "../public/photos/pro-pour.webp";
 import tanks from "../public/photos/tanks.webp";
 import taproomInside from "../public/photos/taproom-inside.webp";
@@ -224,6 +234,46 @@ export const photos = {
     src: proGoblinGlass,
     alt: "A glass of golden beer printed with a grinning goblin holding a mug",
     focal: [50, 50],
+  },
+  "pro-drinkenbier": {
+    src: proDrinkenbier,
+    alt: "A wet can of Drinkenbier copper lager with water splashing around it, against black",
+    focal: [50, 50],
+  },
+  "pro-farmhouse-supplies": {
+    src: proFarmhouseSupplies,
+    alt: "Two hands knocking together foaming cans of Farmhouse Supplies pale ale, in front of weathered boards",
+    focal: [50, 60],
+  },
+  "pro-farmhouse-fire": {
+    src: proFarmhouseFire,
+    alt: "Two cans of Farmhouse Supplies on a stone ledge behind a fire, one foaming over",
+    focal: [62, 38],
+  },
+  "pro-greenhorn-kellerpils": {
+    src: proGreenhornKellerpils,
+    alt: "A can of Greenhorn kellerpils on a tree stump beside a stemmed glass of golden beer printed with the barley mark",
+    focal: [50, 50],
+  },
+  "pro-greenhorn-ice": {
+    src: proGreenhornIce,
+    alt: "A can of Greenhorn kellerpils packed in ice, its red label showing through",
+    focal: [50, 50],
+  },
+  "pro-grisette-beach": {
+    src: proGrisetteBeach,
+    alt: "Two cans of Grisette and two glasses of hazy golden beer standing in beach sand at dusk",
+    focal: [50, 55],
+  },
+  "pro-local-lager-fireworks": {
+    src: proLocalLagerFireworks,
+    alt: "Three cans of Local Lager on a wooden crate with fireworks blurred behind them",
+    focal: [50, 68],
+  },
+  "pro-memory-voyage": {
+    src: proMemoryVoyage,
+    alt: "Three cans of Memory Voyage IPA on a rock beside a striped towel",
+    focal: [62, 45],
   },
 } as const satisfies Record<string, Photo>;
 

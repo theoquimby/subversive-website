@@ -6,6 +6,7 @@ import { eventLabels, inquiryLabels, visitLabels } from "@content/microcopy";
 import type { Metadata, Viewport } from "next";
 import { Lights } from "@/components/events/Lights";
 import { TicketLink } from "@/components/events/TicketLink";
+import { Doodle } from "@/components/graphics/Doodle";
 import { Drawing } from "@/components/home/Ways";
 import { PageWipe } from "@/components/layout/PageWipe";
 import { SectionHead } from "@/components/layout/SectionHead";
@@ -93,6 +94,8 @@ export default async function EventsPage() {
             </section>
           ))}
 
+          {/* an empty calendar: a quiet night out back, off the Camp Comet label */}
+          {coming.length === 0 ? <Doodle name="comet" className="events-empty__art" /> : null}
           {coming.length === 0 ? (
             <p className="events-empty">
               {eventLabels.empty}{" "}

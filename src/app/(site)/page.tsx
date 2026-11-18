@@ -4,7 +4,7 @@
 // Composed, not listed: each part of the page is led by a pen drawing in the margin, and
 // the drawing is the way to that part's own page.
 //   first screen (the glass, the tap, the status) · visit (the taproom: today, where, the
-//   phone) · coming up (a ticket: three tickets) · on tap (the featured beers) · from the
+//   phone) · coming up (a ticket: three tickets) · on tap (a hop: the featured beers) · from the
 //   kitchen (a burger: one photo) · where it comes from (barley: the map you can ask)
 // Hours in full, the whole menu and every event live on their own pages.
 import { labels } from "@content/labels";
@@ -12,6 +12,7 @@ import { homeLabels, microcopy, visitLabels } from "@content/microcopy";
 import { type Photo, photos } from "@content/photos";
 import type { Metadata } from "next";
 import { Can } from "@/components/beer/Can";
+import { Doodle } from "@/components/graphics/Doodle";
 import { PhotoFrame } from "@/components/graphics/PhotoFrame";
 import { Hero } from "@/components/home/Hero";
 import { PhotoStrip } from "@/components/home/PhotoStrip";
@@ -176,7 +177,12 @@ export default async function Home() {
           </section>
         ) : null}
 
-        <section className="home-section band band--plain" aria-labelledby="tap-title">
+        <section className="home-section band" aria-labelledby="tap-title">
+          {/* what is in the glass, off the Hoppy American Lager label: a hop cone and an ear
+              of barley */}
+          <Link href="/menu" className="band__art" aria-hidden="true" tabIndex={-1}>
+            <Doodle name="hop" />
+          </Link>
           <SectionHead id="tap-title" note={`${view.pourSizes.half} / ${view.pourSizes.full}`}>
             {homeLabels.onTap}
           </SectionHead>

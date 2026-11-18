@@ -136,8 +136,11 @@ test("add a burger with its options, see Square's total, pay, and get a confirma
     phone: "(518) 555-0100",
     token: "tok-test",
   });
-  // no price, no total and no card detail is ever sent by the browser
+  // no price and no card detail is ever sent by the browser; the total it was shown goes
+  // along only so the server can refuse to charge a different one
+  expect((sent.order[0] as { expectedTotal: number }).expectedTotal).toBe(2274);
   expect(Object.keys(sent.order[0] as object).sort()).toEqual([
+    "expectedTotal",
     "idempotencyKey",
     "lines",
     "name",

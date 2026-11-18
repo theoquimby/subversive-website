@@ -8,8 +8,10 @@
 //   SQUARE_ENVIRONMENT         "production" to take real money; anything else is the sandbox
 // The sandbox is the default on purpose: a half-finished setup can never charge a card.
 //
-// Facts checked against developer.squareup.com on 2026-11-15: base URLs, headers, the
-// version date, CreateOrder, CalculateOrder, CreatePayment and their error shape.
+// Facts checked against developer.squareup.com on 2026-11-15 and again on 2026-11-18: base
+// URLs, headers, the version date (2026-09-16 is a released version; 2026-11-18 is the
+// newest and has not been tried), CreateOrder, CalculateOrder, CreatePayment and their
+// error shape. Nothing here has talked to Square yet: see docs/ordering.md.
 
 const VERSION = "2026-09-16";
 
@@ -27,6 +29,12 @@ export function squareEnv(): SquareEnv | null {
   const applicationId = process.env.SQUARE_APPLICATION_ID;
   if (process.env.NEXT_PUBLIC_ORDERING !== "on" || !token || !locationId || !applicationId) return null;
   const sandbox = process.env.SQUARE_ENVIRONMENT !== "production";
+  // Square's sandbox application ids begin "sandbox-". A sandbox id with production
+  // switched on (or the reverse) is a half-changed set-up: stay off rather than guess.
+  if (applicationId.startsWith("sandbox-") !== sandbox) {
+    console.warn("order: SQUARE_APPLICATION_ID and SQUARE_ENVIRONMENT disagree; ordering stays off");
+    return null;
+  }
   return {
     sandbox,
     base: sandbox ? "https://connect.squareupsandbox.com/v2" : "https://connect.squareup.com/v2",

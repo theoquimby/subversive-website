@@ -598,6 +598,14 @@
   margin: var(--s-9) 0 0;
   color: var(--fg-muted);
 }
+/* the empty calendar's drawing: the tent under a comet, the line of words close under it */
+.events-page .events-empty__art {
+  width: clamp(5.75rem, 22vw, 9rem);
+  margin-top: var(--s-9);
+}
+.events-empty__art + .events-empty {
+  margin-top: var(--s-4);
+}
 @media (min-width: 64rem) {
   .events-page .tix {
     grid-template-columns: repeat(3, minmax(0, 1fr));

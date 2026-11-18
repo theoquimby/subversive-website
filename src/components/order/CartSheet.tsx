@@ -6,8 +6,9 @@
 // The card is typed into Square's own form (an iframe from Square, loaded only when this
 // sheet opens with something in it), which hands back a one-time token; the card's number
 // never touches this site. The total shown is Square's, tax included, asked for whenever
-// the cart changes. Paying sends the lines, the name, the phone number and the token to
-// /api/order, with a key made once per attempt so a retry can never charge twice.
+// the cart changes. Paying sends the lines, the name, the phone number, the token and the
+// total that was shown to /api/order, with a key made once per attempt so a retry can
+// never charge twice. The server charges Square's total, and only if it is the one shown.
 import { orderLabels } from "@content/microcopy";
 import { Dialog } from "radix-ui";
 import { type FormEvent, useEffect, useId, useRef, useState } from "react";
@@ -90,12 +91,15 @@ function Cart({ config, open, cart }: { config: OrderConfig; open: boolean; cart
   const [cardReady, setCardReady] = useState(false);
   const cardBox = useRef<HTMLDivElement>(null);
   const card = useRef<SquareCard | null>(null);
-  const key = useRef("");
+  // An attempt whose answer never came back, kept whole (key, card token and what was
+  // sent) so that pressing Pay again sends Square the very same request: Square then
+  // answers with the first result instead of charging again. Anything changed (the
+  // cart, the name, the phone, the total) makes it a new attempt with a new key.
+  const pending = useRef<{ key: string; token: string; sent: string } | null>(null);
   const count = cart.length;
 
   // what it costs, from Square, whenever the cart changes while the sheet is open
   useEffect(() => {
-    key.current = ""; // a changed cart is a new attempt, with a key of its own
     if (!open || count === 0) {
       setQuote(null);
       return;
@@ -166,32 +170,33 @@ function Cart({ config, open, cart }: { config: OrderConfig; open: boolean; cart
     if (!/^\+?[0-9 ().-]{7,24}$/.test(phone)) return setProblem(orderLabels.needPhone);
     setProblem("");
     setPhase({ at: "paying" });
-    // one key for this attempt: if the answer is lost and the visitor presses again with
-    // nothing changed, Square returns the first result instead of charging again
-    key.current ||= newKey();
+    const order = { lines: toLines(cart), name, phone, expectedTotal: quote.total };
+    const sent = JSON.stringify(order);
+    if (pending.current?.sent !== sent) pending.current = null;
     try {
-      const token = await card.current.tokenize({
-        amount: (quote.total / 100).toFixed(2),
-        currencyCode: "USD",
-        intent: "CHARGE",
-        customerInitiated: true,
-        sellerKeyedIn: false,
-        billingContact: { givenName: name, phone },
-      });
-      if (token.status !== "OK" || !token.token) {
-        setProblem(orderLabels.cardProblem);
-        setPhase({ at: "cart" });
-        return;
+      if (!pending.current) {
+        const token = await card.current.tokenize({
+          amount: (quote.total / 100).toFixed(2),
+          currencyCode: "USD",
+          intent: "CHARGE",
+          customerInitiated: true,
+          sellerKeyedIn: false,
+          billingContact: { givenName: name, phone },
+        });
+        if (token.status !== "OK" || !token.token) {
+          setProblem(orderLabels.cardProblem);
+          setPhase({ at: "cart" });
+          return;
+        }
+        pending.current = { key: newKey(), token: token.token, sent };
       }
       const res = await fetch("/api/order", {
         method: "POST",
         headers: { "content-type": "application/json" },
         body: JSON.stringify({
-          lines: toLines(cart),
-          name,
-          phone,
-          token: token.token,
-          idempotencyKey: key.current,
+          ...order,
+          token: pending.current.token,
+          idempotencyKey: pending.current.key,
         }),
       });
       const body = (await res.json()) as {
@@ -199,9 +204,12 @@ function Cart({ config, open, cart }: { config: OrderConfig; open: boolean; cart
         reference?: string;
         prepMinutes?: number;
         error?: string;
+        itemId?: string;
+        total?: number;
+        tax?: number | null;
       };
       if (res.ok && body.ok) {
-        key.current = "";
+        pending.current = null;
         clearCart();
         setPhase({
           at: "done",
@@ -211,19 +219,33 @@ function Cart({ config, open, cart }: { config: OrderConfig; open: boolean; cart
         });
         return;
       }
-      // a card token is single use: the next attempt is a new one with a new key
-      key.current = "";
-      setProblem(
-        body.error === "declined"
-          ? orderLabels.declined
-          : body.error === "card"
-            ? orderLabels.cardProblem
-            : body.error === "closed"
-              ? orderLabels.closed
-              : orderLabels.failed,
-      );
+      // A clear "no" (declined, closed, not available): nothing was charged, the card
+      // token is spent, and the next attempt is a new one with a new key. A server error
+      // is not a clear "no", so that attempt is kept and repeated as it was.
+      if (res.status < 500) pending.current = null;
+      if (body.error === "changed" && typeof body.total === "number") {
+        // Square's total moved since it was shown (a price or a tax changed): nothing was
+        // charged; show the new total, and Pay now names it.
+        // TODO(Max): a line of copy for this moment; until there is one, the total just updates.
+        setQuote({ total: body.total, tax: body.tax ?? null });
+      } else {
+        const gone = body.itemId ? cart.find((l) => l.itemId === body.itemId) : undefined;
+        setProblem(
+          gone
+            ? orderLabels.unavailable(gone.name)
+            : body.error === "declined"
+              ? orderLabels.declined
+              : body.error === "card"
+                ? orderLabels.cardProblem
+                : body.error === "closed"
+                  ? orderLabels.closed
+                  : body.error === "bad-phone"
+                    ? orderLabels.needPhone
+                    : orderLabels.failed,
+        );
+      }
     } catch {
-      // the answer never arrived: keep the key, so pressing again cannot charge twice
+      // the answer never arrived: keep the attempt, so pressing again cannot charge twice
       setProblem(orderLabels.failed);
     }
     setPhase({ at: "cart" });

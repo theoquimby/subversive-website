@@ -18,6 +18,9 @@ export async function POST(req: Request) {
     // the kitchen may have closed while the cart was open
     if (!config.open) return json({ error: "closed" }, 409);
     const placed = await place(env, parsed.data, config.items);
+    // the total moved since the visitor saw it: nothing charged, here is the new one
+    if (!placed.ok && placed.reason === "changed")
+      return json({ error: "changed", total: placed.total, tax: placed.tax }, 409);
     if (!placed.ok) return json({ error: placed.reason }, 402);
     return json(
       { ok: true, total: placed.total, reference: placed.reference, prepMinutes: config.prepMinutes },
