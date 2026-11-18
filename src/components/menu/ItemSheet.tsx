@@ -92,6 +92,17 @@ export function ItemSheet() {
 
   useEffect(() => {
     showItem(itemParam()); // a shared link opens on its item
+    // ...and the page behind it stands at that item's row, so closing the view leaves you
+    // at the beer you came for (Home's rows and cans link here; Theo, 2026-11-18). Twice:
+    // the arrival curtain also sets the scroll, a moment later.
+    const arrived = itemParam();
+    const toRow = () =>
+      arrived &&
+      document
+        .querySelector(`[data-menu] [data-row="${CSS.escape(arrived)}"]`)
+        ?.scrollIntoView({ block: "center", behavior: "instant" });
+    toRow();
+    const again = window.setTimeout(toRow, 450);
     const onPop = () => showItem(itemParam());
     const onClick = (e: MouseEvent) => {
       if (e.defaultPrevented || e.button !== 0 || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;
@@ -106,6 +117,7 @@ export function ItemSheet() {
     window.addEventListener("popstate", onPop);
     document.addEventListener("click", onClick);
     return () => {
+      window.clearTimeout(again);
       window.removeEventListener("popstate", onPop);
       document.removeEventListener("click", onClick);
     };

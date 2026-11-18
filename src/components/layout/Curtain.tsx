@@ -71,7 +71,9 @@ export function Curtain() {
     if (root.dataset.curtain !== "cover") return;
     // a new page opens at its top, at once, while the cover is still down (a link to a
     // place on the page keeps its own landing)
-    if (!window.location.hash) window.scrollTo({ top: 0, behavior: "instant" });
+    // (nor does a link to a menu item, ?item=: the item's view scrolls the page to its row)
+    const named = window.location.hash || new URLSearchParams(window.location.search).has("item");
+    if (!named) window.scrollTo({ top: 0, behavior: "instant" });
     for (const t of timers.current) window.clearTimeout(t);
     timers.current = [
       // a beat for the new page to paint under the cover

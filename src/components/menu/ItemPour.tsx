@@ -8,8 +8,8 @@
 //   lift   up and across in an arc, starting to lean as it goes
 //   pour   the mouth at the glass; the lean deepens as the can empties; if the head comes
 //          up to the rim the can eases back, waits, tops it up
-//   after  eased back as the last runs out, drawn clear of the glass and held upright
-//          for a moment, then set down with a small bounce
+//   after  held still a moment as the last runs out, then one unbroken move upright,
+//          clear of the glass and down, landing with a small bounce
 // Smoothness (Theo: "lots of jitter and stutters"): every move starts from where the can
 // really is, so none jumps; while it is carried the can is one composited layer, and its
 // label is a picture drawn once (Can.tsx); and there is no wobble or shake added for effect.
@@ -111,16 +111,16 @@ export function ItemPour({
     const after = async () => {
       if (stage === "after") return;
       stage = "after";
-      // eased back off the pour, the last of it running out
-      if (!(await move({ ...spout, y: spout.y - 4, r: -38 }, 700))) return;
-      await wait(250);
+      // The last of it runs out while the can holds still; then one unbroken move takes it
+      // upright, clear of the glass and down. (It was three moves with waits between: Theo,
+      // 2026-11-18, "it pauses like 3 times on the way down".)
+      await wait(650);
       if (!live) return;
-      // drawn back clear of the glass, upright, and held there a moment
-      if (!(await move({ x: spout.x * 0.3, y: spout.y * 0.62, r: -6 }, 800))) return;
-      await wait(1000);
-      if (!live) return;
-      // set down
-      if (!(await move({ x: 0, y: 0, r: 0 }, 820))) return;
+      const down = await move({ x: 0, y: 0, r: 0 }, 1500, SOFT, [
+        { x: spout.x * 0.78, y: spout.y - 8, r: -44 },
+        { x: spout.x * 0.3, y: spout.y * 0.62, r: -8 },
+      ]);
+      if (!down) return;
       hand.animate(
         [
           { transform: "translateY(0)" },
