@@ -11,6 +11,8 @@ import { brewLabels, menuLabels } from "@content/microcopy";
 import { Dialog } from "radix-ui";
 import { type KeyboardEvent, useCallback, useEffect, useState } from "react";
 import type { Show } from "@/lib/menu/filters";
+import { MOTIFS } from "../beer/motifs";
+import { Doodle } from "../graphics/Doodle";
 import { AddToOrder } from "../order/AddToOrder";
 import { Sheet } from "../ui/Sheet";
 import { TextLink } from "../ui/TextLink";
@@ -149,6 +151,7 @@ export function ItemSheet() {
 
   // one price sits beside the name; a price per pour size gets its own line
   const single = item && item.prices.length === 1 ? item.prices[0]?.[1] : undefined;
+  const motif = item ? MOTIFS[item.id] : undefined;
 
   return (
     <Sheet
@@ -173,6 +176,8 @@ export function ItemSheet() {
           <div className="item__head">
             <Dialog.Title className="item__name">{item.name}</Dialog.Title>
             {single ? <span className="item__price tabular">{single}</span> : null}
+            {/* the beer's own mark, where its label has given us one */}
+            {motif ? <Doodle key={motif} name={motif} className="item__motif" drawn /> : null}
           </div>
           {item.meta || item.badge ? (
             <p className="item__meta">

@@ -162,3 +162,21 @@
     opacity: 0;
   }
 }
+
+/* ---------- Many photographs (Our beer: Max's fourteen) ----------
+   The row of five was built for one large photo and four small. With more, a wide screen
+   gets an even grid, seven across, every photo the same upright shape; a phone keeps the
+   row pushed along with a finger. */
+@media (min-width: 64rem) {
+  .gallery--many {
+    grid-template-columns: repeat(7, minmax(0, 1fr));
+    align-items: start;
+    row-gap: var(--s-5);
+  }
+  .gallery--many .gallery__item .gallery__thumb {
+    aspect-ratio: 4 / 5;
+  }
+  .gallery--many .gallery__item:first-child .gallery__thumb {
+    rotate: -0.6deg;
+  }
+}

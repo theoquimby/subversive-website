@@ -254,13 +254,23 @@ export const DOODLES = {
 
 export type DoodleName = keyof typeof DOODLES;
 
-export function Doodle({ name, className }: { name: DoodleName; className?: string }) {
+export function Doodle({
+  name,
+  className,
+  drawn = false,
+}: {
+  name: DoodleName;
+  className?: string;
+  /** already inked, its loop running: for a drawing that arrives after the page has been
+   *  looked over for things to draw in (one inside a sheet) */
+  drawn?: boolean;
+}) {
   const { box, parts } = DOODLES[name];
   return (
     <svg
       viewBox={box}
       className={className ? `pen doodle ${className}` : "pen doodle"}
-      data-draw=""
+      data-draw={drawn ? "in" : ""}
       aria-hidden="true"
       focusable="false"
     >

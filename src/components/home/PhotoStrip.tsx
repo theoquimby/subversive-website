@@ -8,11 +8,18 @@ import { type PhotoId, photos } from "@content/photos";
 import Image from "next/image";
 import { Lightbox } from "./Lightbox";
 
-export function PhotoStrip({ ids }: { ids: readonly PhotoId[] }) {
+export function PhotoStrip({
+  ids,
+  many = false,
+}: {
+  ids: readonly PhotoId[];
+  /** more than a handful: on a wide screen an even grid, not one large and four small */
+  many?: boolean;
+}) {
   const items = ids.map((id) => ({ id, src: photos[id].src, alt: photos[id].alt }));
   return (
     <Lightbox items={items}>
-      <ul className="gallery" aria-label={galleryLabels.group}>
+      <ul className={many ? "gallery gallery--many" : "gallery"} aria-label={galleryLabels.group}>
         {ids.map((id, i) => {
           const p = photos[id];
           return (

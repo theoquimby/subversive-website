@@ -369,3 +369,20 @@
     transform: scaleY(0.78);
   }
 }
+
+/* ---------- A beer's mark in the pen (src/components/beer/motifs.ts) ---------- */
+/* at the head of the beer's view, opposite its name */
+.item__head .item__motif {
+  flex: none;
+  align-self: center;
+  width: 4rem;
+  height: auto;
+  margin-left: auto;
+}
+/* at the end of a library row for a beer not on the menu, where a price would stand */
+.library .library__motif {
+  align-self: center;
+  justify-self: end;
+  width: 3.25rem;
+  height: auto;
+}

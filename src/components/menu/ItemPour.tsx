@@ -9,7 +9,7 @@
 //   pour   the mouth at the glass; the lean deepens as the can empties; if the head comes
 //          up to the rim the can eases back, waits, tops it up
 //   after  held still a moment as the last runs out, then one unbroken move upright,
-//          clear of the glass and down, landing with a small bounce
+//          clear of the glass and down, set down softly
 // Smoothness (Theo: "lots of jitter and stutters"): every move starts from where the can
 // really is, so none jumps; while it is carried the can is one composited layer, and its
 // label is a picture drawn once (Can.tsx); and there is no wobble or shake added for effect.
@@ -121,16 +121,7 @@ export function ItemPour({
         { x: spout.x * 0.3, y: spout.y * 0.62, r: -8 },
       ]);
       if (!down) return;
-      hand.animate(
-        [
-          { transform: "translateY(0)" },
-          { transform: "translateY(-5px)" },
-          { transform: "translateY(0)" },
-          { transform: "translateY(-1.5px)" },
-          { transform: "translateY(0)" },
-        ],
-        { duration: 420, easing: OUT },
-      );
+      // (no bounce on landing: it read as the can hopping off the table; Theo, 2026-11-18)
       run?.cancel();
       run = undefined;
       setAloft(false);

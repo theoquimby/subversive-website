@@ -11,6 +11,8 @@ import type { Metadata } from "next";
 import { BrewProcess } from "@/components/beer/BrewProcess";
 import { Can } from "@/components/beer/Can";
 import { CanLink } from "@/components/beer/CanLink";
+import { MOTIFS } from "@/components/beer/motifs";
+import { Doodle, type DoodleName } from "@/components/graphics/Doodle";
 import { PhotoFrame } from "@/components/graphics/PhotoFrame";
 import { PhotoStrip } from "@/components/home/PhotoStrip";
 import { Drawing } from "@/components/home/Ways";
@@ -131,6 +133,10 @@ export default async function BeerPage() {
                             <span className="mrow__meta">{b.style}</span>
                           </span>
                         </span>
+                        {/* where a price would stand: the beer's mark, off its label */}
+                        {MOTIFS[b.id] ? (
+                          <Doodle name={MOTIFS[b.id] as DoodleName} className="library__motif" />
+                        ) : null}
                       </span>
                     </div>
                   </li>
@@ -142,6 +148,7 @@ export default async function BeerPage() {
           {/* Max's photographs of the beers (2026-11-18); each opens large */}
           <div className="beer-top__wide">
             <PhotoStrip
+              many
               ids={[
                 "pro-forbidden-fruit",
                 "pro-pour",
