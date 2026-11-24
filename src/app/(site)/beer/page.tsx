@@ -103,45 +103,58 @@ export default async function BeerPage() {
               <SectionHead id="tap-title" note={`${view.pourSizes.half} / ${view.pourSizes.full}`}>
                 {libraryLabels.title}
               </SectionHead>
-              <ul className="mlist library">
-                {taps.map((row, i) => (
-                  <MenuRow
-                    key={row.id}
-                    row={row}
-                    index={i}
-                    detail
-                    note={libraryLabels.onTap}
-                    lead={
-                      <CanLink id={row.id}>
-                        <Can
-                          label={labels[row.id]}
-                          name={row.item.name}
-                          color={isBeer(row.item) ? row.item.color : undefined}
-                        />
-                      </CanLink>
-                    }
-                  />
-                ))}
-                {offMenu.map((b) => (
-                  <li key={b.id} className="mrow mrow--lead">
-                    <Can label={labels[b.id]} name={b.name} />
-                    <div className="mrow__box">
-                      <span className="mrow__sum">
-                        <span className="mrow__main">
-                          <span className="mrow__name">{b.name}</span>
-                          <span className="mrow__line">
-                            <span className="mrow__meta">{b.style}</span>
+              {/* two groups under plain heads, as the menu groups its beers: a badge on
+                  eleven rows of thirteen said nothing (polish pass 1, 2026-11-23) */}
+              <div className="mgroup">
+                <h3 className="mgroup__head">
+                  <span className="mgroup__title">{libraryLabels.onTap}</span>
+                </h3>
+                <ul className="mlist library">
+                  {taps.map((row, i) => (
+                    <MenuRow
+                      key={row.id}
+                      row={row}
+                      index={i}
+                      detail
+                      lead={
+                        <CanLink id={row.id}>
+                          <Can
+                            label={labels[row.id]}
+                            name={row.item.name}
+                            color={isBeer(row.item) ? row.item.color : undefined}
+                          />
+                        </CanLink>
+                      }
+                    />
+                  ))}
+                </ul>
+              </div>
+              <div className="mgroup">
+                <h3 className="mgroup__head">
+                  <span className="mgroup__title">{libraryLabels.notOnTap}</span>
+                </h3>
+                <ul className="mlist library">
+                  {offMenu.map((b) => (
+                    <li key={b.id} className="mrow mrow--lead">
+                      <Can label={labels[b.id]} name={b.name} />
+                      <div className="mrow__box">
+                        <span className="mrow__sum">
+                          <span className="mrow__main">
+                            <span className="mrow__name">{b.name}</span>
+                            <span className="mrow__line">
+                              <span className="mrow__meta">{b.style}</span>
+                            </span>
                           </span>
+                          {/* where a price would stand: the beer's mark, off its label */}
+                          {MOTIFS[b.id] ? (
+                            <Doodle name={MOTIFS[b.id] as DoodleName} className="library__motif" />
+                          ) : null}
                         </span>
-                        {/* where a price would stand: the beer's mark, off its label */}
-                        {MOTIFS[b.id] ? (
-                          <Doodle name={MOTIFS[b.id] as DoodleName} className="library__motif" />
-                        ) : null}
-                      </span>
-                    </div>
-                  </li>
-                ))}
-              </ul>
+                      </div>
+                    </li>
+                  ))}
+                </ul>
+              </div>
             </section>
           </div>
 

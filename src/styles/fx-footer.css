@@ -77,10 +77,13 @@
   width: fit-content;
   padding-block: 11px;
   color: var(--fg);
-  font-family: var(--ff-display);
-  font-weight: 400;
-  font-size: var(--t-subline);
-  line-height: 1.25;
+  /* the condensed face, as Visit sets the same address and number: the display face's
+     figures are heavy and uneven at this size (polish pass 1, 2026-11-23) */
+  font-family: var(--ff-utility);
+  font-weight: 700;
+  font-size: 1.25rem;
+  line-height: 1.2;
+  letter-spacing: 0.005em;
   text-decoration: none;
 }
 .site-footer__fact > span {

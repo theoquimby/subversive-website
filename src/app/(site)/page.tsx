@@ -186,31 +186,34 @@ export default async function Home() {
           <SectionHead id="tap-title" note={`${view.pourSizes.half} / ${view.pourSizes.full}`}>
             {homeLabels.onTap}
           </SectionHead>
-          {/* the featured beers as cans, in Max's labels: each one spins under a finger, and
-              a tap on a can or a row opens that beer on the menu */}
-          <ul className="can-row">
-            {featured.map((row) => (
-              <li key={row.id}>
-                {/* the row below is the named link; the can is a second way in */}
-                <Link
-                  href={`/menu?item=${encodeURIComponent(row.id)}`}
-                  className="can-link"
-                  aria-hidden="true"
-                  tabIndex={-1}
-                  draggable={false}
-                >
-                  <Can
-                    label={labels[row.id]}
-                    name={row.item.name}
-                    color={isBeer(row.item) ? row.item.color : undefined}
-                  />
-                </Link>
-              </li>
-            ))}
-          </ul>
+          {/* The featured beers, each with its can beside it in Max's label. One list, not
+              a row of cans and then the same four beers again (polish pass 1, 2026-11-23).
+              A tap on a can or a row opens that beer on the menu; a can spins under a
+              finger. */}
           <ul className="mlist home-tap">
             {featured.map((row, i) => (
-              <MenuRow key={row.id} row={row} index={i} to={`/menu?item=${encodeURIComponent(row.id)}`} />
+              <MenuRow
+                key={row.id}
+                row={row}
+                index={i}
+                to={`/menu?item=${encodeURIComponent(row.id)}`}
+                lead={
+                  // the row is the named link; the can is a second way in
+                  <Link
+                    href={`/menu?item=${encodeURIComponent(row.id)}`}
+                    className="can-link"
+                    aria-hidden="true"
+                    tabIndex={-1}
+                    draggable={false}
+                  >
+                    <Can
+                      label={labels[row.id]}
+                      name={row.item.name}
+                      color={isBeer(row.item) ? row.item.color : undefined}
+                    />
+                  </Link>
+                }
+              />
             ))}
           </ul>
           <TextLink href="/menu">{homeLabels.fullMenu}</TextLink>

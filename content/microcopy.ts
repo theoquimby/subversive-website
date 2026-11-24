@@ -133,6 +133,7 @@ export const aboutLabels = { title: "About", founders: "Founders" } as const;
 export const libraryLabels = {
   title: "Beer library",
   onTap: "On tap now",
+  notOnTap: "Not on tap now",
 } as const;
 
 export const homeLabels = {

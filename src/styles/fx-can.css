@@ -386,3 +386,26 @@
   width: 3.25rem;
   height: auto;
 }
+
+/* ---------- Polish pass 1 (2026-11-23) ---------- */
+/* Our beer's library on a wide screen: two columns, as the menu sets its beers. One column
+   left each row a short line of text and a price a full page-width away from it. */
+@media (min-width: 64rem) {
+  .library {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    column-gap: var(--s-10);
+  }
+  /* the hairline above each row, which the second column's first row would lack */
+  .library > .mrow + .mrow {
+    border-top: 0;
+  }
+  .library > .mrow {
+    border-bottom: 1px solid var(--hair);
+  }
+}
+/* Home's On tap: the can stands a little smaller beside a two-line row */
+.home-tap .mrow--lead .can {
+  margin-block: var(--s-2);
+  font-size: 0.26rem;
+}

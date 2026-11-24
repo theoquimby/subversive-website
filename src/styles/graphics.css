@@ -1245,3 +1245,21 @@ body::after {
 .home-visit__photo {
   margin-top: var(--s-5);
 }
+
+/* Polish pass 1 (2026-11-23): on a wide screen a reel of three is three across, inside the
+   column; it had run past the column's edge and stopped mid-photograph. */
+@media (min-width: 64rem) {
+  .reel {
+    display: grid;
+    grid-auto-flow: column;
+    grid-auto-columns: minmax(0, 1fr);
+    overflow: visible;
+    margin-inline: 0;
+    padding-inline: 0;
+  }
+  .reel > .photo {
+    width: auto;
+    height: auto;
+    aspect-ratio: 4 / 3;
+  }
+}
