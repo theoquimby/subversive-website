@@ -147,7 +147,19 @@ export default async function VisitPage() {
                 ) : (
                   <div className="stop__pic stop__pic--play">{stop.pic.play}</div>
                 )}
-                {i < stops.length - 1 ? <Doodle name="trail" className="stop__trail" /> : null}
+                {/* the way on to the next stop: a dotted path, swinging the other way each
+                    time (it was a small squiggle that read as a stray mark; polish pass 3) */}
+                {i < stops.length - 1 ? (
+                  <svg
+                    viewBox="0 0 240 44"
+                    preserveAspectRatio="none"
+                    className="stop__way"
+                    aria-hidden="true"
+                    focusable="false"
+                  >
+                    <path d="M8 6C70 4 84 40 128 34S196 8 232 38" />
+                  </svg>
+                ) : null}
               </li>
             ))}
           </ol>

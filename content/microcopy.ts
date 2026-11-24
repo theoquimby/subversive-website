@@ -240,6 +240,7 @@ export const orderLabels = {
 export const galleryLabels = {
   group: "Photos of the brewery",
   open: (alt: string) => `Open photo: ${alt}`,
+  all: (n: number) => `All ${n} photos`,
   close: "Close",
   previous: "Previous photo",
   next: "Next photo",

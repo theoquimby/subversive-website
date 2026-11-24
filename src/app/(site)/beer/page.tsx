@@ -162,6 +162,7 @@ export default async function BeerPage() {
           <div className="beer-top__wide">
             <PhotoStrip
               many
+              show={6}
               ids={[
                 "pro-forbidden-fruit",
                 "pro-pour",

@@ -618,18 +618,25 @@
   background: var(--surface);
 }
 
-/* the way on, turning the other way each time */
-.stop .stop__trail {
+/* the way on: a dotted path from this stop toward the next, swinging the other way each
+   time. Dots of the pen's own weight; the path stretches, the dots do not. */
+.stop .stop__way {
   justify-self: center;
-  width: 3.5rem;
+  width: min(15rem, 62%);
+  height: 2.75rem;
   margin: 0;
+  overflow: visible;
 }
-.stop:nth-child(even) .stop__trail {
+.stop:nth-child(even) .stop__way {
   scale: -1 1;
 }
-.stop__trail path {
-  stroke: color-mix(in srgb, var(--fg) 62%, transparent);
-  stroke-width: 3.6;
+.stop__way path {
+  fill: none;
+  stroke: color-mix(in srgb, var(--fg) 55%, transparent);
+  stroke-width: 3px;
+  stroke-linecap: round;
+  stroke-dasharray: 0.1 9;
+  vector-effect: non-scaling-stroke;
 }
 
 @media (min-width: 64rem) {
@@ -677,10 +684,11 @@
     grid-column: 1;
     justify-self: start;
   }
-  .stop .stop__trail {
+  .stop .stop__way {
     grid-row: 2;
     grid-column: 1 / -1;
-    width: 4.5rem;
+    width: min(26rem, 44%);
+    height: 3.25rem;
   }
 }
 

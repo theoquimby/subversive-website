@@ -54,7 +54,11 @@ export function TicketLink({
         ) : e.startTime ? (
           <span className="tix__time tabular">{formatClock(e.startTime)}</span>
         ) : null}
-        <EventMark kind={e.kind} title={e.displayTitle} className="tix__mark" />
+        {/* a mark that is on every row marks nothing: in a list of games the stub's two
+            strokes say "game"; the ball is kept for tonight's ticket (polish pass 3) */}
+        {e.kind !== "GAME" || tonight || lit ? (
+          <EventMark kind={e.kind} title={e.displayTitle} className="tix__mark" />
+        ) : null}
       </span>
     </Link>
   );

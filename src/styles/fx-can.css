@@ -419,3 +419,9 @@
   margin-block: var(--s-2);
   font-size: 0.26rem;
 }
+
+/* Polish pass 3 (2026-11-23): in a list the plain can (a beer with no label yet) shows its
+   band alone. Its name stands beside it; on the can it was three pixels tall. */
+.mrow--lead .can__house-name {
+  display: none;
+}

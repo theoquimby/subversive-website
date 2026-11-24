@@ -20,7 +20,7 @@ import { getMenu } from "@/lib/menu/source";
 import { buildMenuView, draftBeers, type ItemView, type SectionView } from "@/lib/menu/view";
 import { getSite } from "@/lib/site/site";
 import { now } from "@/lib/time/now";
-import { formatMonthDay, nyParts } from "@/lib/time/ny";
+import { nyParts } from "@/lib/time/ny";
 
 export const revalidate = 3600;
 export const metadata: Metadata = {
@@ -65,9 +65,6 @@ export default async function MenuPage() {
         <header className="menu-head">
           <h1 className="page__title">Menu</h1>
           <OpenNow className="menu-head__open" />
-          <p className="menu-head__updated">
-            <time dateTime={view.updated}>{menuLabels.updated(formatMonthDay(view.updated))}</time>
-          </p>
           <Under21Note />
         </header>
 

@@ -11,16 +11,21 @@ import { Lightbox } from "./Lightbox";
 export function PhotoStrip({
   ids,
   many = false,
+  show,
 }: {
   ids: readonly PhotoId[];
   /** more than a handful: on a wide screen an even grid, not one large and four small */
   many?: boolean;
+  /** show only the first so many on the page; the rest are in the large view, reached by
+   *  the arrows or by the "All n photos" link under the row */
+  show?: number;
 }) {
+  const shown = show ? ids.slice(0, show) : ids;
   const items = ids.map((id) => ({ id, src: photos[id].src, alt: photos[id].alt }));
   return (
     <Lightbox items={items}>
       <ul className={many ? "gallery gallery--many" : "gallery"} aria-label={galleryLabels.group}>
-        {ids.map((id, i) => {
+        {shown.map((id, i) => {
           const p = photos[id];
           return (
             <li key={id} className="gallery__item">
@@ -45,6 +50,13 @@ export function PhotoStrip({
           );
         })}
       </ul>
+      {shown.length < ids.length ? (
+        <p className="gallery__all">
+          <button type="button" className="text-link" data-photo={shown.length} aria-haspopup="dialog">
+            {galleryLabels.all(ids.length)}
+          </button>
+        </p>
+      ) : null}
     </Lightbox>
   );
 }

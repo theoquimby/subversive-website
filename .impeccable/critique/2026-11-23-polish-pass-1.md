@@ -106,3 +106,14 @@ Status: **fixed** in this pass, **proposed** (needs Theo's or Max's call), or **
 - **left** 24: a caption naming the founders under the photograph would imply who stands
   where, which is not known here. Needs Max.
 - **left** 15: nothing specific enough to change on Visit's first screen.
+
+## Pass 3 (same day): the open choices, on Theo's go-ahead ("Yes, do those")
+
+- **done** 14: Visit's way from stop to stop is a dotted path, swinging the other way each
+  time, in place of the small squiggle.
+- **done** 13: the ball is gone from lists of games (the stub's two strokes say "game"); it
+  stays on tonight's ticket and on the event's own page. Other kinds keep their mark.
+- **done** 10: the menu no longer prints "Updated <date>".
+- **done** 21: six photographs on Our beer, "All 14 photos" opening the rest in the large view.
+- **done** 19: in a list the plain can shows its band alone.
+- **open, Max's** 6: what leads "Coming up" on Home.

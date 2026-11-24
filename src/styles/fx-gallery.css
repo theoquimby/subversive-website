@@ -180,3 +180,21 @@
     rotate: -0.6deg;
   }
 }
+
+/* ---------- A chosen few on the page, all in the large view (polish pass 3) ---------- */
+.gallery__all {
+  margin: var(--s-3) 0 0;
+}
+.gallery__all .text-link {
+  padding: 0;
+  border: 0;
+  background-color: transparent;
+  font: inherit;
+  cursor: pointer;
+}
+@media (min-width: 64rem) {
+  /* six across: the even grid was cut for fourteen */
+  .gallery--many {
+    grid-template-columns: repeat(6, minmax(0, 1fr));
+  }
+}
