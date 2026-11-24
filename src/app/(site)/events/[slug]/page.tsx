@@ -3,6 +3,7 @@
 // description, good to know, one primary action (add to calendar) with directions and
 // share beside it, and the tickets before and after. No torn stub, scoreboard or band. A renamed event redirects (308) to its
 // canonical slug; a past one that is gone says "This one's over".
+
 import { eventLabels, microcopy } from "@content/microcopy";
 import type { Metadata, Viewport } from "next";
 import { notFound, permanentRedirect } from "next/navigation";
@@ -13,6 +14,7 @@ import { EventMark } from "@/components/events/EventMark";
 import { dateParts, detailLine } from "@/components/events/EventTicket";
 import { Lights } from "@/components/events/Lights";
 import { GameStrokes, TicketLink } from "@/components/events/TicketLink";
+import { PhotoFrame } from "@/components/graphics/PhotoFrame";
 import { Sticker } from "@/components/graphics/Sticker";
 import { PageWipe } from "@/components/layout/PageWipe";
 import { ShareButton } from "@/components/menu/ShareButton";
@@ -127,6 +129,16 @@ export default async function EventPage({ params }: Params) {
               </p>
             </div>
           </header>
+          {/* wide screens: the fire and two beers, out back at night, in the half of the
+              page the ticket and its text leave empty (polish pass 2, 2026-11-23) */}
+          <div className="event-page__photo">
+            <PhotoFrame
+              id="firepit-beers"
+              ratio="4/5"
+              reveal={false}
+              sizes="(min-width: 1024px) 380px, 1px"
+            />
+          </div>
           <EventDescription text={e.description} />
           {facts.length > 0 ? (
             <section className="event-facts" aria-labelledby="facts-title">

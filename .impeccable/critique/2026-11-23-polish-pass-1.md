@@ -2,12 +2,12 @@
 
 Method: every page captured as scrolled screens at 390 and 1280 px from a production build,
 then read screen by screen as a critic, a PM and an owner would. Each finding names the
-principle it breaks. Sources leaned on: Bringhurst, *The Elements of Typographic Style*
-(measure, rhythm, figures); Butterick, *Practical Typography* (line length, hierarchy by
-few means); Wathan and Schoger, *Refactoring UI* (de-emphasise instead of over-emphasise,
+principle it breaks. Sources leaned on: Bringhurst, _The Elements of Typographic Style_
+(measure, rhythm, figures); Butterick, _Practical Typography_ (line length, hierarchy by
+few means); Wathan and Schoger, _Refactoring UI_ (de-emphasise instead of over-emphasise,
 don't label what the position already says, white space as the first tool); Nielsen
 Norman Group (redundancy, recognition over recall, links that say where they go); Müller-
-Brockmann, *Grid Systems* (one grid, held).
+Brockmann, _Grid Systems_ (one grid, held).
 
 Status: **fixed** in this pass, **proposed** (needs Theo's or Max's call), or **next**.
 
@@ -88,3 +88,21 @@ Status: **fixed** in this pass, **proposed** (needs Theo's or Max's call), or **
 24. **next** About: the founders line ends the page abruptly; the photo could carry their
     names as a caption.
 25. The 404 is the best page on the site. Leave it.
+
+## Pass 2 (same day): what was done with the "next" list
+
+- **fixed** 20: a label is four fifths of the can's body, bare can above and below as on a
+  real one, so its name reads whole at rest.
+- **fixed** 11: the event page's empty half on a wide screen holds the firepit photograph.
+- **fixed** 7: the kitchen photograph keeps its burger (focal point lowered).
+- **fixed** 23: the form's "Email or phone" hint sits with the two fields it speaks for.
+- **fixed** 3: the Safari-engine suite runs four at a time; 224 pass with no retries.
+- **withdrawn** 9: measured, the phone descriptions already run the row's full width; the
+  ragged right was ordinary wrapping.
+- **left** 8, 12: an odd count leaves one row beside an empty column. Every cure looked
+  worse (a full-width last row puts its price a page away from its name).
+- **left** 2: three links across on a phone needs a ragged flow; the even two-column grid
+  looks more made.
+- **left** 24: a caption naming the founders under the photograph would imply who stands
+  where, which is not known here. Needs Max.
+- **left** 15: nothing specific enough to change on Visit's first screen.

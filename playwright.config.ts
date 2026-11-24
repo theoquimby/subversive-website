@@ -13,6 +13,9 @@ export default defineConfig({
   testDir: "tests",
   testMatch: ["e2e/**/*.spec.ts"],
   fullyParallel: true,
+  // WebKit under every core on one machine starved itself: navigation and axe tests timed
+  // out in the full run and passed alone. Four at a time is steady. (2026-11-23)
+  workers: ci ? 4 : undefined,
   forbidOnly: ci,
   retries: ci ? 1 : 0,
   reporter: ci ? [["github"], ["list"]] : "list",

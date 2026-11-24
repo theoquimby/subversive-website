@@ -74,7 +74,8 @@ export const photos = {
   "burger-and-beer": {
     src: burgerAndBeer,
     alt: "A smash burger and a glass of golden beer printed with the barley mark, on the bar",
-    focal: [55, 60],
+    // low: the burger sits at the photograph's foot and a wide crop cut through it
+    focal: [55, 82],
   },
   "burger-and-beer-wide": {
     src: burgerAndBeerWide,

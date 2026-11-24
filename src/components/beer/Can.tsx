@@ -27,6 +27,8 @@ import { KERNELS } from "../graphics/BarleyMark";
 
 /** the wrap is this many times the can's visible width: a turn shows all of it */
 const WRAP = 3.1;
+/** a label's height as a share of the can's body */
+const LABEL = 0.8;
 const FRICTION = 1.6; // per second
 const DETENT = 26; // spring to face front, per second squared
 const REST = 0.004;
@@ -242,7 +244,10 @@ export function Can({ label, name, color, open = false, alive, className }: Prop
 
   // the front's width as a share of the whole wrap (a tall can: the body is 9.4 wide and
   // 18.85 tall, the proportions of the 16 oz cans in Max's photos)
-  const front = label ? Math.min(0.75, (label.ratio * (18.85 / 9.4)) / WRAP) : 0.46;
+  // The label stands LABEL of the body's height, the can bare above and below it, as on a
+  // real can: a label the body's full height showed barely half its width at rest and cut
+  // the beer's name ("heap Dills"). (polish pass 2, 2026-11-23)
+  const front = label ? Math.min(0.75, (label.ratio * ((18.85 * LABEL) / 9.4)) / WRAP) : 0.46;
   const look = {
     "--can-bg": label?.bg ?? "var(--card)",
     "--can-ink": label?.on === "light" ? "var(--bone)" : "var(--ink)",

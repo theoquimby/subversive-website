@@ -1065,7 +1065,9 @@ textarea.field__input {
 /* ---------- Review pass 2026-11-15: the inquiry form and the 404 ---------- */
 /* said before the two fields, not after a failed send */
 .inquiry__either {
-  margin: 0 0 calc(-1 * var(--s-3));
+  /* it speaks for the two fields under it: more air above than below (it sat midway and
+     read as a note on Name; polish pass 2, 2026-11-23) */
+  margin: var(--s-4) 0 calc(-1 * var(--s-4));
   color: var(--fg);
   font-size: var(--t-small);
 }

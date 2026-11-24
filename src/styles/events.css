@@ -1042,3 +1042,27 @@
 .event-page > .eticket {
   margin-bottom: var(--s-2);
 }
+
+/* ---------- Polish pass 2 (2026-11-23): an event's page on a wide screen ----------
+   The ticket and its text keep their 46rem column; a photograph of the place at night
+   stands in the rest, beside the text under the ticket. Not shown below 64rem. */
+.event-page__photo {
+  display: none;
+}
+@media (min-width: 64rem) {
+  .event-page {
+    position: relative;
+    max-width: none;
+  }
+  .event-page > * {
+    max-width: 46rem;
+  }
+  .event-page > .event-page__photo {
+    display: block;
+    position: absolute;
+    top: calc(var(--s-7) + var(--s-9));
+    right: var(--gutter);
+    width: min(22rem, 100% - 46rem - var(--gutter) * 2 - var(--s-9));
+    rotate: 1.2deg;
+  }
+}

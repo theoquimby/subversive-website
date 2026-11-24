@@ -52,6 +52,16 @@
   display: block;
   pointer-events: none;
 }
+/* a label is four fifths of the body's height, centred: the can shows bare above and below
+   it (Can.tsx, LABEL) */
+.can__turn > .can__label,
+.can__turn > .can__art {
+  align-self: center;
+  height: 80%;
+}
+.can__art > .can__label {
+  height: 100%;
+}
 .can__back {
   display: grid;
   flex: 1;
